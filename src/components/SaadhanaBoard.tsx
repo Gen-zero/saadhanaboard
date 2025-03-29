@@ -12,10 +12,28 @@ const SaadhanaBoard = () => {
   const [showManifestationForm, setShowManifestationForm] = useState(false);
   const [view3D, setView3D] = useState(false); // Toggle between 2D and 3D view
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [cursorType, setCursorType] = useState<'normal' | 'pointer' | 'text'>('normal');
   
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       setCursorPosition({ x: e.clientX, y: e.clientY });
+      
+      // Determine cursor type based on what's under the mouse
+      const target = e.target as HTMLElement;
+      if (target.tagName === 'BUTTON' || 
+          target.tagName === 'A' || 
+          target.closest('[role="button"]') || 
+          target.classList.contains('clickable') ||
+          target.classList.contains('cursor-pointer') ||
+          target.style.cursor === 'pointer') {
+        setCursorType('pointer');
+      } else if (target.tagName === 'INPUT' || 
+                target.tagName === 'TEXTAREA' || 
+                target.getAttribute('contenteditable') === 'true') {
+        setCursorType('text');
+      } else {
+        setCursorType('normal');
+      }
     };
     
     window.addEventListener('mousemove', handleMouseMove);
@@ -53,16 +71,31 @@ My Offerings:
 ${sadhanaData.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
   `;
 
+  const getCursorImage = () => {
+    switch (cursorType) {
+      case 'pointer':
+        return '/lovable-uploads/78bb9c75-79b6-4c3e-958c-246c7885b486.png';
+      case 'text':
+        return '/lovable-uploads/83b14924-2205-4bc9-9ef3-2dda313ef1e6.png';
+      default:
+        return '/lovable-uploads/4cdff1a6-c974-418e-a7af-3d09a0c67fb4.png';
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in relative">
-      <div 
-        className="cosmic-cursor fixed w-12 h-12 rounded-full pointer-events-none z-50 mix-blend-screen"
+      <img 
+        src={getCursorImage()}
+        className="cosmic-cursor cursor-pulse"
         style={{
-          background: 'radial-gradient(circle, rgba(147,51,234,0.7) 0%, rgba(139,92,246,0.3) 50%, rgba(0,0,0,0) 70%)',
-          left: `${cursorPosition.x - 24}px`,
-          top: `${cursorPosition.y - 24}px`,
-          transform: 'translate(0, 0)',
-          transition: 'transform 0.1s ease-out, opacity 0.3s ease-out'
+          left: `${cursorPosition.x}px`,
+          top: `${cursorPosition.y}px`,
+          transform: 'translate(-50%, -50%)',
+          position: 'fixed',
+          width: '40px',
+          height: '40px',
+          zIndex: 9999,
+          pointerEvents: 'none'
         }}
       />
       

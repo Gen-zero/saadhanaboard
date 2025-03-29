@@ -40,6 +40,19 @@ body::before {
   transform: translateZ(0);
 }
 
+/* Custom cursor styles */
+body {
+  cursor: url('/lovable-uploads/4cdff1a6-c974-418e-a7af-3d09a0c67fb4.png'), auto;
+}
+
+a, button, [role="button"], .clickable, .cursor-pointer {
+  cursor: url('/lovable-uploads/78bb9c75-79b6-4c3e-958c-246c7885b486.png'), pointer !important;
+}
+
+input, textarea, [contenteditable="true"] {
+  cursor: url('/lovable-uploads/83b14924-2205-4bc9-9ef3-2dda313ef1e6.png'), text !important;
+}
+
 /* Scroll-specific cosmic styles */
 .cosmic-scroll-container {
   position: relative;
@@ -92,4 +105,34 @@ body::before {
 
 .paper-scroll-glow:hover::after {
   opacity: 1;
+}
+
+/* Cosmic cursor styling */
+.cosmic-cursor {
+  transition: transform 0.1s ease-out, opacity 0.2s ease;
+  pointer-events: none;
+  position: fixed;
+  z-index: 9999;
+  mix-blend-mode: screen;
+}
+
+.cosmic-cursor-normal {
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
+}
+
+.cosmic-cursor-pointer {
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
+}
+
+.cosmic-cursor-text {
+  width: 40px;
+  height: 40px;
+  margin-left: -20px;
+  margin-top: -20px;
 }

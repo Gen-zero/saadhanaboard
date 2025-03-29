@@ -10,7 +10,6 @@
 
   body {
     @apply bg-background text-foreground font-poppins;
-    cursor: none; /* Hide default cursor for cosmic cursor */
   }
   
   /* Custom Scrollbar */
