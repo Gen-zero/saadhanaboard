@@ -3,7 +3,7 @@ import { useRef } from 'react';
 import { PerspectiveCamera, Environment } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import YantraGroup from './YantraGroup';
+import YantraGroup, { YantraProps } from './YantraGroup';
 import PaperScroll from './PaperScroll';
 import EnvironmentEffects from './EnvironmentEffects';
 
@@ -15,7 +15,7 @@ const SceneContainer = ({ paperContent }: SceneContainerProps) => {
   const { camera } = useThree();
   
   // Create multiple yantras for a more complex visual experience
-  const yantras = [
+  const yantras: YantraProps[] = [
     { position: [0, 0, -0.2], scale: 1.2, rotation: [0, 0, 0], color: "#f5b042" }, // Main yantra closer and larger
     { position: [2.5, 1.2, -1.5], scale: 0.4, rotation: [0.5, 0.2, 0], color: "#ff719A" },
     { position: [-2.5, -1.2, -1.5], scale: 0.5, rotation: [-0.3, -0.5, 0], color: "#9D4EDD" },

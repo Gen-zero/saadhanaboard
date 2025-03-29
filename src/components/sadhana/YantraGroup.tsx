@@ -4,7 +4,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import SacredYantra from './SacredYantra';
 
-interface YantraProps {
+export interface YantraProps {
   position: [number, number, number];
   scale: number;
   rotation: [number, number, number];
