@@ -1,11 +1,11 @@
 
 import Layout from "@/components/Layout";
-import Profile from "@/components/Profile";
+import DeityInterface from "@/components/DeityInterface";
 
 const ProfilePage = () => {
   return (
     <Layout>
-      <Profile />
+      <DeityInterface />
     </Layout>
   );
 };
