@@ -7,8 +7,20 @@ import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MoonStar, Sparkles, MessageCircle, User, Check, Plus, Star, CloudLightning } from 'lucide-react';
+import { 
+  MoonStar, 
+  Sparkles, 
+  MessageCircle, 
+  User, 
+  Check, 
+  Plus, 
+  Star, 
+  CloudLightning,
+  Loader2 
+} from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import ClaudeApiSetup from './ClaudeApiSetup';
+import { useClaudeAI } from '@/hooks/useClaudeAI';
 
 const DeityInterface = () => {
   const { toast } = useToast();
@@ -61,8 +73,15 @@ const DeityInterface = () => {
     ]
   });
 
-  // Communication history with deity
-  const [communications, setCommunications] = useState([
+  // Use Claude AI hook for deity communications
+  const { 
+    messages: communications,
+    sendMessage,
+    isLoading,
+    apiKey,
+    setApiKey,
+    hasApiKey
+  } = useClaudeAI([
     {
       sender: 'user',
       message: 'Guide me in deepening my meditation practice',
@@ -72,16 +91,6 @@ const DeityInterface = () => {
       sender: 'deity',
       message: 'Remember that stillness is your true nature. When you sit in meditation, don\'t seek experiences - simply rest as awareness itself. Let thoughts arise and dissolve like clouds in the vast sky of your consciousness.',
       timestamp: '2023-08-15T10:31:00'
-    },
-    {
-      sender: 'user',
-      message: 'How can I work with my shadow traits?',
-      timestamp: '2023-08-16T15:45:00'
-    },
-    {
-      sender: 'deity',
-      message: 'Your shadow is not your enemy but the part of you seeking integration. When you notice procrastination, pause and ask what fear lies beneath. Bring compassion to these moments. Each shadow trait contains a gift when embraced with awareness.',
-      timestamp: '2023-08-16T15:46:00'
     }
   ]);
 
@@ -134,36 +143,17 @@ const DeityInterface = () => {
   const handleSendMessage = () => {
     if (!messageText.trim()) return;
     
-    // Add user message
-    const newCommunications = [
-      ...communications,
-      {
-        sender: 'user',
-        message: messageText,
-        timestamp: new Date().toISOString()
-      }
-    ];
+    if (!hasApiKey) {
+      toast({
+        title: "API Key Required",
+        description: "Please set your Claude AI API key first.",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    setCommunications(newCommunications);
+    sendMessage(messageText);
     setMessageText("");
-    
-    // Simulate deity response
-    setTimeout(() => {
-      const responses = [
-        "Your awareness of this challenge is itself a profound step on your path. Look deeper into the shadow to find the light it obscures.",
-        "The divine exists within both your light and shadow aspects. Embrace the entirety of your being with compassion.",
-        "Consider this an invitation to transcend the limitations you've placed on yourself. Your highest self already exists beyond these perceived boundaries.",
-        "The spiritual journey isn't about perfection but integration. Allow your shadow and light to dance together in sacred harmony."
-      ];
-      
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
-      setCommunications([...newCommunications, {
-        sender: 'deity',
-        message: randomResponse,
-        timestamp: new Date().toISOString()
-      }]);
-    }, 1500);
   };
 
   const handleSaveChanges = () => {
@@ -427,7 +417,7 @@ const DeityInterface = () => {
                     <span>Divine Communion</span>
                   </CardTitle>
                   <CardDescription>
-                    Communicate with your higher self
+                    Communicate with your higher self via Claude AI
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
@@ -453,6 +443,15 @@ const DeityInterface = () => {
             <CardContent>
               {communicationMode === "chat" ? (
                 <div className="flex flex-col h-[500px]">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-sm text-muted-foreground">
+                      {hasApiKey ? 
+                        "Commune with Claude AI, your spiritual guide" : 
+                        "Set your Claude AI API key to begin your spiritual dialogue"}
+                    </p>
+                    <ClaudeApiSetup apiKey={apiKey} setApiKey={setApiKey} />
+                  </div>
+                  
                   <div className="flex-1 overflow-y-auto mb-4 space-y-4 p-4 bg-secondary/30 rounded-lg">
                     {communications.map((comm, index) => (
                       <div 
@@ -480,6 +479,21 @@ const DeityInterface = () => {
                         </div>
                       </div>
                     ))}
+                    
+                    {isLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-secondary border border-purple-500/20 max-w-[80%] p-3 rounded-lg">
+                          <div className="flex items-center mb-1">
+                            <MoonStar className="h-3 w-3 mr-2" />
+                            <span className="text-xs font-medium">{deityData.name}</span>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <p className="text-sm">Communing with the divine...</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="flex gap-2">
@@ -494,12 +508,19 @@ const DeityInterface = () => {
                           handleSendMessage();
                         }
                       }}
+                      disabled={isLoading || !hasApiKey}
                     />
                     <Button 
                       className="self-end bg-primary-gradient"
                       onClick={handleSendMessage}
+                      disabled={isLoading || !hasApiKey}
                     >
-                      Send
+                      {isLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Sending
+                        </>
+                      ) : "Send"}
                     </Button>
                   </div>
                 </div>
