@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -12,7 +11,8 @@ import {
   ChevronRight,
   AlarmClock,
   BookHeart,
-  WandSparkles
+  WandSparkles,
+  Library
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -26,6 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navItems = [
     { name: 'Dashboard', icon: Home, path: '/' },
     { name: 'Saadhana Yantra', icon: BookHeart, path: '/sadhana' },
+    { name: 'Spiritual Library', icon: BookOpen, path: '/library' },
     { name: 'Tasks', icon: CheckSquare, path: '/tasks' },
     { name: 'Deity', icon: User, path: '/deity' },
     { name: 'Settings', icon: Settings, path: '/settings' }

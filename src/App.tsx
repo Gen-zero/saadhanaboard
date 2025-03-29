@@ -11,6 +11,7 @@ import TasksPage from "./pages/TasksPage";
 import DeityPage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
+import LibraryPage from "./pages/LibraryPage";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/sadhana" element={<SadhanaPage />} />
           <Route path="/tasks" element={<TasksPage />} />
           <Route path="/deity" element={<DeityPage />} />
+          <Route path="/library" element={<LibraryPage />} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
