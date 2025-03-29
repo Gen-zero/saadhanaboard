@@ -66,7 +66,7 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom color palette
+				// Custom color palette - our specific named colors
 				crimson: '#DC143C',
 				ivory: '#FFFFF0',
 				charcoal: '#36454F',
