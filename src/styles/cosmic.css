@@ -40,29 +40,6 @@ body::before {
   transform: translateZ(0);
 }
 
-/* Custom cursor styles - hide default cursor everywhere */
-* {
-  cursor: none !important;
-}
-
-/* Ensure we're using the correct image URLs */
-body.cursor-hidden {
-  cursor: none !important;
-}
-
-/* These classes are used for diagnostic purposes but don't actually affect the cursor display */
-.cursor-default-area {
-  /* Areas that should show the default cursor */
-}
-
-.cursor-pointer-area {
-  /* Areas that should show the pointer cursor */
-}
-
-.cursor-text-area {
-  /* Areas that should show the text cursor */
-}
-
 /* Scroll-specific cosmic styles */
 .cosmic-scroll-container {
   position: relative;
@@ -115,13 +92,4 @@ body.cursor-hidden {
 
 .paper-scroll-glow:hover::after {
   opacity: 1;
-}
-
-/* Cosmic cursor styling */
-.cosmic-cursor {
-  position: fixed;
-  pointer-events: none;
-  mix-blend-mode: screen;
-  will-change: transform;
-  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
 }

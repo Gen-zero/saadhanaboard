@@ -32,8 +32,6 @@ const SadhanaPage = () => {
     
     // Set cosmic background
     document.body.classList.add('cosmic-bg');
-    // Ensure cursor is hidden on this page
-    document.body.classList.add('cursor-hidden');
     
     // Play ethereal sound on first visit
     if (!localStorage.getItem('visited-sadhana')) {
@@ -52,7 +50,6 @@ const SadhanaPage = () => {
     
     return () => {
       document.body.classList.remove('cosmic-bg');
-      document.body.classList.remove('cursor-hidden');
     };
   }, []);
 
