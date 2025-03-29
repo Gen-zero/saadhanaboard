@@ -14,12 +14,94 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
   
-  // Load texture for the scroll
-  const texture = useTexture("/textures/parchment.jpg");
+  // Create a fallback texture in case the external one fails to load
+  const createFallbackTexture = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024;
+    canvas.height = 1024;
+    const context = canvas.getContext('2d');
+    
+    if (context) {
+      // Create parchment-like background
+      const gradient = context.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, 0,
+        canvas.width / 2, canvas.height / 2, canvas.width / 2
+      );
+      gradient.addColorStop(0, '#f5e7d3');
+      gradient.addColorStop(0.8, '#e8d4b7');
+      gradient.addColorStop(1, '#d8c4a7');
+      
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Add some noise for texture
+      for (let i = 0; i < 50000; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const opacity = Math.random() * 0.1;
+        
+        context.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        context.fillRect(x, y, 1, 1);
+      }
+      
+      // Add some aging effects
+      for (let i = 0; i < 20; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const width = Math.random() * 100 + 50;
+        const height = Math.random() * 5 + 2;
+        const opacity = Math.random() * 0.05;
+        
+        context.fillStyle = `rgba(139, 69, 19, ${opacity})`;
+        context.fillRect(x, y, width, height);
+      }
+    }
+    
+    const texture = new THREE.CanvasTexture(canvas);
+    return texture;
+  };
   
-  // Create displacement and normal maps
-  const displacement = useTexture("/textures/displacement.jpg");
-  displacement.wrapS = displacement.wrapT = THREE.RepeatWrapping;
+  // Try to load the actual texture but use fallback if it fails
+  const fallbackTexture = createFallbackTexture();
+  
+  // Create material with appropriate textures
+  const texture = useTexture(
+    "/textures/parchment.jpg", 
+    (loadedTexture) => {
+      console.log("Parchment texture loaded successfully");
+    },
+    (error) => {
+      console.error("Failed to load parchment texture:", error);
+    }
+  ) || fallbackTexture;
+  
+  // Create displacement map
+  const createDisplacementMap = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const context = canvas.getContext('2d');
+    
+    if (context) {
+      context.fillStyle = '#888888';
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Add some random noise for displacement
+      for (let i = 0; i < 10000; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const grayValue = Math.floor(Math.random() * 40 + 100);
+        context.fillStyle = `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
+        context.fillRect(x, y, 3, 3);
+      }
+    }
+    
+    const displacementTexture = new THREE.CanvasTexture(canvas);
+    displacementTexture.wrapS = displacementTexture.wrapT = THREE.RepeatWrapping;
+    return displacementTexture;
+  };
+  
+  const displacement = createDisplacementMap();
   
   // Create animated glowing effect
   useFrame((state) => {
