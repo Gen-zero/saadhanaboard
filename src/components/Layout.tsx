@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -33,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navItems = [
     { name: 'Dashboard', icon: Home, path: '/' },
-    { name: 'Saadhana Yantra', icon: BookHeart, path: '/sadhana' },
+    { name: 'Saadhana Board', icon: BookHeart, path: '/sadhana' },
     { name: 'Spiritual Library', icon: BookOpen, path: '/library' },
     { name: 'Tasks', icon: CheckSquare, path: '/tasks' },
     { name: 'Deity', icon: User, path: '/deity' },
@@ -66,8 +67,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="h-full flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
             <div className="flex items-center gap-2">
-              <WandSparkles className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold text-sidebar-foreground">Saadhana Yantra</h1>
+              <img src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" alt="Saadhana Board Logo" className="h-8 w-8" />
+              <h1 className="text-xl font-semibold text-sidebar-foreground">Saadhana Board</h1>
             </div>
             <button 
               className="p-1 rounded-md text-sidebar-foreground hover:bg-sidebar-accent md:hidden"
@@ -142,7 +143,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             <Menu size={24} />
           </button>
-          <h1 className="ml-4 text-lg font-semibold">Saadhana Yantra</h1>
+          <div className="ml-4 flex items-center gap-2">
+            <img src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" alt="Saadhana Board Logo" className="h-6 w-6" />
+            <h1 className="text-lg font-semibold">Saadhana Board</h1>
+          </div>
         </header>
 
         {/* Page Content */}
