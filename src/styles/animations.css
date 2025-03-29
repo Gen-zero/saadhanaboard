@@ -1,5 +1,4 @@
 
-
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
@@ -107,3 +106,18 @@
   }
 }
 
+/* Added cursor animation for smoother movement */
+@keyframes cursor-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cursor-appear {
+  animation: cursor-appear 0.3s ease-out forwards;
+}

@@ -11,16 +11,6 @@ const SaadhanaBoard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showManifestationForm, setShowManifestationForm] = useState(false);
   const [view3D, setView3D] = useState(false); // Toggle between 2D and 3D view
-  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
-  
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setCursorPosition({ x: e.clientX, y: e.clientY });
-    };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
   
   const sadhanaData = {
     purpose: "To deepen my connection with the divine and cultivate inner peace.",
@@ -55,17 +45,6 @@ ${sadhanaData.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
 
   return (
     <div className="space-y-6 animate-fade-in relative">
-      <div 
-        className="cosmic-cursor fixed w-12 h-12 rounded-full pointer-events-none z-50 mix-blend-screen"
-        style={{
-          background: 'radial-gradient(circle, rgba(147,51,234,0.7) 0%, rgba(139,92,246,0.3) 50%, rgba(0,0,0,0) 70%)',
-          left: `${cursorPosition.x - 24}px`,
-          top: `${cursorPosition.y - 24}px`,
-          transform: 'translate(0, 0)',
-          transition: 'transform 0.1s ease-out, opacity 0.3s ease-out'
-        }}
-      />
-      
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-0 left-1/4 w-64 h-64 bg-purple-600/20 rounded-full filter blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-indigo-500/20 rounded-full filter blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
