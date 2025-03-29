@@ -95,10 +95,14 @@ ${sadhanaData.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
     <div className="space-y-6 animate-fade-in relative">
       <img 
         src={getCursorImage()}
-        className={`cosmic-cursor cosmic-cursor-${cursorType} cursor-pulse`}
+        className="cosmic-cursor cosmic-cursor-default absolute pointer-events-none"
         style={{
           left: `${cursorPosition.x}px`,
           top: `${cursorPosition.y}px`,
+          transform: 'translate(-50%, -50%)',
+          width: '40px',
+          height: '40px',
+          zIndex: 9999
         }}
         alt=""
       />
