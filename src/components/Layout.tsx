@@ -27,7 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Dashboard', icon: Home, path: '/' },
     { name: 'Saadhana Yantra', icon: BookHeart, path: '/sadhana' },
     { name: 'Tasks', icon: CheckSquare, path: '/tasks' },
-    { name: 'Profile', icon: User, path: '/profile' },
+    { name: 'Deity', icon: User, path: '/deity' },
     { name: 'Settings', icon: Settings, path: '/settings' }
   ];
 

@@ -4,7 +4,7 @@ import DeityInterface from "@/components/DeityInterface";
 import ShadowSelfMonitor from "@/components/ShadowSelfMonitor";
 import { useState } from "react";
 
-const ProfilePage = () => {
+const DeityPage = () => {
   // Mock data for shadow and perfect being traits
   const [shadowTraits] = useState([
     'Procrastination',
@@ -33,4 +33,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default DeityPage;
