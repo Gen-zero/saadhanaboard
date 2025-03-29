@@ -16,11 +16,11 @@ const SceneContainer = ({ paperContent }: SceneContainerProps) => {
   
   // Create multiple yantras for a more complex visual experience
   const yantras = [
-    { position: [0, 0, -0.5], scale: 0.9, rotation: [0, 0, 0], color: "#f5b042" },
-    { position: [2, 1, -1], scale: 0.4, rotation: [0.5, 0.2, 0], color: "#ff719A" },
-    { position: [-2, -1, -1], scale: 0.5, rotation: [-0.3, -0.5, 0], color: "#9D4EDD" },
-    { position: [0, 2, -2], scale: 0.6, rotation: [0.7, 0, 0.2], color: "#00B4D8" },
-    { position: [0, -2, -2], scale: 0.7, rotation: [-0.7, 0, -0.2], color: "#FFD60A" },
+    { position: [0, 0, -0.2], scale: 1.2, rotation: [0, 0, 0], color: "#f5b042" }, // Main yantra closer and larger
+    { position: [2.5, 1.2, -1.5], scale: 0.4, rotation: [0.5, 0.2, 0], color: "#ff719A" },
+    { position: [-2.5, -1.2, -1.5], scale: 0.5, rotation: [-0.3, -0.5, 0], color: "#9D4EDD" },
+    { position: [0, 2.5, -2.5], scale: 0.6, rotation: [0.7, 0, 0.2], color: "#00B4D8" },
+    { position: [0, -2.5, -2.5], scale: 0.7, rotation: [-0.7, 0, -0.2], color: "#FFD60A" },
   ];
 
   // Auto-rotation of the entire scene
@@ -40,7 +40,7 @@ const SceneContainer = ({ paperContent }: SceneContainerProps) => {
 
   return (
     <>
-      <PerspectiveCamera makeDefault position={[0, 0, 5.5]} fov={45} />
+      <PerspectiveCamera makeDefault position={[0, 0, 4.8]} fov={45} /> {/* Closer camera position */}
       <ambientLight intensity={0.3} />
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
       <pointLight position={[-10, -10, -10]} intensity={0.5} />

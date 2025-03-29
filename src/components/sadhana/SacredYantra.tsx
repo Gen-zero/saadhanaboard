@@ -13,7 +13,7 @@ interface SacredYantraProps {
 const SacredYantra = ({ 
   position = [0, 0, 0], 
   rotation = [0, 0, 0], 
-  scale = 1, 
+  scale = 1.5, // Increased default scale for more zoom
   color = "#f5b042" 
 }: SacredYantraProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
@@ -57,8 +57,8 @@ const SacredYantra = ({
       meshRef.current.rotation.z += 0.001;
       meshRef.current.rotation.x = Math.sin(state.clock.getElapsedTime() * 0.2) * 0.1;
       
-      // Pulsing scale effect
-      const pulseScale = scale * (1 + Math.sin(state.clock.getElapsedTime() * 0.5) * 0.05);
+      // Pulsing scale effect with increased amplitude
+      const pulseScale = scale * (1 + Math.sin(state.clock.getElapsedTime() * 0.5) * 0.08);
       meshRef.current.scale.set(pulseScale, pulseScale, pulseScale);
     }
     
@@ -67,7 +67,7 @@ const SacredYantra = ({
       (glowRef.current.material as THREE.ShaderMaterial).uniforms.time.value = state.clock.getElapsedTime();
       
       // Make glow larger than the yantra
-      const glowScale = scale * 1.2 * (1 + Math.sin(state.clock.getElapsedTime() * 0.3) * 0.1);
+      const glowScale = scale * 1.4 * (1 + Math.sin(state.clock.getElapsedTime() * 0.3) * 0.12);
       glowRef.current.scale.set(glowScale, glowScale, glowScale);
     }
   });
@@ -77,8 +77,8 @@ const SacredYantra = ({
     const shape = new THREE.Shape();
     
     // Complex yantra with multiple shapes
-    const segments = 96; // Higher segments for smoother curves
-    const radius = 2;
+    const segments = 120; // Higher segments for smoother curves
+    const radius = 2.2; // Increased radius
     
     // Start point
     shape.moveTo(radius, 0);
@@ -94,7 +94,7 @@ const SacredYantra = ({
     
     // Create inner triangle
     const triangleShape = new THREE.Shape();
-    const triangleSize = radius * 0.8;
+    const triangleSize = radius * 0.85; // Larger triangle
     triangleShape.moveTo(0, triangleSize);
     triangleShape.lineTo(-triangleSize * Math.sqrt(3)/2, -triangleSize/2);
     triangleShape.lineTo(triangleSize * Math.sqrt(3)/2, -triangleSize/2);
@@ -102,7 +102,7 @@ const SacredYantra = ({
     
     // Create inner hexagon
     const hexagonShape = new THREE.Shape();
-    const hexRadius = radius * 0.5;
+    const hexRadius = radius * 0.6; // Larger hexagon
     for (let i = 0; i < 6; i++) {
       const angle = (i / 6) * Math.PI * 2;
       const x = Math.cos(angle) * hexRadius;
@@ -114,8 +114,8 @@ const SacredYantra = ({
     
     // Create star shape
     const starShape = new THREE.Shape();
-    const outerRadius = radius * 0.3;
-    const innerRadius = radius * 0.15;
+    const outerRadius = radius * 0.4; // Larger star
+    const innerRadius = radius * 0.2;
     const spikes = 9; // Sacred number
     
     for (let i = 0; i < spikes * 2; i++) {
@@ -139,7 +139,7 @@ const SacredYantra = ({
     <group position={position} rotation={rotation}>
       {/* Glow effect */}
       <mesh ref={glowRef} renderOrder={-1}>
-        <planeGeometry args={[5, 5]} />
+        <planeGeometry args={[6, 6]} /> {/* Larger plane for glow */}
         <primitive object={glowMaterial} attach="material" />
       </mesh>
       
@@ -151,7 +151,7 @@ const SacredYantra = ({
           metalness={0.7}
           roughness={0.2}
           emissive={color}
-          emissiveIntensity={0.6}
+          emissiveIntensity={0.8} // Increased emissive intensity
           side={THREE.DoubleSide}
         />
       </mesh>

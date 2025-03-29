@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { BookOpen, Sparkles, Search, BookText, AlignCenter, Loader2 } from "lucide-react";
+import { BookOpen, Sparkles, Search, BookText, AlignCenter, Loader2, Download, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import BookViewer from "./BookViewer";
@@ -9,7 +9,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { spiritualBooks } from "@/data/spiritualBooks";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SpiritualBook } from "@/types/books";
-import { fetchAllSpiritualBooks } from "@/lib/api";
+import { fetchAllSpiritualBooks, fetchOpenLibrarySubject } from "@/lib/api";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const SpiritualLibrary = () => {
   const { toast } = useToast();
@@ -20,6 +21,52 @@ const SpiritualLibrary = () => {
   const [books, setBooks] = useState<SpiritualBook[]>(spiritualBooks);
   const [isLoading, setIsLoading] = useState(false);
   const [dataSource, setDataSource] = useState<"local" | "api">("local");
+  const [currentSubject, setCurrentSubject] = useState<string>("spirituality");
+  
+  const spiritualSubjects = [
+    { id: "spirituality", name: "Spirituality" },
+    { id: "buddhism", name: "Buddhism" },
+    { id: "yoga", name: "Yoga" },
+    { id: "meditation", name: "Meditation" },
+    { id: "hinduism", name: "Hinduism" },
+    { id: "taoism", name: "Taoism" },
+    { id: "sufism", name: "Sufism" },
+    { id: "christianity", name: "Christianity" },
+    { id: "mysticism", name: "Mysticism" },
+  ];
+
+  // Load data based on the selected subject
+  const loadSubjectData = async (subject: string) => {
+    setIsLoading(true);
+    try {
+      const subjectBooks = await fetchOpenLibrarySubject(subject);
+      if (subjectBooks.length > 0) {
+        setBooks([...spiritualBooks, ...subjectBooks]);
+        toast({
+          title: `${subject} books loaded`,
+          description: `Loaded ${subjectBooks.length} books from Open Library`,
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: "No books found",
+          description: `No books found for ${subject}`,
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error(`Error loading ${subject} books:`, error);
+      toast({
+        title: "Error loading books",
+        description: `Failed to load ${subject} books. Using local library.`,
+        variant: "destructive",
+        duration: 3000,
+      });
+      setBooks(spiritualBooks);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   // Fetch books from APIs when data source changes
   useEffect(() => {
@@ -58,6 +105,12 @@ const SpiritualLibrary = () => {
       setBooks(spiritualBooks);
     }
   }, [dataSource, toast]);
+
+  useEffect(() => {
+    if (dataSource === "api" && currentSubject) {
+      loadSubjectData(currentSubject);
+    }
+  }, [currentSubject, dataSource]);
   
   const filteredBooks = books.filter(
     (book) => 
@@ -83,6 +136,13 @@ const SpiritualLibrary = () => {
     setDataSource(dataSource === "local" ? "api" : "local");
   };
 
+  const handleSubjectChange = (subject: string) => {
+    setCurrentSubject(subject);
+    if (dataSource === "api") {
+      loadSubjectData(subject);
+    }
+  };
+
   return (
     <div className="cosmic-nebula-bg p-4 md:p-6 rounded-lg border border-purple-500/20">
       <div className="flex flex-col gap-4">
@@ -99,7 +159,11 @@ const SpiritualLibrary = () => {
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-1 cosmic-highlight bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
+              className={`flex items-center gap-1 cosmic-highlight ${
+                dataSource === "api" 
+                  ? "bg-primary/20 border-primary/50 text-primary"
+                  : "bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
+              }`}
               onClick={toggleDataSource}
               disabled={isLoading}
             >
@@ -108,7 +172,7 @@ const SpiritualLibrary = () => {
               ) : (
                 <Sparkles className="h-4 w-4" />
               )}
-              <span>{dataSource === "local" ? "Add External Books" : "Local Books Only"}</span>
+              <span>{dataSource === "local" ? "Connect to Open Library" : "Local Books Only"}</span>
             </Button>
             
             <Button
@@ -122,6 +186,28 @@ const SpiritualLibrary = () => {
             </Button>
           </div>
         </div>
+
+        {dataSource === "api" && (
+          <div className="w-full overflow-x-auto">
+            <Tabs 
+              defaultValue={currentSubject} 
+              onValueChange={handleSubjectChange}
+              className="w-full"
+            >
+              <TabsList className="mb-4 overflow-x-auto flex flex-nowrap p-1 w-full">
+                {spiritualSubjects.map((subject) => (
+                  <TabsTrigger 
+                    key={subject.id}
+                    value={subject.id}
+                    className="whitespace-nowrap"
+                  >
+                    {subject.name}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
+        )}
         
         <div className="flex items-center w-full max-w-md relative">
           <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
@@ -141,11 +227,21 @@ const SpiritualLibrary = () => {
         ) : selectedBook ? (
           <BookViewer bookId={selectedBook} onClose={handleCloseBook} />
         ) : (
-          <BookShelf 
-            books={filteredBooks} 
-            onSelectBook={handleSelectBook} 
-            view={view}
-          />
+          <>
+            <BookShelf 
+              books={filteredBooks} 
+              onSelectBook={handleSelectBook} 
+              view={view}
+            />
+            {dataSource === "api" && filteredBooks.length > spiritualBooks.length && (
+              <div className="flex justify-center mt-4">
+                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                  <ExternalLink size={12} />
+                  Books provided by Open Library API
+                </span>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

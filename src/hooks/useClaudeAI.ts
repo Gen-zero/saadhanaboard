@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { sendMessageToClaude } from '@/services/claudeAIService';
+import { sendMessageToClaude, ClaudeMessage } from '@/services/claudeAIService';
 import { useToast } from "@/hooks/use-toast";
 
 interface Message {
@@ -40,8 +40,8 @@ export const useClaudeAI = (initialMessages: Message[] = []) => {
     setIsLoading(true);
 
     try {
-      // Format messages for Claude API with explicit typing
-      const formattedMessages = messages
+      // Format messages for Claude API with explicit typing to satisfy TypeScript
+      const formattedMessages: ClaudeMessage[] = messages
         .concat(userMessage)
         .map(msg => ({
           role: msg.sender === 'user' ? 'user' as const : 'assistant' as const,
