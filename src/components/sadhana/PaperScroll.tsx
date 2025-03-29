@@ -23,14 +23,14 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
     const context = canvas.getContext('2d');
     
     if (context) {
-      // Create parchment-like background
+      // Create parchment-like background with ivory color
       const gradient = context.createRadialGradient(
         canvas.width / 2, canvas.height / 2, 0,
         canvas.width / 2, canvas.height / 2, canvas.width / 2
       );
-      gradient.addColorStop(0, '#f5e7d3');
-      gradient.addColorStop(0.8, '#e8d4b7');
-      gradient.addColorStop(1, '#d8c4a7');
+      gradient.addColorStop(0, '#FFFFF0'); // Ivory
+      gradient.addColorStop(0.8, '#FFF8DC'); // Lighter Ivory
+      gradient.addColorStop(1, '#F8F4E3'); // Slightly darker Ivory
       
       context.fillStyle = gradient;
       context.fillRect(0, 0, canvas.width, canvas.height);
@@ -41,21 +41,37 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
         const y = Math.random() * canvas.height;
         const opacity = Math.random() * 0.1;
         
-        context.fillStyle = `rgba(0, 0, 0, ${opacity})`;
+        context.fillStyle = `rgba(54, 69, 79, ${opacity})`; // Charcoal with opacity
         context.fillRect(x, y, 1, 1);
       }
       
-      // Add some aging effects
+      // Add some aging effects with crimson and gold touches
       for (let i = 0; i < 20; i++) {
         const x = Math.random() * canvas.width;
         const y = Math.random() * canvas.height;
         const width = Math.random() * 100 + 50;
         const height = Math.random() * 5 + 2;
+        const colorChoice = Math.random();
         const opacity = Math.random() * 0.05;
         
-        context.fillStyle = `rgba(139, 69, 19, ${opacity})`;
+        if (colorChoice < 0.7) {
+          context.fillStyle = `rgba(220, 20, 60, ${opacity})`; // Crimson with opacity
+        } else {
+          context.fillStyle = `rgba(255, 215, 0, ${opacity})`; // Gold with opacity
+        }
         context.fillRect(x, y, width, height);
       }
+      
+      // Add subtle gold frame
+      const frameWidth = 30;
+      context.strokeStyle = 'rgba(255, 215, 0, 0.3)'; // Gold with opacity
+      context.lineWidth = frameWidth;
+      context.strokeRect(
+        frameWidth / 2, 
+        frameWidth / 2, 
+        canvas.width - frameWidth, 
+        canvas.height - frameWidth
+      );
     }
     
     const texture = new THREE.CanvasTexture(canvas);
@@ -161,7 +177,7 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
           side={THREE.DoubleSide}
           transparent={true}
           opacity={0.95}
-          emissive="#ffebcd"
+          emissive="#FFD700" // Gold emissive glow
           emissiveIntensity={0.1}
         />
       </mesh>
@@ -172,7 +188,7 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
         fontSize={0.2}
         maxWidth={4}
         lineHeight={1.2}
-        color="#331c0c"
+        color="#36454F" // Charcoal text color
         anchorX="center"
         anchorY="middle"
         font="/fonts/poppins-v20-latin-regular.woff"

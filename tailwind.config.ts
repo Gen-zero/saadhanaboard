@@ -65,7 +65,14 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				// Custom color palette
+				crimson: '#DC143C',
+				ivory: '#FFFFF0',
+				charcoal: '#36454F',
+				gold: '#FFD700',
+				navy: '#000080',
+				sage: '#77815C',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
