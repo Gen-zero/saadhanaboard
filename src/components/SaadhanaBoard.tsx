@@ -15,6 +15,9 @@ const SaadhanaBoard = () => {
   const [cursorType, setCursorType] = useState<'normal' | 'pointer' | 'text'>('normal');
   
   useEffect(() => {
+    // Apply cursor-hidden to body to ensure we don't see default cursor
+    document.body.classList.add('cursor-hidden');
+    
     const handleMouseMove = (e: MouseEvent) => {
       setCursorPosition({ x: e.clientX, y: e.clientY });
       
@@ -25,11 +28,14 @@ const SaadhanaBoard = () => {
           target.closest('[role="button"]') || 
           target.classList.contains('clickable') ||
           target.classList.contains('cursor-pointer') ||
-          target.style.cursor === 'pointer') {
+          target.style.cursor === 'pointer' ||
+          target.closest('button') ||
+          target.tagName === 'LABEL') {
         setCursorType('pointer');
       } else if (target.tagName === 'INPUT' || 
                 target.tagName === 'TEXTAREA' || 
-                target.getAttribute('contenteditable') === 'true') {
+                target.getAttribute('contenteditable') === 'true' ||
+                target.closest('[contenteditable="true"]')) {
         setCursorType('text');
       } else {
         setCursorType('normal');
@@ -37,7 +43,10 @@ const SaadhanaBoard = () => {
     };
     
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      document.body.classList.remove('cursor-hidden');
+    };
   }, []);
   
   const sadhanaData = {
@@ -86,17 +95,12 @@ ${sadhanaData.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
     <div className="space-y-6 animate-fade-in relative">
       <img 
         src={getCursorImage()}
-        className="cosmic-cursor cursor-pulse"
+        className={`cosmic-cursor cosmic-cursor-${cursorType} cursor-pulse`}
         style={{
           left: `${cursorPosition.x}px`,
           top: `${cursorPosition.y}px`,
-          transform: 'translate(-50%, -50%)',
-          position: 'fixed',
-          width: '40px',
-          height: '40px',
-          zIndex: 9999,
-          pointerEvents: 'none'
         }}
+        alt=""
       />
       
       <div className="absolute inset-0 -z-10 overflow-hidden">
