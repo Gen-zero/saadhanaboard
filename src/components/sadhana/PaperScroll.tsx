@@ -13,7 +13,6 @@ interface PaperProps {
 const PaperScroll = ({ content, position, rotation }: PaperProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
-  const [textureLoaded, setTextureLoaded] = useState(false);
   const [fallbackActive, setFallbackActive] = useState(false);
   
   // Create a fallback texture in case the external one fails to load
@@ -63,37 +62,34 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
     return texture;
   };
   
-  // Use the useTexture hook correctly with proper error handling
-  const parchmentTexture = useTexture(
-    '/textures/parchment.jpg',
-    (texture) => {
-      // Success callback
-      setTextureLoaded(true);
-      console.log("Texture loaded successfully");
-    }
-  );
+  // Separate texture loading with error handling
+  const [texture, setTexture] = useState<THREE.Texture | null>(null);
   
-  // Handle texture loading error
   useEffect(() => {
-    const handleError = () => {
-      console.error("Failed to load parchment texture");
-      setFallbackActive(true);
-    };
-    
-    // Add error event listener to the texture's source
-    if (parchmentTexture && parchmentTexture.source) {
-      const image = parchmentTexture.source.data;
-      if (image instanceof HTMLImageElement) {
-        image.addEventListener('error', handleError);
-        return () => {
-          image.removeEventListener('error', handleError);
-        };
+    // First attempt to load the texture directly
+    const loader = new THREE.TextureLoader();
+    loader.load(
+      '/textures/parchment.jpg',
+      // Success callback
+      (loadedTexture) => {
+        console.log("Texture loaded successfully");
+        setTexture(loadedTexture);
+      },
+      // Progress callback
+      undefined,
+      // Error callback
+      (error) => {
+        console.error("Failed to load parchment texture:", error);
+        setFallbackActive(true);
+        setTexture(createFallbackTexture());
       }
-    }
-  }, [parchmentTexture]);
-  
-  // Create final texture based on load status
-  const finalTexture = fallbackActive ? createFallbackTexture() : parchmentTexture;
+    );
+    
+    // Cleanup
+    return () => {
+      if (texture) texture.dispose();
+    };
+  }, []);
   
   // Create displacement map
   const createDisplacementMap = () => {
@@ -142,6 +138,9 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
       }
     }
   });
+
+  // Use fallback texture if texture loading fails or while loading
+  const finalTexture = fallbackActive || !texture ? createFallbackTexture() : texture;
 
   return (
     <group position={position} rotation={rotation}>
