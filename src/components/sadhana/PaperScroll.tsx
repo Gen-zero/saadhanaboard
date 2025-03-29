@@ -63,26 +63,34 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
     return texture;
   };
   
-  // Try to load the texture with proper error handling
-  const [parchmentTexture, parchmentError] = useTexture(
-    ['/textures/parchment.jpg'],
-    // The useTexture hook provides error handling through the return value,
-    // not through callback parameters
-    undefined, 
-    (error) => {
-      console.error("Failed to load parchment texture:", error);
-      setFallbackActive(true);
+  // Use the useTexture hook correctly with proper error handling
+  const parchmentTexture = useTexture(
+    '/textures/parchment.jpg',
+    (texture) => {
+      // Success callback
+      setTextureLoaded(true);
+      console.log("Texture loaded successfully");
     }
   );
   
+  // Handle texture loading error
   useEffect(() => {
-    if (parchmentError) {
-      console.error("Texture loading error detected:", parchmentError);
+    const handleError = () => {
+      console.error("Failed to load parchment texture");
       setFallbackActive(true);
-    } else if (parchmentTexture) {
-      setTextureLoaded(true);
+    };
+    
+    // Add error event listener to the texture's source
+    if (parchmentTexture && parchmentTexture.source) {
+      const image = parchmentTexture.source.data;
+      if (image instanceof HTMLImageElement) {
+        image.addEventListener('error', handleError);
+        return () => {
+          image.removeEventListener('error', handleError);
+        };
+      }
     }
-  }, [parchmentTexture, parchmentError]);
+  }, [parchmentTexture]);
   
   // Create final texture based on load status
   const finalTexture = fallbackActive ? createFallbackTexture() : parchmentTexture;
