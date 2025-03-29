@@ -52,3 +52,33 @@
 .glow-accent {
   animation: glow-accent 3s ease-in-out infinite;
 }
+
+/* Paper scroll animations */
+@keyframes unfold {
+  0% { transform: scaleY(0.1); opacity: 0; }
+  100% { transform: scaleY(1); opacity: 1; }
+}
+
+.unfold {
+  animation: unfold 1s ease-out forwards;
+  transform-origin: top center;
+}
+
+@keyframes ink-appear {
+  0% { opacity: 0; filter: blur(2px); }
+  100% { opacity: 1; filter: blur(0); }
+}
+
+.ink-appear {
+  animation: ink-appear 1.5s ease-out 0.5s forwards;
+}
+
+/* Scroll parchment ambient glow */
+@keyframes parchment-glow {
+  0%, 100% { filter: brightness(1) saturate(1); }
+  50% { filter: brightness(1.05) saturate(1.1); }
+}
+
+.parchment-glow {
+  animation: parchment-glow 4s ease-in-out infinite;
+}

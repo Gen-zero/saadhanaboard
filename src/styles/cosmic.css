@@ -39,3 +39,57 @@ body::before {
   z-index: -1;
   transform: translateZ(0);
 }
+
+/* Scroll-specific cosmic styles */
+.cosmic-scroll-container {
+  position: relative;
+}
+
+.cosmic-scroll-container::before,
+.cosmic-scroll-container::after {
+  content: '';
+  position: absolute;
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.1;
+  filter: blur(40px);
+  animation: cosmic-pulse 8s ease-in-out infinite;
+}
+
+.cosmic-scroll-container::before {
+  top: -5%;
+  left: -5%;
+  background: radial-gradient(circle, hsla(var(--primary), 0.5), transparent 70%);
+}
+
+.cosmic-scroll-container::after {
+  bottom: -5%;
+  right: -5%;
+  background: radial-gradient(circle, hsla(var(--accent), 0.5), transparent 70%);
+  animation-delay: 4s;
+}
+
+/* Paper scroll effects */
+.paper-scroll-glow {
+  position: relative;
+}
+
+.paper-scroll-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+    hsla(var(--primary), 0.1),
+    hsla(var(--accent), 0.1)
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease-out;
+  border-radius: inherit;
+  filter: blur(10px);
+}
+
+.paper-scroll-glow:hover::after {
+  opacity: 1;
+}

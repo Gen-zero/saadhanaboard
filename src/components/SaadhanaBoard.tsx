@@ -1,13 +1,16 @@
+
 import { useState, useEffect } from 'react';
-import { BookOpen, Edit, WandSparkles, MoonStar, Sparkles } from 'lucide-react';
+import { BookOpen, Edit, WandSparkles, MoonStar, Sparkles, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ManifestationForm from './sadhana/ManifestationForm';
 import SadhanaDetails from './sadhana/SadhanaDetails';
 import SadhanaViewer from './sadhana/SadhanaViewer';
+import PaperScroll2D from './sadhana/PaperScroll2D';
 
 const SaadhanaBoard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showManifestationForm, setShowManifestationForm] = useState(false);
+  const [view3D, setView3D] = useState(false); // Toggle between 2D and 3D view
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   
   useEffect(() => {
@@ -97,8 +100,17 @@ ${sadhanaData.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
               className="flex items-center gap-1 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
               onClick={() => setIsEditing(!isEditing)}
             >
-              <Edit className="h-4 w-4" />
+              {isEditing ? <Eye className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
               {isEditing ? 'Cosmic View' : 'Edit Details'}
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
+              onClick={() => setView3D(!view3D)}
+            >
+              <BookOpen className="h-4 w-4" />
+              {view3D ? '2D View' : '3D View'}
             </Button>
           </div>
         </div>
@@ -116,8 +128,18 @@ ${sadhanaData.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
       <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
         {isEditing ? (
           <SadhanaDetails sadhanaData={sadhanaData} />
-        ) : (
+        ) : view3D ? (
           <SadhanaViewer paperContent={paperContent} />
+        ) : (
+          <div className="cosmic-nebula-bg rounded-lg p-6">
+            <PaperScroll2D 
+              content={paperContent} 
+              onClick={() => setView3D(true)}
+            />
+            <div className="text-center mt-4 italic text-sm text-muted-foreground">
+              Click the scroll to view in 3D immersive mode
+            </div>
+          </div>
         )}
       </div>
       
