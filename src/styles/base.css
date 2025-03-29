@@ -10,7 +10,12 @@
 
   body {
     @apply bg-background text-foreground font-poppins;
-    cursor: none; /* Hide default cursor for cosmic cursor */
+    cursor: none; /* Hide default cursor for custom cursor */
+  }
+  
+  /* Make buttons and interactive elements use the custom cursor */
+  button, a, input, textarea, [role="button"], .clickable {
+    cursor: none;
   }
   
   /* Custom Scrollbar */
