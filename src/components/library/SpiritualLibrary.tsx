@@ -1,20 +1,19 @@
 
 import { useState, useEffect } from "react";
-import { BookOpen, Sparkles, Search, BookText, AlignCenter, Loader2, Download, Check, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { ExternalLink } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import BookViewer from "./BookViewer";
 import BookShelf from "./BookShelf";
-import { useToast } from "@/components/ui/use-toast";
+import LibraryHeader from "./LibraryHeader";
+import SubjectTabs from "./SubjectTabs";
+import SearchBar from "./SearchBar";
+import LibraryLoading from "./LibraryLoading";
 import { spiritualBooks } from "@/data/spiritualBooks";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { SpiritualBook } from "@/types/books";
 import { fetchAllSpiritualBooks, fetchOpenLibrarySubject } from "@/lib/api";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 const SpiritualLibrary = () => {
   const { toast } = useToast();
-  const isMobile = useIsMobile();
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState<"grid" | "list">("grid");
@@ -136,94 +135,37 @@ const SpiritualLibrary = () => {
     setDataSource(dataSource === "local" ? "api" : "local");
   };
 
-  const handleSubjectChange = (subject: string) => {
-    setCurrentSubject(subject);
-    if (dataSource === "api") {
-      loadSubjectData(subject);
-    }
+  const toggleView = () => {
+    setView(view === "grid" ? "list" : "grid");
   };
 
   return (
     <div className="cosmic-nebula-bg p-4 md:p-6 rounded-lg border border-purple-500/20">
       <div className="flex flex-col gap-4">
-        <div className="flex justify-between items-center flex-wrap gap-3">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
-            <BookOpen className="h-6 w-6 text-purple-500" />
-            <span>Spiritual Library</span>
-            <span className="text-sm text-muted-foreground ml-1 italic font-normal">
-              Ancient Wisdom Repository
-            </span>
-          </h1>
-          
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className={`flex items-center gap-1 cosmic-highlight ${
-                dataSource === "api" 
-                  ? "bg-primary/20 border-primary/50 text-primary"
-                  : "bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
-              }`}
-              onClick={toggleDataSource}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Sparkles className="h-4 w-4" />
-              )}
-              <span>{dataSource === "local" ? "Connect to Open Library" : "Local Books Only"}</span>
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1 cosmic-highlight bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
-              onClick={() => setView(view === "grid" ? "list" : "grid")}
-            >
-              <AlignCenter className="h-4 w-4" />
-              <span>{view === "grid" ? "List View" : "Grid View"}</span>
-            </Button>
-          </div>
-        </div>
-
+        <LibraryHeader 
+          dataSource={dataSource}
+          view={view}
+          isLoading={isLoading}
+          toggleDataSource={toggleDataSource}
+          toggleView={toggleView}
+        />
+        
         {dataSource === "api" && (
-          <div className="w-full overflow-x-auto">
-            <Tabs 
-              defaultValue={currentSubject} 
-              onValueChange={handleSubjectChange}
-              className="w-full"
-            >
-              <TabsList className="mb-4 overflow-x-auto flex flex-nowrap p-1 w-full">
-                {spiritualSubjects.map((subject) => (
-                  <TabsTrigger 
-                    key={subject.id}
-                    value={subject.id}
-                    className="whitespace-nowrap"
-                  >
-                    {subject.name}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </div>
+          <SubjectTabs 
+            subjects={spiritualSubjects}
+            currentSubject={currentSubject}
+            onChange={setCurrentSubject}
+          />
         )}
         
-        <div className="flex items-center w-full max-w-md relative">
-          <Search className="absolute left-3 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by title, author or tradition..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-background/80 backdrop-blur-sm border-purple-500/20 focus:border-purple-500/50"
-          />
-        </div>
+        <SearchBar
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search by title, author or tradition..."
+        />
         
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 text-purple-500 animate-spin mb-4" />
-            <p className="text-muted-foreground">Loading spiritual texts from across realms...</p>
-          </div>
+          <LibraryLoading />
         ) : selectedBook ? (
           <BookViewer bookId={selectedBook} onClose={handleCloseBook} />
         ) : (
