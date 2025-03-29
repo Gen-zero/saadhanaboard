@@ -1,17 +1,30 @@
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { 
+  Calendar, 
+  CheckSquare, 
+  Clock, 
+  Filter, 
+  Plus, 
+  Search, 
+  Star,
+  Trash2,
+  Edit3,
+  Clock3,
+  AlertCircle
+} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CheckSquare, Plus, BookOpen, CheckCheck, Calendar, Trash2, Edit, AlertCircle } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 
 interface Task {
   id: number;
@@ -21,918 +34,554 @@ interface Task {
   category: 'daily' | 'goal';
   dueDate?: string;
   time?: string;
-  createdAt: string;
   priority: 'low' | 'medium' | 'high';
+  tags?: string[];
 }
 
 const Tasks = () => {
-  const { toast } = useToast();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState('all');
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
-  const [taskData, setTaskData] = useState<Task | null>(null);
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filter, setFilter] = useState('all');
   
-  // Form state
-  const [formData, setFormData] = useState({
-    id: 0,
+  const [newTask, setNewTask] = useState<Omit<Task, 'id'>>({
     title: '',
     description: '',
+    completed: false,
     category: 'daily',
-    dueDate: '',
-    time: '',
-    priority: 'medium'
+    dueDate: new Date().toISOString().split('T')[0],
+    time: '09:00',
+    priority: 'medium',
+    tags: []
   });
   
-  // Get tasks from localStorage or use default
-  const getLocalTasks = () => {
+  const { toast } = useToast();
+
+  // Load tasks from localStorage on component mount
+  useEffect(() => {
     const savedTasks = localStorage.getItem('saadhanaTasks');
     if (savedTasks) {
       try {
-        return JSON.parse(savedTasks);
+        setTasks(JSON.parse(savedTasks));
       } catch (e) {
-        console.error("Failed to parse tasks:", e);
-        return [];
+        console.error('Failed to parse tasks from localStorage:', e);
+        // Initialize with empty array if parsing fails
+        setTasks([]);
       }
     }
-    
-    // Default tasks
-    return [
-      // Daily ritual tasks
-      {
-        id: 1,
-        title: 'Morning Prayer/Meditation',
-        description: 'Start the day with intention and connection',
-        completed: false,
-        category: 'daily',
-        time: '06:00',
-        createdAt: new Date().toISOString(),
-        priority: 'high'
-      },
-      {
-        id: 2,
-        title: 'Recite Sacred Text',
-        description: 'Reading from your chosen spiritual text',
-        completed: true,
-        category: 'daily',
-        time: '07:00',
-        createdAt: new Date().toISOString(),
-        priority: 'medium'
-      },
-      {
-        id: 3,
-        title: 'Evening Reflection',
-        description: 'Reflect on the day and set intentions for tomorrow',
-        completed: false,
-        category: 'daily',
-        time: '21:00',
-        createdAt: new Date().toISOString(),
-        priority: 'medium'
-      },
-      // Goal oriented tasks
-      {
-        id: 4,
-        title: 'Volunteer at Community Service',
-        description: 'Give back to your community',
-        completed: false,
-        category: 'goal',
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        createdAt: new Date().toISOString(),
-        priority: 'medium'
-      },
-      {
-        id: 5,
-        title: 'Study Chapter 3 of Sacred Text',
-        description: 'Deepen your understanding',
-        completed: false,
-        category: 'goal',
-        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        createdAt: new Date().toISOString(),
-        priority: 'high'
-      },
-      {
-        id: 6,
-        title: 'Attend Spiritual Gathering',
-        description: 'Connect with community',
-        completed: true,
-        category: 'goal',
-        dueDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        createdAt: new Date().toISOString(),
-        priority: 'low'
-      }
-    ];
-  };
+  }, []);
 
-  // Initialize tasks from localStorage
-  const [tasks, setTasks] = useState<Task[]>(getLocalTasks());
-
-  // Save tasks to localStorage whenever they change
+  // Save tasks to localStorage whenever tasks state changes
   useEffect(() => {
     localStorage.setItem('saadhanaTasks', JSON.stringify(tasks));
   }, [tasks]);
 
-  // Reset form data
-  const resetFormData = () => {
-    setFormData({
-      id: 0,
-      title: '',
-      description: '',
-      category: 'daily',
-      dueDate: '',
-      time: '',
-      priority: 'medium'
-    });
-    setIsEditMode(false);
-  };
-
-  // Open dialog for new task
-  const openNewTaskDialog = () => {
-    resetFormData();
-    setTaskData(null);
-    setIsDialogOpen(true);
-  };
-
-  // Open dialog for editing task
-  const openEditTaskDialog = (task: Task) => {
-    setFormData({
-      id: task.id,
-      title: task.title,
-      description: task.description || '',
-      category: task.category,
-      dueDate: task.dueDate || '',
-      time: task.time || '',
-      priority: task.priority
-    });
-    setTaskData(task);
-    setIsEditMode(true);
-    setIsDialogOpen(true);
-  };
-
-  // Handle form input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  // Handle select changes
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  // Handle task form submission
-  const handleTaskSubmit = () => {
-    if (!formData.title.trim()) {
+  const handleAddTask = () => {
+    if (!newTask.title.trim()) {
       toast({
-        title: "Title required",
-        description: "Please enter a task title",
+        title: "Task title required",
+        description: "Please provide a title for your task.",
         variant: "destructive"
       });
       return;
     }
+    
+    const newTaskWithId: Task = {
+      ...newTask,
+      id: Date.now()
+    };
+    
+    setTasks([...tasks, newTaskWithId]);
+    
+    // Reset form
+    setNewTask({
+      title: '',
+      description: '',
+      completed: false,
+      category: 'daily',
+      dueDate: new Date().toISOString().split('T')[0],
+      time: '09:00',
+      priority: 'medium',
+      tags: []
+    });
+    
+    setIsAddingTask(false);
+    
+    toast({
+      title: "Task added",
+      description: "Your task has been successfully added."
+    });
+  };
 
-    if (isEditMode && taskData) {
-      // Update existing task
-      const updatedTasks = tasks.map(task => 
-        task.id === taskData.id ? {
-          ...task,
-          title: formData.title,
-          description: formData.description || undefined,
-          category: formData.category as 'daily' | 'goal',
-          dueDate: formData.dueDate || undefined,
-          time: formData.time || undefined,
-          priority: formData.priority as 'low' | 'medium' | 'high'
-        } : task
-      );
-      setTasks(updatedTasks);
+  const handleUpdateTask = () => {
+    if (!editingTask) return;
+    
+    if (!editingTask.title.trim()) {
       toast({
-        title: "Task updated",
-        description: "Your task has been updated successfully"
+        title: "Task title required",
+        description: "Please provide a title for your task.",
+        variant: "destructive"
       });
-    } else {
-      // Add new task
-      const newTask: Task = {
-        id: Date.now(),
-        title: formData.title,
-        description: formData.description || undefined,
-        completed: false,
-        category: formData.category as 'daily' | 'goal',
-        dueDate: formData.dueDate || undefined,
-        time: formData.time || undefined,
-        createdAt: new Date().toISOString(),
-        priority: formData.priority as 'low' | 'medium' | 'high'
-      };
-      setTasks([...tasks, newTask]);
-      toast({
-        title: "Task added",
-        description: "Your new task has been added successfully"
-      });
+      return;
     }
     
-    setIsDialogOpen(false);
-    resetFormData();
-  };
-
-  // Delete task
-  const confirmDeleteTask = (taskId: number) => {
-    setTaskToDelete(taskId);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const deleteTask = () => {
-    if (taskToDelete === null) return;
+    setTasks(tasks.map(task => 
+      task.id === editingTask.id ? editingTask : task
+    ));
     
-    const updatedTasks = tasks.filter(task => task.id !== taskToDelete);
-    setTasks(updatedTasks);
-    setIsDeleteDialogOpen(false);
-    setTaskToDelete(null);
+    setEditingTask(null);
+    
+    toast({
+      title: "Task updated",
+      description: "Your task has been successfully updated."
+    });
+  };
+
+  const handleDeleteTask = (id: number) => {
+    setTasks(tasks.filter(task => task.id !== id));
     
     toast({
       title: "Task deleted",
-      description: "Your task has been removed"
+      description: "Your task has been deleted."
     });
   };
 
-  // Toggle task completion
-  const toggleTaskCompletion = (taskId: number) => {
+  const toggleTaskCompletion = (id: number) => {
     setTasks(tasks.map(task => 
-      task.id === taskId ? { ...task, completed: !task.completed } : task
+      task.id === id ? { ...task, completed: !task.completed } : task
     ));
     
-    const task = tasks.find(t => t.id === taskId);
-    if (task) {
-      toast({
-        title: task.completed ? "Task marked as incomplete" : "Task completed",
-        description: task.completed ? "Task marked as pending" : `Congratulations on completing "${task.title}"!`
-      });
-    }
+    const task = tasks.find(t => t.id === id);
+    
+    toast({
+      title: task?.completed ? "Task incomplete" : "Task completed",
+      description: task?.completed 
+        ? "Task marked as incomplete." 
+        : "Great job! Your task is complete."
+    });
   };
 
-  // Filter tasks based on active tab
+  // Filter and search tasks
   const filteredTasks = tasks.filter(task => {
-    if (activeTab === 'all') return true;
-    if (activeTab === 'daily') return task.category === 'daily';
-    if (activeTab === 'goal') return task.category === 'goal';
-    if (activeTab === 'completed') return task.completed;
-    if (activeTab === 'pending') return !task.completed;
+    // Filter by tab
+    if (activeTab === 'daily' && task.category !== 'daily') return false;
+    if (activeTab === 'goals' && task.category !== 'goal') return false;
+    if (activeTab === 'completed' && !task.completed) return false;
+    if (activeTab === 'incomplete' && task.completed) return false;
+    
+    // Filter by priority
+    if (filter !== 'all' && task.priority !== filter) return false;
+    
+    // Filter by search query
+    if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    
     return true;
   });
 
-  // Separate tasks by category
-  const dailyTasks = tasks.filter(task => task.category === 'daily');
-  const goalTasks = tasks.filter(task => task.category === 'goal');
-  
-  // Get priority class
-  const getPriorityClass = (priority: string) => {
-    switch(priority) {
-      case 'high': return 'bg-red-500/20 text-red-700 dark:text-red-300';
-      case 'medium': return 'bg-yellow-500/20 text-yellow-700 dark:text-yellow-300';
-      case 'low': return 'bg-green-500/20 text-green-700 dark:text-green-300';
-      default: return 'bg-secondary text-muted-foreground';
+  // Sort tasks by priority and due date
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    // First by completion status
+    if (a.completed !== b.completed) {
+      return a.completed ? 1 : -1;
+    }
+    
+    // Then by priority
+    const priorityOrder = { high: 0, medium: 1, low: 2 };
+    if (a.priority !== b.priority) {
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    }
+    
+    // Then by due date (if available)
+    if (a.dueDate && b.dueDate) {
+      return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+    }
+    
+    // Finally by title
+    return a.title.localeCompare(b.title);
+  });
+
+  // Get color for priority
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return 'text-red-500';
+      case 'medium':
+        return 'text-yellow-500';
+      case 'low':
+        return 'text-green-500';
+      default:
+        return 'text-primary';
     }
   };
-  
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    if (!dateString) return '';
+
+  // Format date
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'No Date';
     
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
+    const taskDate = new Date(dateString);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    
+    const taskDateStart = new Date(taskDate);
+    taskDateStart.setHours(0, 0, 0, 0);
+    
+    if (taskDateStart.getTime() === today.getTime()) {
+      return 'Today';
+    } else if (taskDateStart.getTime() === tomorrow.getTime()) {
+      return 'Tomorrow';
+    } else {
+      return taskDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+      });
+    }
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <CheckSquare className="h-7 w-7 text-primary" />
-            <span>Tasks</span>
-          </h1>
-          <p className="text-muted-foreground">
-            Manage your spiritual practices and goals.
-          </p>
-        </div>
-        <Button className="mt-2 sm:mt-0" onClick={openNewTaskDialog}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add New Task
-        </Button>
+      <div className="flex flex-col gap-2">
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <CheckSquare className="h-7 w-7 text-primary" />
+          Tasks
+        </h1>
+        <p className="text-muted-foreground">
+          Organize your spiritual practices and goals.
+        </p>
       </div>
 
-      <Tabs defaultValue="all" onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-5 w-full max-w-md mb-6">
+      <div className="flex flex-col sm:flex-row justify-between gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input 
+            placeholder="Search tasks..."
+            className="pl-9"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="flex gap-2">
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-[130px]">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4" />
+                <span>Priority</span>
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="high">High</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="low">Low</SelectItem>
+            </SelectContent>
+          </Select>
+          <Dialog open={isAddingTask} onOpenChange={setIsAddingTask}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Add Task
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Add New Task</DialogTitle>
+                <DialogDescription>
+                  Create a new task for your spiritual practice or goal.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    placeholder="Task title"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({...newTask, title: e.target.value})}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Task description"
+                    value={newTask.description || ''}
+                    onChange={(e) => setNewTask({...newTask, description: e.target.value})}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="category">Category</Label>
+                    <Select
+                      value={newTask.category}
+                      onValueChange={(value: 'daily' | 'goal') => setNewTask({...newTask, category: value})}
+                    >
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily Ritual</SelectItem>
+                        <SelectItem value="goal">Goal Oriented</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="priority">Priority</Label>
+                    <Select
+                      value={newTask.priority}
+                      onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask({...newTask, priority: value})}
+                    >
+                      <SelectTrigger id="priority">
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="dueDate">Due Date</Label>
+                    <Input
+                      id="dueDate"
+                      type="date"
+                      value={newTask.dueDate || ''}
+                      onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="time">Time</Label>
+                    <Input
+                      id="time"
+                      type="time"
+                      value={newTask.time || ''}
+                      onChange={(e) => setNewTask({...newTask, time: e.target.value})}
+                    />
+                  </div>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddingTask(false)}>Cancel</Button>
+                <Button onClick={handleAddTask}>Add Task</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-5">
           <TabsTrigger value="all">All</TabsTrigger>
           <TabsTrigger value="daily">Daily</TabsTrigger>
-          <TabsTrigger value="goal">Goals</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="completed">Done</TabsTrigger>
+          <TabsTrigger value="goals">Goals</TabsTrigger>
+          <TabsTrigger value="completed">Completed</TabsTrigger>
+          <TabsTrigger value="incomplete">Incomplete</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <CheckCheck className="h-5 w-5 text-primary" />
-                  <span>Daily Rituals</span>
-                </CardTitle>
-                <CardDescription>
-                  Recurring spiritual practices
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {dailyTasks.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <AlertCircle className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                    <p>No daily rituals found</p>
-                    <Button variant="link" size="sm" onClick={openNewTaskDialog} className="mt-2">
-                      Add your first daily ritual
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {dailyTasks.map((task) => (
-                      <div 
-                        key={task.id} 
-                        className={`flex items-start p-3 rounded-lg task-item-transition ${
-                          task.completed ? 'bg-secondary/30 opacity-70' : 'bg-secondary/50 hover-lift'
-                        }`}
-                      >
-                        <Checkbox 
-                          id={`task-${task.id}`} 
+        {/* Task list for all tabs */}
+        <TabsContent value={activeTab} className="mt-4">
+          {sortedTasks.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <CheckSquare className="h-16 w-16 text-muted-foreground/30 mb-4" />
+              <h3 className="text-xl font-medium mb-2">No tasks found</h3>
+              <p className="text-muted-foreground max-w-md">
+                {searchQuery || filter !== 'all' 
+                  ? "Try changing your search or filter settings." 
+                  : "Create your first task by clicking the 'Add Task' button."}
+              </p>
+              <Button 
+                variant="outline" 
+                className="mt-4"
+                onClick={() => setIsAddingTask(true)}
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Task
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4 mt-4">
+              {sortedTasks.map(task => (
+                <Card key={task.id} className={`hover-lift transition-all ${task.completed ? 'opacity-70' : ''}`}>
+                  <CardHeader className="pb-2">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <Checkbox
                           checked={task.completed}
                           onCheckedChange={() => toggleTaskCompletion(task.id)}
-                          className="mt-1 h-5 w-5"
+                          className="mt-1"
                         />
-                        <div className="ml-3 space-y-1 flex-1">
-                          <div className="flex items-center gap-2">
-                            <Label 
-                              htmlFor={`task-${task.id}`}
-                              className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}
-                            >
-                              {task.title}
-                            </Label>
-                            <span className={`text-xs px-2 py-0.5 rounded ${getPriorityClass(task.priority)}`}>
-                              {task.priority}
-                            </span>
-                          </div>
+                        <div>
+                          <CardTitle className={`text-xl ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                            {task.title}
+                          </CardTitle>
                           {task.description && (
-                            <p className="text-sm text-muted-foreground">
+                            <CardDescription className="mt-1">
                               {task.description}
-                            </p>
+                            </CardDescription>
                           )}
                         </div>
-                        <div className="flex items-center gap-2">
-                          {task.time && (
-                            <div className="text-xs text-muted-foreground font-medium bg-background/50 px-2 py-1 rounded">
-                              {task.time}
-                            </div>
-                          )}
-                          <div className="flex flex-col md:flex-row gap-1">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-7 w-7" 
-                              onClick={() => openEditTaskDialog(task)}
-                            >
-                              <Edit size={15} />
+                      </div>
+                      <div className="flex gap-2">
+                        <Dialog open={editingTask?.id === task.id} onOpenChange={(open) => {
+                          if (open) {
+                            setEditingTask(task);
+                          } else {
+                            setEditingTask(null);
+                          }
+                        }}>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <Edit3 className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-7 w-7 text-destructive hover:text-destructive/90" 
-                              onClick={() => confirmDeleteTask(task.id)}
-                            >
-                              <Trash2 size={15} />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  <span>Goal Oriented</span>
-                </CardTitle>
-                <CardDescription>
-                  Tasks to help you achieve your spiritual goals
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {goalTasks.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <AlertCircle className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                    <p>No goals found</p>
-                    <Button variant="link" size="sm" onClick={openNewTaskDialog} className="mt-2">
-                      Add your first goal
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {goalTasks.map((task) => (
-                      <div 
-                        key={task.id} 
-                        className={`flex items-start p-3 rounded-lg task-item-transition ${
-                          task.completed ? 'bg-secondary/30 opacity-70' : 'bg-secondary/50 hover-lift'
-                        }`}
-                      >
-                        <Checkbox 
-                          id={`task-${task.id}`} 
-                          checked={task.completed}
-                          onCheckedChange={() => toggleTaskCompletion(task.id)}
-                          className="mt-1 h-5 w-5"
-                        />
-                        <div className="ml-3 space-y-1 flex-1">
-                          <div className="flex items-center gap-2">
-                            <Label 
-                              htmlFor={`task-${task.id}`}
-                              className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}
-                            >
-                              {task.title}
-                            </Label>
-                            <span className={`text-xs px-2 py-0.5 rounded ${getPriorityClass(task.priority)}`}>
-                              {task.priority}
-                            </span>
-                          </div>
-                          {task.description && (
-                            <p className="text-sm text-muted-foreground">
-                              {task.description}
-                            </p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {task.dueDate && (
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground font-medium bg-background/50 px-2 py-1 rounded">
-                              <Calendar className="h-3 w-3" />
-                              {formatDate(task.dueDate)}
-                            </div>
-                          )}
-                          <div className="flex flex-col md:flex-row gap-1">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-7 w-7" 
-                              onClick={() => openEditTaskDialog(task)}
-                            >
-                              <Edit size={15} />
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
-                              className="h-7 w-7 text-destructive hover:text-destructive/90" 
-                              onClick={() => confirmDeleteTask(task.id)}
-                            >
-                              <Trash2 size={15} />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="daily" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CheckCheck className="h-6 w-6 text-primary" />
-                <span>Daily Ritual Tasks</span>
-              </CardTitle>
-              <CardDescription>Recurring spiritual practices</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {filteredTasks.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <AlertCircle className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                  <p>No daily rituals found</p>
-                  <Button variant="link" size="sm" onClick={openNewTaskDialog} className="mt-2">
-                    Add your first daily ritual
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredTasks.map((task) => (
-                    <div 
-                      key={task.id} 
-                      className={`flex items-start p-3 rounded-lg task-item-transition ${
-                        task.completed ? 'bg-secondary/30 opacity-70' : 'bg-secondary/50 hover-lift'
-                      }`}
-                    >
-                      <Checkbox 
-                        id={`daily-${task.id}`} 
-                        checked={task.completed}
-                        onCheckedChange={() => toggleTaskCompletion(task.id)}
-                        className="mt-1 h-5 w-5"
-                      />
-                      <div className="ml-3 space-y-1 flex-1">
-                        <div className="flex items-center gap-2">
-                          <Label 
-                            htmlFor={`daily-${task.id}`}
-                            className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}
-                          >
-                            {task.title}
-                          </Label>
-                          <span className={`text-xs px-2 py-0.5 rounded ${getPriorityClass(task.priority)}`}>
-                            {task.priority}
-                          </span>
-                        </div>
-                        {task.description && (
-                          <p className="text-sm text-muted-foreground">
-                            {task.description}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {task.time && (
-                          <div className="text-xs text-muted-foreground font-medium bg-background/50 px-2 py-1 rounded">
-                            {task.time}
-                          </div>
-                        )}
-                        <div className="flex flex-col md:flex-row gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7" 
-                            onClick={() => openEditTaskDialog(task)}
-                          >
-                            <Edit size={15} />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 text-destructive hover:text-destructive/90" 
-                            onClick={() => confirmDeleteTask(task.id)}
-                          >
-                            <Trash2 size={15} />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="goal" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BookOpen className="h-6 w-6 text-primary" />
-                <span>Goal Oriented Tasks</span>
-              </CardTitle>
-              <CardDescription>Tasks to help you achieve your spiritual goals</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {filteredTasks.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <AlertCircle className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                  <p>No goals found</p>
-                  <Button variant="link" size="sm" onClick={openNewTaskDialog} className="mt-2">
-                    Add your first goal
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredTasks.map((task) => (
-                    <div 
-                      key={task.id} 
-                      className={`flex items-start p-3 rounded-lg task-item-transition ${
-                        task.completed ? 'bg-secondary/30 opacity-70' : 'bg-secondary/50 hover-lift'
-                      }`}
-                    >
-                      <Checkbox 
-                        id={`goal-${task.id}`} 
-                        checked={task.completed}
-                        onCheckedChange={() => toggleTaskCompletion(task.id)}
-                        className="mt-1 h-5 w-5"
-                      />
-                      <div className="ml-3 space-y-1 flex-1">
-                        <div className="flex items-center gap-2">
-                          <Label 
-                            htmlFor={`goal-${task.id}`}
-                            className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}
-                          >
-                            {task.title}
-                          </Label>
-                          <span className={`text-xs px-2 py-0.5 rounded ${getPriorityClass(task.priority)}`}>
-                            {task.priority}
-                          </span>
-                        </div>
-                        {task.description && (
-                          <p className="text-sm text-muted-foreground">
-                            {task.description}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {task.dueDate && (
-                          <div className="flex items-center gap-1 text-xs text-muted-foreground font-medium bg-background/50 px-2 py-1 rounded">
-                            <Calendar className="h-3 w-3" />
-                            {formatDate(task.dueDate)}
-                          </div>
-                        )}
-                        <div className="flex flex-col md:flex-row gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7" 
-                            onClick={() => openEditTaskDialog(task)}
-                          >
-                            <Edit size={15} />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 text-destructive hover:text-destructive/90" 
-                            onClick={() => confirmDeleteTask(task.id)}
-                          >
-                            <Trash2 size={15} />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="pending" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pending Tasks</CardTitle>
-              <CardDescription>Tasks that need your attention</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {filteredTasks.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <AlertCircle className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                  <p>No pending tasks</p>
-                  <Button variant="link" size="sm" onClick={openNewTaskDialog} className="mt-2">
-                    Add a new task
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredTasks.map((task) => (
-                    <div 
-                      key={task.id} 
-                      className="flex items-start p-3 bg-secondary/50 rounded-lg hover-lift"
-                    >
-                      <Checkbox 
-                        id={`pending-${task.id}`} 
-                        checked={task.completed}
-                        onCheckedChange={() => toggleTaskCompletion(task.id)}
-                        className="mt-1 h-5 w-5"
-                      />
-                      <div className="ml-3 space-y-1 flex-1">
-                        <div className="flex items-center gap-2">
-                          <Label 
-                            htmlFor={`pending-${task.id}`}
-                            className="font-medium"
-                          >
-                            {task.title}
-                          </Label>
-                          <span className={`text-xs px-2 py-0.5 rounded ${getPriorityClass(task.priority)}`}>
-                            {task.priority}
-                          </span>
-                        </div>
-                        {task.description && (
-                          <p className="text-sm text-muted-foreground">
-                            {task.description}
-                          </p>
-                        )}
-                        <p className="text-xs text-primary font-medium">
-                          {task.category === 'daily' ? 'Daily Ritual' : 'Goal Oriented'}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {(task.time || task.dueDate) && (
-                          <div className="text-xs text-muted-foreground font-medium bg-background/50 px-2 py-1 rounded">
-                            {task.time || formatDate(task.dueDate!)}
-                          </div>
-                        )}
-                        <div className="flex flex-col md:flex-row gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7" 
-                            onClick={() => openEditTaskDialog(task)}
-                          >
-                            <Edit size={15} />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-7 w-7 text-destructive hover:text-destructive/90" 
-                            onClick={() => confirmDeleteTask(task.id)}
-                          >
-                            <Trash2 size={15} />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="completed" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Completed Tasks</CardTitle>
-              <CardDescription>Tasks you have accomplished</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {filteredTasks.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <AlertCircle className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                  <p>No completed tasks</p>
-                  <p className="text-sm mt-1">Tasks you complete will appear here</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredTasks.map((task) => (
-                    <div 
-                      key={task.id} 
-                      className="flex items-start p-3 bg-secondary/30 rounded-lg opacity-80"
-                    >
-                      <Checkbox 
-                        id={`completed-${task.id}`} 
-                        checked={task.completed}
-                        onCheckedChange={() => toggleTaskCompletion(task.id)}
-                        className="mt-1 h-5 w-5"
-                      />
-                      <div className="ml-3 space-y-1 flex-1">
-                        <div className="flex items-center gap-2">
-                          <Label 
-                            htmlFor={`completed-${task.id}`}
-                            className="font-medium line-through text-muted-foreground"
-                          >
-                            {task.title}
-                          </Label>
-                          <span className={`text-xs px-2 py-0.5 rounded ${getPriorityClass(task.priority)} opacity-50`}>
-                            {task.priority}
-                          </span>
-                        </div>
-                        {task.description && (
-                          <p className="text-sm text-muted-foreground line-through">
-                            {task.description}
-                          </p>
-                        )}
-                        <p className="text-xs text-primary/70 font-medium">
-                          {task.category === 'daily' ? 'Daily Ritual' : 'Goal Oriented'}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {(task.time || task.dueDate) && (
-                          <div className="text-xs text-muted-foreground font-medium bg-background/50 px-2 py-1 rounded">
-                            {task.time || formatDate(task.dueDate!)}
-                          </div>
-                        )}
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-7 w-7 text-destructive hover:text-destructive/90" 
-                          onClick={() => confirmDeleteTask(task.id)}
-                        >
-                          <Trash2 size={15} />
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[500px]">
+                            <DialogHeader>
+                              <DialogTitle>Edit Task</DialogTitle>
+                              <DialogDescription>
+                                Update your task details.
+                              </DialogDescription>
+                            </DialogHeader>
+                            {editingTask && (
+                              <div className="grid gap-4 py-4">
+                                <div className="grid gap-2">
+                                  <Label htmlFor="edit-title">Title</Label>
+                                  <Input
+                                    id="edit-title"
+                                    placeholder="Task title"
+                                    value={editingTask.title}
+                                    onChange={(e) => setEditingTask({...editingTask, title: e.target.value})}
+                                  />
+                                </div>
+                                <div className="grid gap-2">
+                                  <Label htmlFor="edit-description">Description</Label>
+                                  <Textarea
+                                    id="edit-description"
+                                    placeholder="Task description"
+                                    value={editingTask.description || ''}
+                                    onChange={(e) => setEditingTask({...editingTask, description: e.target.value})}
+                                  />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="grid gap-2">
+                                    <Label htmlFor="edit-category">Category</Label>
+                                    <Select
+                                      value={editingTask.category}
+                                      onValueChange={(value: 'daily' | 'goal') => setEditingTask({...editingTask, category: value})}
+                                    >
+                                      <SelectTrigger id="edit-category">
+                                        <SelectValue placeholder="Select category" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="daily">Daily Ritual</SelectItem>
+                                        <SelectItem value="goal">Goal Oriented</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <div className="grid gap-2">
+                                    <Label htmlFor="edit-priority">Priority</Label>
+                                    <Select
+                                      value={editingTask.priority}
+                                      onValueChange={(value: 'low' | 'medium' | 'high') => setEditingTask({...editingTask, priority: value})}
+                                    >
+                                      <SelectTrigger id="edit-priority">
+                                        <SelectValue placeholder="Select priority" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="low">Low</SelectItem>
+                                        <SelectItem value="medium">Medium</SelectItem>
+                                        <SelectItem value="high">High</SelectItem>
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="grid gap-2">
+                                    <Label htmlFor="edit-dueDate">Due Date</Label>
+                                    <Input
+                                      id="edit-dueDate"
+                                      type="date"
+                                      value={editingTask.dueDate || ''}
+                                      onChange={(e) => setEditingTask({...editingTask, dueDate: e.target.value})}
+                                    />
+                                  </div>
+                                  <div className="grid gap-2">
+                                    <Label htmlFor="edit-time">Time</Label>
+                                    <Input
+                                      id="edit-time"
+                                      type="time"
+                                      value={editingTask.time || ''}
+                                      onChange={(e) => setEditingTask({...editingTask, time: e.target.value})}
+                                    />
+                                  </div>
+                                </div>
+                                <div className="grid gap-2">
+                                  <div className="flex items-center gap-2">
+                                    <Switch 
+                                      checked={editingTask.completed}
+                                      onCheckedChange={(checked) => setEditingTask({...editingTask, completed: checked})}
+                                    />
+                                    <Label>Mark as completed</Label>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            <DialogFooter>
+                              <Button variant="outline" onClick={() => setEditingTask(null)}>Cancel</Button>
+                              <Button onClick={handleUpdateTask}>Save Changes</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteTask(task.id)}>
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                  </CardHeader>
+                  <CardContent className="pb-4">
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                      <Badge variant="outline" className={`flex items-center gap-1 ${getPriorityColor(task.priority)}`}>
+                        <AlertCircle className="h-3 w-3" />
+                        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+                      </Badge>
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        {task.category === 'daily' ? (
+                          <>
+                            <Clock3 className="h-3 w-3" />
+                            Daily Ritual
+                          </>
+                        ) : (
+                          <>
+                            <Star className="h-3 w-3" />
+                            Goal Oriented
+                          </>
+                        )}
+                      </Badge>
+                      {task.dueDate && (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(task.dueDate)}
+                        </Badge>
+                      )}
+                      {task.time && (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {task.time}
+                        </Badge>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
-
-      {/* Add/Edit Task Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{isEditMode ? "Edit Task" : "Add New Task"}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Task Title</Label>
-              <Input 
-                id="title" 
-                name="title"
-                placeholder="Enter task title" 
-                value={formData.title}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
-              <Textarea 
-                id="description" 
-                name="description"
-                placeholder="Enter task description" 
-                value={formData.description}
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="category">Task Category</Label>
-              <Select 
-                value={formData.category}
-                onValueChange={(value) => handleSelectChange('category', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="daily">Daily Ritual</SelectItem>
-                  <SelectItem value="goal">Goal Oriented</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="priority">Priority</Label>
-              <Select 
-                value={formData.priority}
-                onValueChange={(value) => handleSelectChange('priority', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {formData.category === 'goal' ? (
-                <div className="space-y-2">
-                  <Label htmlFor="dueDate">Due Date</Label>
-                  <Input 
-                    id="dueDate" 
-                    name="dueDate"
-                    type="date" 
-                    value={formData.dueDate}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <Label htmlFor="time">Time</Label>
-                  <Input 
-                    id="time" 
-                    name="time"
-                    type="time" 
-                    value={formData.time}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleTaskSubmit}>{isEditMode ? "Update" : "Add"} Task</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this task.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={deleteTask} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
