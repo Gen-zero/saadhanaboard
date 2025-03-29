@@ -37,11 +37,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex bg-pattern">
-      {/* Sidebar */}
+      {/* Sidebar - now fixed with 100vh height */}
       <div 
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 ease-in-out ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 h-screen bg-sidebar border-r border-sidebar-border transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:relative md:translate-x-0`}
+        } md:translate-x-0`}
       >
         <div className="h-full flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
@@ -83,10 +83,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      {/* Main Content - adjusted to account for fixed sidebar */}
+      <div className="flex-1 flex flex-col min-w-0 md:ml-64">
         {/* Mobile Header */}
-        <header className="bg-background border-b border-border p-4 flex items-center md:hidden">
+        <header className="bg-background border-b border-border p-4 flex items-center md:hidden sticky top-0 z-40">
           <button
             className="p-1 rounded-md text-muted-foreground hover:bg-secondary"
             onClick={() => setIsSidebarOpen(true)}
