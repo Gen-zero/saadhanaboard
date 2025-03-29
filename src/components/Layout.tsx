@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
   Home, 
@@ -12,8 +13,13 @@ import {
   AlarmClock,
   BookHeart,
   WandSparkles,
-  Library
+  Library,
+  LogOut,
+  LogIn
 } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
+import { Button } from './ui/button';
+import { useToast } from './ui/use-toast';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,6 +28,9 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
 
   const navItems = [
     { name: 'Dashboard', icon: Home, path: '/' },
@@ -36,6 +45,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     if (path === '/' && location.pathname === '/') return true;
     if (path !== '/' && location.pathname.startsWith(path)) return true;
     return false;
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logged out",
+      description: "You've been successfully logged out."
+    });
+    navigate('/login');
   };
 
   return (
@@ -79,7 +97,36 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             ))}
           </nav>
           <div className="p-4 border-t border-sidebar-border">
-            <div className="text-xs text-sidebar-foreground/70 text-center">
+            {user ? (
+              <div className="flex flex-col space-y-2">
+                <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90">
+                  <User size={16} className="text-primary" />
+                  <span className="truncate">{user.displayName || user.email}</span>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start text-sidebar-foreground"
+                  onClick={handleLogout}
+                >
+                  <LogOut size={16} className="mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-col space-y-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start text-sidebar-foreground"
+                  onClick={() => navigate('/login')}
+                >
+                  <LogIn size={16} className="mr-2" />
+                  Sign In
+                </Button>
+              </div>
+            )}
+            <div className="mt-4 text-xs text-sidebar-foreground/70 text-center">
               <p>Manifest your spiritual journey into reality</p>
             </div>
           </div>
