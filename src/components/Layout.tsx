@@ -10,7 +10,9 @@ import {
   Menu, 
   X, 
   ChevronRight,
-  AlarmClock
+  AlarmClock,
+  BookHeart,
+  WandSparkles
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -23,7 +25,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navItems = [
     { name: 'Dashboard', icon: Home, path: '/' },
-    { name: 'Saadhana Board', icon: BookOpen, path: '/sadhana' },
+    { name: 'Saadhana Yantra', icon: BookHeart, path: '/sadhana' },
     { name: 'Tasks', icon: CheckSquare, path: '/tasks' },
     { name: 'Profile', icon: User, path: '/profile' },
     { name: 'Settings', icon: Settings, path: '/settings' }
@@ -46,8 +48,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="h-full flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
             <div className="flex items-center gap-2">
-              <AlarmClock className="h-6 w-6 text-primary" />
-              <h1 className="text-xl font-semibold text-sidebar-foreground">Saadhana Board</h1>
+              <WandSparkles className="h-6 w-6 text-primary" />
+              <h1 className="text-xl font-semibold text-sidebar-foreground">Saadhana Yantra</h1>
             </div>
             <button 
               className="p-1 rounded-md text-sidebar-foreground hover:bg-sidebar-accent md:hidden"
@@ -77,7 +79,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </nav>
           <div className="p-4 border-t border-sidebar-border">
             <div className="text-xs text-sidebar-foreground/70 text-center">
-              <p>May your spiritual journey be blessed</p>
+              <p>Manifest your spiritual journey into reality</p>
             </div>
           </div>
         </div>
@@ -93,7 +95,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           >
             <Menu size={24} />
           </button>
-          <h1 className="ml-4 text-lg font-semibold">Saadhana Board</h1>
+          <h1 className="ml-4 text-lg font-semibold">Saadhana Yantra</h1>
         </header>
 
         {/* Page Content */}
