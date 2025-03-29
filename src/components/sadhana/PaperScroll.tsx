@@ -1,5 +1,5 @@
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Text, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -13,6 +13,8 @@ interface PaperProps {
 const PaperScroll = ({ content, position, rotation }: PaperProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
+  const [textureLoaded, setTextureLoaded] = useState(false);
+  const [fallbackActive, setFallbackActive] = useState(false);
   
   // Create a fallback texture in case the external one fails to load
   const createFallbackTexture = () => {
@@ -61,19 +63,29 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
     return texture;
   };
   
-  // Try to load the actual texture but use fallback if it fails
-  const fallbackTexture = createFallbackTexture();
-  
-  // Create material with appropriate textures
-  const texture = useTexture(
-    "/textures/parchment.jpg", 
-    (loadedTexture) => {
-      console.log("Parchment texture loaded successfully");
-    },
+  // Try to load the texture with proper error handling
+  const [parchmentTexture, parchmentError] = useTexture(
+    ['/textures/parchment.jpg'],
+    // The useTexture hook provides error handling through the return value,
+    // not through callback parameters
+    undefined, 
     (error) => {
       console.error("Failed to load parchment texture:", error);
+      setFallbackActive(true);
     }
-  ) || fallbackTexture;
+  );
+  
+  useEffect(() => {
+    if (parchmentError) {
+      console.error("Texture loading error detected:", parchmentError);
+      setFallbackActive(true);
+    } else if (parchmentTexture) {
+      setTextureLoaded(true);
+    }
+  }, [parchmentTexture, parchmentError]);
+  
+  // Create final texture based on load status
+  const finalTexture = fallbackActive ? createFallbackTexture() : parchmentTexture;
   
   // Create displacement map
   const createDisplacementMap = () => {
@@ -134,7 +146,7 @@ const PaperScroll = ({ content, position, rotation }: PaperProps) => {
       >
         <planeGeometry args={[4.5, 6, 32, 32]} />
         <meshStandardMaterial 
-          map={texture}
+          map={finalTexture}
           displacementMap={displacement}
           displacementScale={0.03}
           roughness={0.7} 
