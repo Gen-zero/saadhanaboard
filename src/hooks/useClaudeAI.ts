@@ -40,11 +40,11 @@ export const useClaudeAI = (initialMessages: Message[] = []) => {
     setIsLoading(true);
 
     try {
-      // Format messages for Claude API
+      // Format messages for Claude API with explicit typing
       const formattedMessages = messages
         .concat(userMessage)
         .map(msg => ({
-          role: msg.sender === 'user' ? 'user' : 'assistant',
+          role: msg.sender === 'user' ? 'user' as const : 'assistant' as const,
           content: msg.message
         }));
 
