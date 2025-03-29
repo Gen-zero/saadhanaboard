@@ -1,6 +1,5 @@
-
-import { useState } from 'react';
-import { BookOpen, Edit, WandSparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { BookOpen, Edit, WandSparkles, MoonStar, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ManifestationForm from './sadhana/ManifestationForm';
 import SadhanaDetails from './sadhana/SadhanaDetails';
@@ -9,8 +8,17 @@ import SadhanaViewer from './sadhana/SadhanaViewer';
 const SaadhanaBoard = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showManifestationForm, setShowManifestationForm] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   
-  // Mock data for sadhana board
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setCursorPosition({ x: e.clientX, y: e.clientY });
+    };
+    
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+  
   const sadhanaData = {
     purpose: "To deepen my connection with the divine and cultivate inner peace.",
     goal: "Complete a 40-day meditation practice focusing on gratitude and compassion.",
@@ -43,51 +51,81 @@ ${sadhanaData.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
   `;
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col gap-2">
+    <div className="space-y-6 animate-fade-in relative">
+      <div 
+        className="cosmic-cursor fixed w-12 h-12 rounded-full pointer-events-none z-50 mix-blend-screen"
+        style={{
+          background: 'radial-gradient(circle, rgba(147,51,234,0.7) 0%, rgba(139,92,246,0.3) 50%, rgba(0,0,0,0) 70%)',
+          left: `${cursorPosition.x - 24}px`,
+          top: `${cursorPosition.y - 24}px`,
+          transform: 'translate(0, 0)',
+          transition: 'transform 0.1s ease-out, opacity 0.3s ease-out'
+        }}
+      />
+      
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-64 h-64 bg-purple-600/20 rounded-full filter blur-3xl animate-pulse-slow"></div>
+        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-indigo-500/20 rounded-full filter blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+      </div>
+      
+      <div className="flex flex-col gap-2 backdrop-blur-sm bg-background/70 p-4 rounded-lg border border-purple-500/20">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <BookOpen className="h-7 w-7 text-primary" />
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
+            <MoonStar className="h-7 w-7 text-purple-500" />
             <span>Saadhana Board</span>
             <span className="text-sm text-muted-foreground ml-2 italic font-normal">
-              Digital Yantra for Manifestation
+              Celestial Yantra for Divine Manifestation
             </span>
           </h1>
           <div className="flex gap-2">
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
               onClick={() => setShowManifestationForm(!showManifestationForm)}
             >
-              <WandSparkles className="h-4 w-4" />
-              Manifest Intention
+              <Sparkles className="h-4 w-4" />
+              <span>Manifest Intention</span>
+              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
+              </span>
             </Button>
             <Button 
               variant="outline" 
               size="sm" 
-              className="flex items-center gap-1"
+              className="flex items-center gap-1 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
               onClick={() => setIsEditing(!isEditing)}
             >
               <Edit className="h-4 w-4" />
-              {isEditing ? 'View Mode' : 'Edit Details'}
+              {isEditing ? 'Cosmic View' : 'Edit Details'}
             </Button>
           </div>
         </div>
-        <p className="text-muted-foreground">
-          Your spiritual intentions, goals, and devotional practice. Connect with your deity to manifest ideas into reality.
+        <p className="text-muted-foreground font-light tracking-wide">
+          Your spiritual intentions transcend dimensions through this cosmic yantra. Connect with your divine guide to manifest your desires into reality.
         </p>
       </div>
 
       {showManifestationForm && (
-        <ManifestationForm onClose={() => setShowManifestationForm(false)} />
+        <div className="relative z-10">
+          <ManifestationForm onClose={() => setShowManifestationForm(false)} />
+        </div>
       )}
 
-      {isEditing ? (
-        <SadhanaDetails sadhanaData={sadhanaData} />
-      ) : (
-        <SadhanaViewer paperContent={paperContent} />
-      )}
+      <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
+        {isEditing ? (
+          <SadhanaDetails sadhanaData={sadhanaData} />
+        ) : (
+          <SadhanaViewer paperContent={paperContent} />
+        )}
+      </div>
+      
+      <div className="p-4 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 rounded-lg border border-purple-500/20 backdrop-blur-md">
+        <p className="text-center text-sm italic text-indigo-200 font-light tracking-wide">
+          "The universe is not outside of you. Look inside yourself; everything that you want, you already are." — Rumi
+        </p>
+      </div>
     </div>
   );
 };
