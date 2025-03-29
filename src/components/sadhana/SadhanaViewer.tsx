@@ -46,18 +46,18 @@ const SadhanaViewer = ({ paperContent }: SadhanaViewerProps) => {
 
   return (
     <div className="w-full bg-gradient-to-br from-indigo-950 via-purple-900 to-indigo-950 rounded-lg overflow-hidden shadow-2xl relative h-[600px]">
-      {/* Cosmic background elements */}
+      {/* Cosmic background elements using theme colors */}
       <div className="absolute inset-0 z-0 opacity-20">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-500 rounded-full filter blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-500 rounded-full filter blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full filter blur-3xl animate-pulse-slow bg-primary/50"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full filter blur-3xl animate-pulse-slow bg-accent/50" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 w-80 h-80 rounded-full filter blur-3xl animate-pulse-slow bg-secondary/60" style={{ animationDelay: '2s' }}></div>
       </div>
       
       <div className="absolute top-4 right-4 z-10 flex gap-2">
         <Button 
           variant="secondary" 
           size="sm" 
-          className="backdrop-blur-md bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all"
+          className="backdrop-blur-md bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all btn-cosmic"
           onClick={toggleAudio}
         >
           {audioPlaying ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
@@ -67,7 +67,7 @@ const SadhanaViewer = ({ paperContent }: SadhanaViewerProps) => {
         <Button 
           variant="secondary" 
           size="sm" 
-          className="backdrop-blur-md bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all"
+          className="backdrop-blur-md bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all btn-cosmic"
           onClick={handlePrint}
         >
           <Download className="h-4 w-4" />

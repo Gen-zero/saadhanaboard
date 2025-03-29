@@ -23,7 +23,7 @@
   100% { background-position: 0% 50%; }
 }
 
-/* Animation for loading dots */
+/* Animation for loading dots with consistent color scheme */
 @keyframes pulse {
   0% { opacity: 0.4; transform: scale(0.8); }
   50% { opacity: 1; transform: scale(1.2); }
@@ -32,4 +32,23 @@
 
 .animate-pulse-slow {
   animation: pulse 6s ease-in-out infinite;
+}
+
+/* New color-specific glow animations */
+@keyframes glow-primary {
+  0%, 100% { box-shadow: 0 0 5px 2px hsla(var(--primary), 0.3); }
+  50% { box-shadow: 0 0 15px 5px hsla(var(--primary), 0.5); }
+}
+
+@keyframes glow-accent {
+  0%, 100% { box-shadow: 0 0 5px 2px hsla(var(--accent), 0.3); }
+  50% { box-shadow: 0 0 15px 5px hsla(var(--accent), 0.5); }
+}
+
+.glow-primary {
+  animation: glow-primary 3s ease-in-out infinite;
+}
+
+.glow-accent {
+  animation: glow-accent 3s ease-in-out infinite;
 }

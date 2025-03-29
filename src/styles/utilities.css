@@ -1,13 +1,13 @@
 
 .bg-pattern {
-  background-color: #FFFFF0;
-  background-image: radial-gradient(rgba(220, 20, 60, 0.15) 0.5px, transparent 0.5px);
+  background-color: hsl(var(--background));
+  background-image: radial-gradient(hsla(var(--primary), 0.15) 0.5px, transparent 0.5px);
   background-size: 20px 20px;
 }
 
 .dark .bg-pattern {
   background-color: hsl(var(--background));
-  background-image: radial-gradient(rgba(255, 215, 0, 0.15) 0.5px, transparent 0.5px);
+  background-image: radial-gradient(hsla(var(--accent), 0.15) 0.5px, transparent 0.5px);
 }
 
 .task-item-transition {
@@ -18,21 +18,68 @@
   @apply transition-transform duration-300 hover:-translate-y-1;
 }
 
-/* Ethereal glow effects */
+/* Ethereal glow effects using theme variables */
 .ethereal-glow {
-  box-shadow: 0 0 15px 2px rgba(220, 20, 60, 0.3);
+  box-shadow: 0 0 15px 2px hsla(var(--primary), 0.3);
 }
 
-.ethereal-glow-crimson {
-  box-shadow: 0 0 25px 5px rgba(220, 20, 60, 0.3);
+.ethereal-glow-primary {
+  box-shadow: 0 0 25px 5px hsla(var(--primary), 0.3);
 }
 
-.ethereal-glow-gold {
-  box-shadow: 0 0 25px 5px rgba(255, 215, 0, 0.3);
+.ethereal-glow-accent {
+  box-shadow: 0 0 25px 5px hsla(var(--accent), 0.3);
 }
 
 /* Animated text gradient */
 .animated-text-gradient {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--primary)) 0%,
+    hsl(var(--accent)) 50%,
+    hsl(var(--primary)) 100%
+  );
   background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
   animation: gradient-shift 8s ease infinite;
+}
+
+/* Color-based utility classes */
+.border-theme {
+  border-color: hsla(var(--border), 0.5);
+}
+
+.glass-effect {
+  background: hsla(var(--background), 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid hsla(var(--border), 0.3);
+}
+
+/* Cosmic highlight effects */
+.cosmic-highlight {
+  position: relative;
+}
+
+.cosmic-highlight::after {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, 
+    hsla(var(--primary), 0.6), 
+    hsla(var(--accent), 0.6)
+  );
+  z-index: -1;
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cosmic-highlight:hover::after {
+  opacity: 0.7;
 }
