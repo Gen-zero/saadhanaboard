@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { Button } from './ui/button';
-import { useToast } from './ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -37,7 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Saadhana Board', icon: BookHeart, path: '/sadhana' },
     { name: 'Spiritual Library', icon: BookOpen, path: '/library' },
     { name: 'Tasks', icon: CheckSquare, path: '/tasks' },
-    { name: 'Deity', icon: User, path: '/deity' },
+    { name: 'Profile', icon: User, path: '/deity' },
     { name: 'Settings', icon: Settings, path: '/settings' }
   ];
 
@@ -56,6 +56,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navigate('/login');
   };
 
+  const handleLoginNavigation = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="min-h-screen flex bg-pattern">
       {/* Sidebar - now fixed with 100vh height */}
@@ -67,7 +71,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="h-full flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
             <div className="flex items-center gap-2">
-              <img src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" alt="Saadhana Board Logo" className="h-8 w-8" />
+              <img 
+                src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" 
+                alt="Saadhana Board Logo" 
+                className="h-10 w-10" 
+              />
               <h1 className="text-xl font-semibold text-sidebar-foreground">Saadhana Board</h1>
             </div>
             <button 
@@ -97,35 +105,35 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             ))}
           </nav>
           <div className="p-4 border-t border-sidebar-border">
-            {user ? (
-              <div className="flex flex-col space-y-2">
-                <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90">
-                  <User size={16} className="text-primary" />
-                  <span className="truncate">{user.displayName || user.email}</span>
+            <div className="flex flex-col space-y-2">
+              {user ? (
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90">
+                    <User size={16} className="text-primary" />
+                    <span className="truncate">{user.displayName || user.email}</span>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full justify-start text-sidebar-foreground"
+                    onClick={handleLogout}
+                  >
+                    <LogOut size={16} className="mr-2" />
+                    Sign Out
+                  </Button>
                 </div>
+              ) : (
                 <Button 
                   variant="outline" 
                   size="sm" 
                   className="w-full justify-start text-sidebar-foreground"
-                  onClick={handleLogout}
-                >
-                  <LogOut size={16} className="mr-2" />
-                  Sign Out
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-col space-y-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full justify-start text-sidebar-foreground"
-                  onClick={() => navigate('/login')}
+                  onClick={handleLoginNavigation}
                 >
                   <LogIn size={16} className="mr-2" />
                   Sign In
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
             <div className="mt-4 text-xs text-sidebar-foreground/70 text-center">
               <p>Manifest your spiritual journey into reality</p>
             </div>
@@ -144,7 +152,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <Menu size={24} />
           </button>
           <div className="ml-4 flex items-center gap-2">
-            <img src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" alt="Saadhana Board Logo" className="h-6 w-6" />
+            <img 
+              src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" 
+              alt="Saadhana Board Logo" 
+              className="h-8 w-8" 
+            />
             <h1 className="text-lg font-semibold">Saadhana Board</h1>
           </div>
         </header>

@@ -1,10 +1,11 @@
 
 import Layout from "@/components/Layout";
+import Profile from "@/components/Profile";
 import DeityInterface from "@/components/DeityInterface";
 import ShadowSelfMonitor from "@/components/ShadowSelfMonitor";
 import { useState } from "react";
 
-const DeityPage = () => {
+const ProfilePage = () => {
   // Mock data for shadow and perfect being traits
   const [shadowTraits] = useState([
     'Procrastination',
@@ -23,6 +24,7 @@ const DeityPage = () => {
   return (
     <Layout>
       <div className="space-y-8">
+        <Profile />
         <DeityInterface />
         <ShadowSelfMonitor 
           shadowTraits={shadowTraits} 
@@ -33,4 +35,4 @@ const DeityPage = () => {
   );
 };
 
-export default DeityPage;
+export default ProfilePage;

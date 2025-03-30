@@ -149,7 +149,7 @@ const Tasks = () => {
   };
 
   const toggleTaskCompletion = (id: number) => {
-    setTasks(tasks.map(task => 
+    setTasks(prevTasks => prevTasks.map(task => 
       task.id === id ? { ...task, completed: !task.completed } : task
     ));
     
@@ -412,6 +412,7 @@ const Tasks = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         <Checkbox
+                          id={`task-${task.id}`}
                           checked={task.completed}
                           onCheckedChange={() => toggleTaskCompletion(task.id)}
                           className="mt-1"

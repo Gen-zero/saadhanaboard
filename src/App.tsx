@@ -8,7 +8,7 @@ import CustomCursor from "./components/CustomCursor";
 import Index from "./pages/Index";
 import SadhanaPage from "./pages/SadhanaPage";
 import TasksPage from "./pages/TasksPage";
-import DeityPage from "./pages/ProfilePage";
+import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import LibraryPage from "./pages/LibraryPage";
@@ -30,7 +30,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/sadhana" element={<SadhanaPage />} />
             <Route path="/tasks" element={<TasksPage />} />
-            <Route path="/deity" element={<DeityPage />} />
+            <Route path="/deity" element={<ProfilePage />} />
             <Route path="/library" element={<LibraryPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/login" element={<LoginPage />} />
