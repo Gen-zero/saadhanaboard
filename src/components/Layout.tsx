@@ -116,8 +116,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent group"
                     onClick={handleLogout}
                   >
-                    <LogOut size={16} className="mr-2 text-sidebar-foreground group-hover:text-destructive" />
-                    <span className="text-sidebar-foreground group-hover:text-destructive opacity-100 group-hover:opacity-100 transition-opacity duration-200">
+                    <LogOut size={16} className="mr-2 text-sidebar-foreground group-hover:text-destructive bg-red-500" />
+                    <span className="text-black text-sidebar-foreground group-hover:text-destructive opacity-100 group-hover:opacity-100 transition-opacity duration-200">
                       Sign Out
                     </span>
                   </Button>
