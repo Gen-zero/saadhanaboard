@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -62,7 +61,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex bg-pattern">
-      {/* Sidebar - now fixed with 100vh height */}
       <div 
         className={`fixed inset-y-0 left-0 z-50 w-64 h-screen bg-sidebar border-r border-sidebar-border transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
@@ -115,22 +113,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+                    className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent group"
                     onClick={handleLogout}
                   >
-                    <LogOut size={16} className="mr-2 text-sidebar-foreground" />
-                    <span className="text-sidebar-foreground">Sign Out</span>
+                    <LogOut size={16} className="mr-2 text-sidebar-foreground group-hover:text-destructive" />
+                    <span className="text-sidebar-foreground group-hover:text-destructive opacity-100 group-hover:opacity-100 transition-opacity duration-200">
+                      Sign Out
+                    </span>
                   </Button>
                 </div>
               ) : (
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
+                  className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent group"
                   onClick={handleLoginNavigation}
                 >
-                  <LogIn size={16} className="mr-2 text-sidebar-foreground" />
-                  <span className="text-sidebar-foreground">Sign In</span>
+                  <LogIn size={16} className="mr-2 text-sidebar-foreground group-hover:text-primary" />
+                  <span className="text-sidebar-foreground group-hover:text-primary opacity-100 group-hover:opacity-100 transition-opacity duration-200">
+                    Sign In
+                  </span>
                 </Button>
               )}
             </div>
@@ -141,9 +143,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </div>
 
-      {/* Main Content - adjusted to account for fixed sidebar */}
       <div className="flex-1 flex flex-col min-w-0 md:ml-64">
-        {/* Mobile Header */}
         <header className="bg-background border-b border-border p-4 flex items-center md:hidden sticky top-0 z-40">
           <button
             className="p-1 rounded-md text-muted-foreground hover:bg-secondary"
@@ -161,7 +161,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="flex-1 p-4 md:p-8 overflow-auto">
           {children}
         </main>
