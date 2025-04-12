@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -113,11 +114,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent group"
+                    className="w-full justify-start text-sidebar-foreground cosmic-highlight relative overflow-hidden group"
                     onClick={handleLogout}
                   >
-                    <LogOut size={16} className="mr-2 text-sidebar-foreground group-hover:text-destructive bg-red-500" />
-                    <span className="text-black text-sidebar-foreground group-hover:text-destructive opacity-100 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="absolute inset-0 bg-gradient-to-r from-destructive/0 via-destructive/20 to-destructive/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+                    <LogOut size={16} className="mr-2 text-destructive group-hover:scale-110 transition-transform duration-300" />
+                    <span className="text-destructive/90 group-hover:text-destructive group-hover:font-medium transition-all duration-300">
                       Sign Out
                     </span>
                   </Button>
@@ -126,11 +128,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent group"
+                  className="w-full justify-start cosmic-highlight relative overflow-hidden group"
                   onClick={handleLoginNavigation}
                 >
-                  <LogIn size={16} className="mr-2 text-sidebar-foreground group-hover:text-primary" />
-                  <span className="text-sidebar-foreground group-hover:text-primary opacity-100 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+                  <LogIn size={16} className="mr-2 text-primary group-hover:scale-110 transition-transform duration-300" />
+                  <span className="text-sidebar-foreground group-hover:text-primary group-hover:font-medium transition-all duration-300">
                     Sign In
                   </span>
                 </Button>
