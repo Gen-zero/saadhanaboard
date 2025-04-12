@@ -74,7 +74,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <img 
                 src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" 
                 alt="Saadhana Board Logo" 
-                className="h-10 w-10" 
+                className="h-12 w-12" 
               />
               <h1 className="text-xl font-semibold text-sidebar-foreground">Saadhana Board</h1>
             </div>
@@ -115,22 +115,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full justify-start text-sidebar-foreground"
+                    className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
                     onClick={handleLogout}
                   >
-                    <LogOut size={16} className="mr-2" />
-                    Sign Out
+                    <LogOut size={16} className="mr-2 text-sidebar-foreground" />
+                    <span className="text-sidebar-foreground">Sign Out</span>
                   </Button>
                 </div>
               ) : (
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full justify-start text-sidebar-foreground"
+                  className="w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent"
                   onClick={handleLoginNavigation}
                 >
-                  <LogIn size={16} className="mr-2" />
-                  Sign In
+                  <LogIn size={16} className="mr-2 text-sidebar-foreground" />
+                  <span className="text-sidebar-foreground">Sign In</span>
                 </Button>
               )}
             </div>

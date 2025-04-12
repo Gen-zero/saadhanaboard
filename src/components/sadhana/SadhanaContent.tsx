@@ -35,11 +35,9 @@ const SadhanaContent = ({
         <div className="cosmic-nebula-bg rounded-lg p-6">
           <PaperScroll2D 
             content={paperContent} 
-            onClick={() => setView3D(true)}
+            onClick={() => {}} // Removed 3D view functionality
           />
-          <div className="text-center mt-4 italic text-sm text-muted-foreground">
-            Click the scroll to view in 3D immersive mode
-          </div>
+          {/* Removed 3D view instruction */}
         </div>
       )}
     </div>

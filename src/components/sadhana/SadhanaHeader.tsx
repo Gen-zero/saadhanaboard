@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MoonStar, Sparkles, Eye, Pencil, BookOpen } from 'lucide-react';
+import { MoonStar, Sparkles, Eye, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SadhanaHeaderProps {
@@ -53,15 +53,7 @@ const SadhanaHeader = ({
             {isEditing ? <Eye className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
             {isEditing ? 'Cosmic View' : 'Edit Details'}
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-1 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
-            onClick={() => setView3D(!view3D)}
-          >
-            <BookOpen className="h-4 w-4" />
-            {view3D ? '2D View' : '3D View'}
-          </Button>
+          {/* 3D view button removed */}
         </div>
       </div>
       <p className="text-muted-foreground font-light tracking-wide">
