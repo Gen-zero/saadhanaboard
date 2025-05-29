@@ -1,11 +1,11 @@
 
 import Layout from "@/components/Layout";
-import Dashboard from "@/components/Dashboard";
+import SaadhanaBoard from "@/components/SaadhanaBoard";
 
 const Index = () => {
   return (
     <Layout>
-      <Dashboard />
+      <SaadhanaBoard />
     </Layout>
   );
 };
