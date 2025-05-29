@@ -261,7 +261,7 @@ const SaadhanaBoard = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in relative">
+    <div className="space-y-8 animate-fade-in relative">
       <CosmicBackgroundSimple />
       
       <SadhanaHeader 
@@ -279,170 +279,198 @@ const SaadhanaBoard = () => {
         </div>
       )}
 
-      {/* Dashboard Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <Card className="bg-background/80 backdrop-blur-sm border-purple-500/20">
-          <CardHeader>
-            <CardTitle className="text-xl font-medium flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-primary" />
-              <span>Today's Progress</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center justify-center h-48">
-              <div className="relative w-32 h-32 mb-4">
-                <svg className="w-full h-full" viewBox="0 0 100 100">
-                  <circle 
-                    className="text-secondary stroke-current" 
-                    strokeWidth="10" 
-                    cx="50" 
-                    cy="50" 
-                    r="40" 
-                    fill="transparent"
-                  />
-                  <circle 
-                    className="text-primary stroke-current" 
-                    strokeWidth="10" 
-                    cx="50" 
-                    cy="50" 
-                    r="40" 
-                    fill="transparent"
-                    strokeDasharray="251.2"
-                    strokeDashoffset={251.2 - (251.2 * dailyProgress) / 100}
-                    strokeLinecap="round"
-                    transform="rotate(-90 50 50)"
-                  />
-                </svg>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-4xl font-bold text-foreground">
-                      {completedCount}/{totalCount}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground">Daily Tasks Completed</p>
-              {dailyProgress === 100 && (
-                <span className="mt-2 text-xs px-2 py-1 bg-primary/20 text-primary rounded-full">
-                  Congratulations! All tasks complete
-                </span>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+      {/* Main Layout: Two Sections Side by Side */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        <Card className="bg-background/80 backdrop-blur-sm border-purple-500/20">
-          <CardHeader>
-            <CardTitle className="text-xl font-medium flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-primary" />
-              <span>Spiritual Focus</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="bg-secondary/30 p-4 rounded-lg">
-                <h3 className="font-medium flex items-center gap-2 text-foreground">
-                  <Calendar className="h-4 w-4 text-primary" />
-                  Today's Intention
-                </h3>
-                <p className="text-muted-foreground mt-1 italic">
-                  "{dailyIntention}"
-                </p>
-              </div>
-              <div className="bg-secondary/30 p-4 rounded-lg">
-                <h3 className="font-medium flex items-center gap-2 text-foreground">
-                  <BookOpen className="h-4 w-4 text-primary" />
-                  Goal Progress
-                </h3>
-                <p className="text-muted-foreground mt-1">
-                  {currentDay} days into your {totalDays}-day devotional practice
-                </p>
-                <div className="w-full mt-2 space-y-1">
-                  <div className="flex justify-between text-xs text-foreground">
-                    <span>Day 1</span>
-                    <span>Day {totalDays}</span>
-                  </div>
-                  <Progress value={goalProgress} className="h-2" />
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        {/* Left Section: Sadhana Paper */}
+        <div className="space-y-6">
+          <div className="backdrop-blur-sm bg-background/70 p-4 rounded-lg border border-purple-500/20">
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600 mb-2">
+              Sacred Sadhana Paper
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Your spiritual intentions and divine practice documented
+            </p>
+          </div>
+          
+          <SadhanaContent 
+            isEditing={isEditing}
+            view3D={view3D}
+            sadhanaData={sadhanaData}
+            paperContent={paperContent}
+            setView3D={setView3D}
+          />
+        </div>
 
-      {/* Tasks Section */}
-      <Card className="bg-background/80 backdrop-blur-sm border-purple-500/20">
-        <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-          <CardTitle className="text-xl font-medium flex items-center gap-2">
-            <AlarmClock className="h-5 w-5 text-primary" />
-            <span>Tasks Requiring Attention</span>
-          </CardTitle>
-          <Button variant="outline" size="sm" onClick={() => navigate('/tasks')}>
-            View All Tasks
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {urgentTasks.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8">
-              <CheckSquare className="h-12 w-12 text-primary/30 mb-2" />
-              <p className="text-muted-foreground">All caught up! No urgent tasks.</p>
-              <Button 
-                variant="link" 
-                size="sm" 
-                className="mt-2" 
-                onClick={() => navigate('/tasks')}
-              >
-                Add New Task
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {urgentTasks.map((task) => (
-                <div 
-                  key={task.id} 
-                  className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg hover-lift"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      <CheckSquare className={`h-5 w-5 ${
-                        task.priority === 'high' ? 'text-red-500' : 
-                        task.priority === 'medium' ? 'text-yellow-500' : 
-                        'text-primary/70'
-                      }`} />
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-foreground">{task.title}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent text-accent-foreground">
-                          {task.category === 'daily' ? 'Daily Ritual' : 'Goal Oriented'}
-                        </span>
-                      </p>
+        {/* Right Section: Metrics and Progress */}
+        <div className="space-y-6">
+          <div className="backdrop-blur-sm bg-background/70 p-4 rounded-lg border border-purple-500/20">
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600 mb-2">
+              Spiritual Progress & Metrics
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Track your divine journey and daily accomplishments
+            </p>
+          </div>
+
+          {/* Progress Overview Cards */}
+          <div className="space-y-6">
+            <Card className="bg-background/80 backdrop-blur-sm border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-xl font-medium flex items-center gap-2">
+                  <PieChart className="h-5 w-5 text-primary" />
+                  <span>Today's Progress</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center justify-center h-48">
+                  <div className="relative w-32 h-32 mb-4">
+                    <svg className="w-full h-full" viewBox="0 0 100 100">
+                      <circle 
+                        className="text-secondary stroke-current" 
+                        strokeWidth="10" 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="transparent"
+                      />
+                      <circle 
+                        className="text-primary stroke-current" 
+                        strokeWidth="10" 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="transparent"
+                        strokeDasharray="251.2"
+                        strokeDashoffset={251.2 - (251.2 * dailyProgress) / 100}
+                        strokeLinecap="round"
+                        transform="rotate(-90 50 50)"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-foreground">
+                          {completedCount}/{totalCount}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-muted-foreground">{getDeadline(task)}</span>
+                  <p className="text-sm text-muted-foreground">Daily Tasks Completed</p>
+                  {dailyProgress === 100 && (
+                    <span className="mt-2 text-xs px-2 py-1 bg-primary/20 text-primary rounded-full">
+                      Congratulations! All tasks complete
+                    </span>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-background/80 backdrop-blur-sm border-purple-500/20">
+              <CardHeader>
+                <CardTitle className="text-xl font-medium flex items-center gap-2">
+                  <Lightbulb className="h-5 w-5 text-primary" />
+                  <span>Spiritual Focus</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="bg-secondary/30 p-4 rounded-lg">
+                    <h3 className="font-medium flex items-center gap-2 text-foreground">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      Today's Intention
+                    </h3>
+                    <p className="text-muted-foreground mt-1 italic">
+                      "{dailyIntention}"
+                    </p>
+                  </div>
+                  <div className="bg-secondary/30 p-4 rounded-lg">
+                    <h3 className="font-medium flex items-center gap-2 text-foreground">
+                      <BookOpen className="h-4 w-4 text-primary" />
+                      Goal Progress
+                    </h3>
+                    <p className="text-muted-foreground mt-1">
+                      {currentDay} days into your {totalDays}-day devotional practice
+                    </p>
+                    <div className="w-full mt-2 space-y-1">
+                      <div className="flex justify-between text-xs text-foreground">
+                        <span>Day 1</span>
+                        <span>Day {totalDays}</span>
+                      </div>
+                      <Progress value={goalProgress} className="h-2" />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Tasks Section */}
+            <Card className="bg-background/80 backdrop-blur-sm border-purple-500/20">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                <CardTitle className="text-xl font-medium flex items-center gap-2">
+                  <AlarmClock className="h-5 w-5 text-primary" />
+                  <span>Tasks Requiring Attention</span>
+                </CardTitle>
+                <Button variant="outline" size="sm" onClick={() => navigate('/tasks')}>
+                  View All Tasks
+                </Button>
+              </CardHeader>
+              <CardContent>
+                {urgentTasks.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <CheckSquare className="h-12 w-12 text-primary/30 mb-2" />
+                    <p className="text-muted-foreground">All caught up! No urgent tasks.</p>
                     <Button 
-                      variant="ghost" 
+                      variant="link" 
                       size="sm" 
-                      onClick={() => completeTask(task.id)}
+                      className="mt-2" 
+                      onClick={() => navigate('/tasks')}
                     >
-                      Complete
+                      Add New Task
                     </Button>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <SadhanaContent 
-        isEditing={isEditing}
-        view3D={view3D}
-        sadhanaData={sadhanaData}
-        paperContent={paperContent}
-        setView3D={setView3D}
-      />
+                ) : (
+                  <div className="space-y-4">
+                    {urgentTasks.map((task) => (
+                      <div 
+                        key={task.id} 
+                        className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg hover-lift"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5">
+                            <CheckSquare className={`h-5 w-5 ${
+                              task.priority === 'high' ? 'text-red-500' : 
+                              task.priority === 'medium' ? 'text-yellow-500' : 
+                              'text-primary/70'
+                            }`} />
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-foreground">{task.title}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent text-accent-foreground">
+                                {task.category === 'daily' ? 'Daily Ritual' : 'Goal Oriented'}
+                              </span>
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-muted-foreground">{getDeadline(task)}</span>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => completeTask(task.id)}
+                          >
+                            Complete
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
       
       <SadhanaFooter />
     </div>
