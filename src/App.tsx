@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
@@ -7,7 +6,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import CustomCursor from "./components/CustomCursor";
 import SadhanaPage from "./pages/SadhanaPage";
 import SaadhanasPage from "./pages/SaadhanasPage";
-import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 import LibraryPage from "./pages/LibraryPage";
@@ -40,7 +38,6 @@ const AppRoutes = () => {
       <Route path="/" element={<Navigate to="/sadhana" replace />} />
       <Route path="/sadhana" element={<ProtectedRoute><SadhanaPage /></ProtectedRoute>} />
       <Route path="/saadhanas" element={<ProtectedRoute><SaadhanasPage /></ProtectedRoute>} />
-      <Route path="/deity" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/library" element={<ProtectedRoute><LibraryPage /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />

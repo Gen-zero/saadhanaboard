@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -35,7 +36,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     { name: 'Saadhana Board', icon: BookHeart, path: '/sadhana' },
     { name: 'Spiritual Library', icon: BookOpen, path: '/library' },
     { name: 'Saadhanas', icon: CheckSquare, path: '/saadhanas' },
-    { name: 'Profile', icon: User, path: '/deity' },
     { name: 'Settings', icon: Settings, path: '/settings' }
   ];
 
