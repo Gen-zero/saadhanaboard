@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { BookOpen, Calendar, Clock } from 'lucide-react';
+import { BookOpen, Calendar, Clock, BarChartHorizontal } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const ProfileSettings = () => {
@@ -57,104 +57,54 @@ const ProfileSettings = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-1">
-          <CardHeader className="text-center">
-            <Avatar className="h-24 w-24 mx-auto">
-              <AvatarImage src={userData.avatar} />
-              <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-                {userData.name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')}
-              </AvatarFallback>
-            </Avatar>
-            <CardTitle className="mt-4">{userData.name}</CardTitle>
-            <CardDescription className="flex justify-center items-center gap-1">
-              <Calendar className="h-3 w-3" />
+    <Card>
+      <CardHeader>
+        <div className="flex flex-col sm:flex-row items-start gap-6">
+          <Avatar className="h-24 w-24">
+            <AvatarImage src={userData.avatar} />
+            <AvatarFallback className="bg-primary/10 text-primary text-3xl">
+              {userData.name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex-1">
+            <CardTitle className="text-3xl">{userData.name}</CardTitle>
+            <CardDescription className="mt-2 flex items-center gap-1.5 text-base">
+              <Calendar className="h-4 w-4" />
               <span>Joined {userData.joined}</span>
             </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="bg-secondary/40 p-4 rounded-lg">
-                <h3 className="font-medium text-sm text-muted-foreground">Email</h3>
-                <p className="mt-1">{userData.email}</p>
-              </div>
-              <div className="bg-secondary/40 p-4 rounded-lg">
-                <h3 className="font-medium text-sm text-muted-foreground">
-                  Current Practice
-                </h3>
-                <p className="mt-1">40-Day Meditation Journey</p>
-                <p className="text-xs text-muted-foreground mt-1">Day 15 of 40</p>
-                <div className="w-full bg-secondary h-2 rounded-full mt-2">
-                  <div className="bg-primary h-2 rounded-full w-[37.5%]"></div>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full">
-                Edit Profile
-              </Button>
+            <p className="mt-2 text-muted-foreground">{userData.email}</p>
+            <Button variant="outline" className="mt-4">
+              Edit Profile
+            </Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-8 pt-6">
+        <div>
+          <h3 className="text-xl font-semibold mb-1">Current Practice</h3>
+          <p className="text-sm text-muted-foreground mb-4">Your active sadhana journey.</p>
+          <div className="bg-secondary/40 p-4 rounded-lg">
+            <h4 className="font-medium">40-Day Meditation Journey</h4>
+            <p className="text-sm text-muted-foreground mt-1">Day 15 of 40</p>
+            <div className="w-full bg-secondary h-2 rounded-full mt-2">
+              <div className="bg-primary h-2 rounded-full w-[37.5%]"></div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
+        
+        <Separator />
 
-        <Card className="md:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" />
-              <span>Previous Saadhanas</span>
-            </CardTitle>
-            <CardDescription>Your spiritual journey history</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {userData.previousSadhanas.map((sadhana) => (
-                <div key={sadhana.id} className="space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div>
-                      <h3 className="font-medium text-lg">{sadhana.title}</h3>
-                      <p className="text-sm text-muted-foreground">{sadhana.deity}</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm font-medium bg-accent/40 text-accent-foreground px-3 py-1 rounded-full">
-                      <Clock className="h-4 w-4" />
-                      <span>{sadhana.duration} Days</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-secondary/30 p-3 rounded-lg">
-                      <h4 className="text-xs font-medium text-muted-foreground">GOAL</h4>
-                      <p className="mt-1 text-sm">{sadhana.goal}</p>
-                    </div>
-                    <div className="bg-secondary/30 p-3 rounded-lg">
-                      <h4 className="text-xs font-medium text-muted-foreground">
-                        TIME PERIOD
-                      </h4>
-                      <p className="mt-1 text-sm">
-                        {formatDate(sadhana.startDate)} - {formatDate(sadhana.endDate)}
-                      </p>
-                    </div>
-                  </div>
-
-                  <Separator className="my-2" />
-                </div>
-              ))}
-
-              <div className="text-center pt-2">
-                <Button variant="ghost">View All Spiritual History</Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Spiritual Statistics</CardTitle>
-          <CardDescription>Your journey in numbers</CardDescription>
-        </CardHeader>
-        <CardContent>
+        <div>
+          <div className="mb-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2 mb-1">
+              <BarChartHorizontal className="h-5 w-5 text-primary" />
+              <span>Spiritual Statistics</span>
+            </h3>
+            <p className="text-sm text-muted-foreground">Your journey in numbers.</p>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-secondary/50 p-4 rounded-lg text-center">
               <h3 className="text-3xl font-bold text-primary">3</h3>
@@ -179,9 +129,56 @@ const ProfileSettings = () => {
               <p className="text-sm text-muted-foreground mt-1">Deities Connected</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+
+        <Separator />
+
+        <div>
+           <div className="mb-4">
+            <h3 className="text-xl font-semibold flex items-center gap-2 mb-1">
+              <BookOpen className="h-5 w-5 text-primary" />
+              <span>Previous Saadhanas</span>
+            </h3>
+            <p className="text-sm text-muted-foreground">Your spiritual journey history.</p>
+          </div>
+          <div className="space-y-6">
+            {userData.previousSadhanas.map((sadhana, index) => (
+              <div key={sadhana.id}>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <h4 className="font-medium text-lg">{sadhana.title}</h4>
+                    <p className="text-sm text-muted-foreground">{sadhana.deity}</p>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm font-medium bg-accent/40 text-accent-foreground px-3 py-1 rounded-full">
+                    <Clock className="h-4 w-4" />
+                    <span>{sadhana.duration} Days</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                  <div className="bg-secondary/30 p-3 rounded-lg">
+                    <h5 className="text-xs font-medium text-muted-foreground">GOAL</h5>
+                    <p className="mt-1 text-sm">{sadhana.goal}</p>
+                  </div>
+                  <div className="bg-secondary/30 p-3 rounded-lg">
+                    <h5 className="text-xs font-medium text-muted-foreground">
+                      TIME PERIOD
+                    </h5>
+                    <p className="mt-1 text-sm">
+                      {formatDate(sadhana.startDate)} - {formatDate(sadhana.endDate)}
+                    </p>
+                  </div>
+                </div>
+                {index < userData.previousSadhanas.length - 1 && <Separator className="my-6" />}
+              </div>
+            ))}
+            <div className="text-center pt-2">
+              <Button variant="ghost">View All Spiritual History</Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
