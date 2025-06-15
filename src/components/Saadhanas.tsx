@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   Calendar, 
@@ -11,7 +10,8 @@ import {
   Trash2,
   Edit3,
   Clock3,
-  AlertCircle
+  AlertCircle,
+  MessageSquare
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,7 @@ interface Sadhana {
   time?: string;
   priority: 'low' | 'medium' | 'high';
   tags?: string[];
+  reflection?: string;
 }
 
 const Saadhanas = () => {
@@ -45,8 +46,10 @@ const Saadhanas = () => {
   const [editingSadhana, setEditingSadhana] = useState<Sadhana | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
+  const [reflectingSadhana, setReflectingSadhana] = useState<Sadhana | null>(null);
+  const [reflectionText, setReflectionText] = useState('');
   
-  const [newSadhana, setNewSadhana] = useState<Omit<Sadhana, 'id'>>({
+  const [newSadhana, setNewSadhana] = useState<Omit<Sadhana, 'id' | 'reflection'>>({
     title: '',
     description: '',
     completed: false,
@@ -148,19 +151,44 @@ const Saadhanas = () => {
     });
   };
 
-  const toggleSadhanaCompletion = (id: number) => {
-    setSaadhanas(prevSaadhanas => prevSaadhanas.map(sadhana => 
-      sadhana.id === id ? { ...sadhana, completed: !sadhana.completed } : sadhana
-    ));
-    
-    const sadhana = saadhanas.find(t => t.id === id);
-    
+  const handleToggleCompletion = (sadhanaToToggle: Sadhana) => {
+    if (sadhanaToToggle.completed) {
+      // Mark as incomplete, remove reflection
+      setSaadhanas(prevSaadhanas =>
+        prevSaadhanas.map(sadhana =>
+          sadhana.id === sadhanaToToggle.id
+            ? { ...sadhana, completed: false, reflection: undefined }
+            : sadhana
+        )
+      );
+      toast({
+        title: "Sadhana incomplete",
+        description: "Your sadhana has been marked as incomplete."
+      });
+    } else {
+      // Open reflection dialog to mark as complete
+      setReflectingSadhana(sadhanaToToggle);
+    }
+  };
+
+  const handleSaveReflection = () => {
+    if (!reflectingSadhana) return;
+
+    setSaadhanas(prevSaadhanas =>
+      prevSaadhanas.map(sadhana =>
+        sadhana.id === reflectingSadhana.id
+          ? { ...sadhana, completed: true, reflection: reflectionText }
+          : sadhana
+      )
+    );
+
     toast({
-      title: sadhana?.completed ? "Sadhana incomplete" : "Sadhana completed",
-      description: sadhana?.completed 
-        ? "Sadhana marked as incomplete." 
-        : "Great job! Your sadhana is complete."
+      title: "Sadhana Completed!",
+      description: "Great job on your practice. Your reflection is saved."
     });
+
+    setReflectingSadhana(null);
+    setReflectionText('');
   };
 
   // Filter and search saadhanas
@@ -405,19 +433,12 @@ const Saadhanas = () => {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
               {sortedSaadhanas.map(sadhana => (
-                <Card key={sadhana.id} className={`hover-lift transition-all ${sadhana.completed ? 'opacity-70' : ''}`}>
-                  <CardHeader className="pb-2">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <Checkbox
-                          id={`sadhana-${sadhana.id}`}
-                          checked={sadhana.completed}
-                          onCheckedChange={() => toggleSadhanaCompletion(sadhana.id)}
-                          className="mt-1"
-                        />
-                        <div>
+                <Card key={sadhana.id} className={`flex flex-col hover-lift transition-all ${sadhana.completed ? 'bg-card/60 border-green-500/30' : ''}`}>
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between gap-4">
+                        <div className="flex-grow">
                           <CardTitle className={`text-xl ${sadhana.completed ? 'line-through text-muted-foreground' : ''}`}>
                             {sadhana.title}
                           </CardTitle>
@@ -427,8 +448,63 @@ const Saadhanas = () => {
                             </CardDescription>
                           )}
                         </div>
+                        <div className="shrink-0">
+                          <Button
+                            variant={sadhana.completed ? 'secondary' : 'default'}
+                            size="sm"
+                            onClick={() => handleToggleCompletion(sadhana)}
+                            className="w-full"
+                          >
+                            <CheckSquare className="h-4 w-4 mr-2" />
+                            {sadhana.completed ? 'Undo' : 'Complete'}
+                          </Button>
+                        </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="pb-4 flex-grow space-y-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="outline" className={`flex items-center gap-1 ${getPriorityColor(sadhana.priority)}`}>
+                        <AlertCircle className="h-3 w-3" />
+                        {sadhana.priority.charAt(0).toUpperCase() + sadhana.priority.slice(1)} Priority
+                      </Badge>
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        {sadhana.category === 'daily' ? (
+                          <>
+                            <Clock3 className="h-3 w-3" />
+                            Daily Ritual
+                          </>
+                        ) : (
+                          <>
+                            <Star className="h-3 w-3" />
+                            Goal Oriented
+                          </>
+                        )}
+                      </Badge>
+                      {sadhana.dueDate && (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {formatDate(sadhana.dueDate)}
+                        </Badge>
+                      )}
+                      {sadhana.time && (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {sadhana.time}
+                        </Badge>
+                      )}
+                    </div>
+
+                    {sadhana.reflection && (
+                      <div className="mt-4 p-3 bg-background/50 rounded-lg border border-border">
+                        <p className="text-sm font-semibold flex items-center gap-2 text-primary">
+                          <MessageSquare className="h-4 w-4" />
+                          Reflection
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1 italic">"{sadhana.reflection}"</p>
                       </div>
-                      <div className="flex gap-2">
+                    )}
+                  </CardContent>
+                  <CardFooter className="pt-0 flex justify-end gap-2">
                         <Dialog open={editingSadhana?.id === sadhana.id} onOpenChange={(open) => {
                           if (open) {
                             setEditingSadhana(sadhana);
@@ -541,48 +617,44 @@ const Saadhanas = () => {
                         <Button variant="ghost" size="icon" onClick={() => handleDeleteSadhana(sadhana.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pb-4">
-                    <div className="flex flex-wrap items-center gap-2 mt-2">
-                      <Badge variant="outline" className={`flex items-center gap-1 ${getPriorityColor(sadhana.priority)}`}>
-                        <AlertCircle className="h-3 w-3" />
-                        {sadhana.priority.charAt(0).toUpperCase() + sadhana.priority.slice(1)} Priority
-                      </Badge>
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        {sadhana.category === 'daily' ? (
-                          <>
-                            <Clock3 className="h-3 w-3" />
-                            Daily Ritual
-                          </>
-                        ) : (
-                          <>
-                            <Star className="h-3 w-3" />
-                            Goal Oriented
-                          </>
-                        )}
-                      </Badge>
-                      {sadhana.dueDate && (
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          {formatDate(sadhana.dueDate)}
-                        </Badge>
-                      )}
-                      {sadhana.time && (
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {sadhana.time}
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
+                  </CardFooter>
                 </Card>
               ))}
             </div>
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Reflection Dialog */}
+      <Dialog open={!!reflectingSadhana} onOpenChange={(open) => {
+        if (!open) {
+          setReflectingSadhana(null);
+          setReflectionText('');
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Complete Sadhana: {reflectingSadhana?.title}</DialogTitle>
+            <DialogDescription>
+              Record a reflection on your practice. This can be a thought, a feeling, or an insight you gained.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="reflection">Your Reflection</Label>
+            <Textarea
+              id="reflection"
+              placeholder="How was your practice today?"
+              value={reflectionText}
+              onChange={(e) => setReflectionText(e.target.value)}
+              className="mt-2 min-h-[120px]"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setReflectingSadhana(null); setReflectionText(''); }}>Cancel</Button>
+            <Button onClick={handleSaveReflection}>Complete & Save</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
