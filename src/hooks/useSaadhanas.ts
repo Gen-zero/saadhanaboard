@@ -1,11 +1,9 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Sadhana } from '@/types/sadhana';
 
 export const useSaadhanas = () => {
   const [saadhanas, setSaadhanas] = useState<Sadhana[]>([]);
-  const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
   const [reflectingSadhana, setReflectingSadhana] = useState<Sadhana | null>(null);
@@ -109,31 +107,84 @@ export const useSaadhanas = () => {
     setReflectionText('');
   };
 
-  const filteredSaadhanas = useMemo(() => saadhanas.filter(sadhana => {
-    if (activeTab === 'daily' && sadhana.category !== 'daily') return false;
-    if (activeTab === 'goals' && sadhana.category !== 'goal') return false;
-    if (activeTab === 'completed' && !sadhana.completed) return false;
-    if (activeTab === 'incomplete' && sadhana.completed) return false;
-    if (filter !== 'all' && sadhana.priority !== filter) return false;
-    if (searchQuery && !sadhana.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  }), [saadhanas, activeTab, filter, searchQuery]);
+  const groupedSaadhanas = useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
 
-  const sortedSaadhanas = useMemo(() => [...filteredSaadhanas].sort((a, b) => {
-    if (a.completed !== b.completed) return a.completed ? 1 : -1;
+    const groups: {
+      overdue: Sadhana[];
+      today: Sadhana[];
+      upcoming: Sadhana[];
+      noDueDate: Sadhana[];
+      completed: Sadhana[];
+    } = {
+      overdue: [],
+      today: [],
+      upcoming: [],
+      noDueDate: [],
+      completed: [],
+    };
+
+    const filtered = saadhanas.filter(sadhana => {
+      if (filter !== 'all' && sadhana.priority !== filter) return false;
+      if (searchQuery && !sadhana.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      return true;
+    });
+
+    for (const sadhana of filtered) {
+      if (sadhana.completed) {
+        groups.completed.push(sadhana);
+        continue;
+      }
+      if (sadhana.category === 'daily') {
+        groups.today.push(sadhana);
+        continue;
+      }
+      if (sadhana.dueDate) {
+        const dueDate = new Date(sadhana.dueDate);
+        if (dueDate.getTime() < now.getTime()) {
+          groups.overdue.push(sadhana);
+        } else if (dueDate.getFullYear() === now.getFullYear() && dueDate.getMonth() === now.getMonth() && dueDate.getDate() === now.getDate()) {
+          groups.today.push(sadhana);
+        } else {
+          groups.upcoming.push(sadhana);
+        }
+      } else {
+        groups.noDueDate.push(sadhana);
+      }
+    }
+
     const priorityOrder = { high: 0, medium: 1, low: 2 };
-    if (a.priority !== b.priority) return priorityOrder[a.priority] - priorityOrder[b.priority];
-    if (a.dueDate && b.dueDate) return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
-    return a.title.localeCompare(b.title);
-  }), [filteredSaadhanas]);
+    const baseSort = (a: Sadhana, b: Sadhana) => {
+      if (a.priority !== b.priority) return priorityOrder[a.priority] - priorityOrder[b.priority];
+      return a.title.localeCompare(b.title);
+    };
+
+    groups.overdue.sort((a, b) => {
+        const aDate = new Date(a.dueDate!).getTime();
+        const bDate = new Date(b.dueDate!).getTime();
+        if (aDate !== bDate) return aDate - bDate;
+        return baseSort(a,b);
+    });
+    groups.today.sort(baseSort);
+    groups.upcoming.sort((a, b) => {
+        const aDate = new Date(a.dueDate!).getTime();
+        const bDate = new Date(b.dueDate!).getTime();
+        if (aDate !== bDate) return aDate - bDate;
+        return baseSort(a,b);
+    });
+    groups.noDueDate.sort(baseSort);
+    groups.completed.sort((a, b) => b.id - a.id);
+
+    return groups;
+  }, [saadhanas, filter, searchQuery]);
 
   return {
-    activeTab, setActiveTab,
     searchQuery, setSearchQuery,
     filter, setFilter,
     reflectingSadhana, setReflectingSadhana,
     reflectionText, setReflectionText,
-    sortedSaadhanas,
+    groupedSaadhanas,
     handleAddSadhana,
     handleUpdateSadhana,
     handleDeleteSadhana,
