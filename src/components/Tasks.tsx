@@ -26,7 +26,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 
-interface Saadhana {
+interface Task {
   id: number;
   title: string;
   description?: string;
@@ -38,15 +38,15 @@ interface Saadhana {
   tags?: string[];
 }
 
-const Saadhanas = () => {
-  const [saadhanas, setSaadhanas] = useState<Saadhana[]>([]);
+const Tasks = () => {
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTab, setActiveTab] = useState('all');
-  const [isAddingSaadhana, setIsAddingSaadhana] = useState(false);
-  const [editingSaadhana, setEditingSaadhana] = useState<Saadhana | null>(null);
+  const [isAddingTask, setIsAddingTask] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all');
   
-  const [newSaadhana, setNewSaadhana] = useState<Omit<Saadhana, 'id'>>({
+  const [newTask, setNewTask] = useState<Omit<Task, 'id'>>({
     title: '',
     description: '',
     completed: false,
@@ -59,44 +59,44 @@ const Saadhanas = () => {
   
   const { toast } = useToast();
 
-  // Load saadhanas from localStorage on component mount
+  // Load tasks from localStorage on component mount
   useEffect(() => {
-    const savedSaadhanas = localStorage.getItem('saadhanas');
-    if (savedSaadhanas) {
+    const savedTasks = localStorage.getItem('saadhanaTasks');
+    if (savedTasks) {
       try {
-        setSaadhanas(JSON.parse(savedSaadhanas));
+        setTasks(JSON.parse(savedTasks));
       } catch (e) {
-        console.error('Failed to parse saadhanas from localStorage:', e);
+        console.error('Failed to parse tasks from localStorage:', e);
         // Initialize with empty array if parsing fails
-        setSaadhanas([]);
+        setTasks([]);
       }
     }
   }, []);
 
-  // Save saadhanas to localStorage whenever saadhanas state changes
+  // Save tasks to localStorage whenever tasks state changes
   useEffect(() => {
-    localStorage.setItem('saadhanas', JSON.stringify(saadhanas));
-  }, [saadhanas]);
+    localStorage.setItem('saadhanaTasks', JSON.stringify(tasks));
+  }, [tasks]);
 
-  const handleAddSaadhana = () => {
-    if (!newSaadhana.title.trim()) {
+  const handleAddTask = () => {
+    if (!newTask.title.trim()) {
       toast({
-        title: "Saadhana title required",
-        description: "Please provide a title for your saadhana.",
+        title: "Task title required",
+        description: "Please provide a title for your task.",
         variant: "destructive"
       });
       return;
     }
     
-    const newSaadhanaWithId: Saadhana = {
-      ...newSaadhana,
+    const newTaskWithId: Task = {
+      ...newTask,
       id: Date.now()
     };
     
-    setSaadhanas([...saadhanas, newSaadhanaWithId]);
+    setTasks([...tasks, newTaskWithId]);
     
     // Reset form
-    setNewSaadhana({
+    setNewTask({
       title: '',
       description: '',
       completed: false,
@@ -107,81 +107,81 @@ const Saadhanas = () => {
       tags: []
     });
     
-    setIsAddingSaadhana(false);
+    setIsAddingTask(false);
     
     toast({
-      title: "Saadhana added",
-      description: "Your saadhana has been successfully added."
+      title: "Task added",
+      description: "Your task has been successfully added."
     });
   };
 
-  const handleUpdateSaadhana = () => {
-    if (!editingSaadhana) return;
+  const handleUpdateTask = () => {
+    if (!editingTask) return;
     
-    if (!editingSaadhana.title.trim()) {
+    if (!editingTask.title.trim()) {
       toast({
-        title: "Saadhana title required",
-        description: "Please provide a title for your saadhana.",
+        title: "Task title required",
+        description: "Please provide a title for your task.",
         variant: "destructive"
       });
       return;
     }
     
-    setSaadhanas(saadhanas.map(saadhana => 
-      saadhana.id === editingSaadhana.id ? editingSaadhana : saadhana
+    setTasks(tasks.map(task => 
+      task.id === editingTask.id ? editingTask : task
     ));
     
-    setEditingSaadhana(null);
+    setEditingTask(null);
     
     toast({
-      title: "Saadhana updated",
-      description: "Your saadhana has been successfully updated."
+      title: "Task updated",
+      description: "Your task has been successfully updated."
     });
   };
 
-  const handleDeleteSaadhana = (id: number) => {
-    setSaadhanas(saadhanas.filter(saadhana => saadhana.id !== id));
+  const handleDeleteTask = (id: number) => {
+    setTasks(tasks.filter(task => task.id !== id));
     
     toast({
-      title: "Saadhana deleted",
-      description: "Your saadhana has been deleted."
+      title: "Task deleted",
+      description: "Your task has been deleted."
     });
   };
 
-  const toggleSaadhanaCompletion = (id: number) => {
-    setSaadhanas(prevSaadhanas => prevSaadhanas.map(saadhana => 
-      saadhana.id === id ? { ...saadhana, completed: !saadhana.completed } : saadhana
+  const toggleTaskCompletion = (id: number) => {
+    setTasks(prevTasks => prevTasks.map(task => 
+      task.id === id ? { ...task, completed: !task.completed } : task
     ));
     
-    const saadhana = saadhanas.find(t => t.id === id);
+    const task = tasks.find(t => t.id === id);
     
     toast({
-      title: saadhana?.completed ? "Saadhana incomplete" : "Saadhana completed",
-      description: saadhana?.completed 
-        ? "Saadhana marked as incomplete." 
-        : "Great job! Your saadhana is complete."
+      title: task?.completed ? "Task incomplete" : "Task completed",
+      description: task?.completed 
+        ? "Task marked as incomplete." 
+        : "Great job! Your task is complete."
     });
   };
 
-  // Filter and search saadhanas
-  const filteredSaadhanas = saadhanas.filter(saadhana => {
+  // Filter and search tasks
+  const filteredTasks = tasks.filter(task => {
     // Filter by tab
-    if (activeTab === 'daily' && saadhana.category !== 'daily') return false;
-    if (activeTab === 'goals' && saadhana.category !== 'goal') return false;
-    if (activeTab === 'completed' && !saadhana.completed) return false;
-    if (activeTab === 'incomplete' && saadhana.completed) return false;
+    if (activeTab === 'daily' && task.category !== 'daily') return false;
+    if (activeTab === 'goals' && task.category !== 'goal') return false;
+    if (activeTab === 'completed' && !task.completed) return false;
+    if (activeTab === 'incomplete' && task.completed) return false;
     
     // Filter by priority
-    if (filter !== 'all' && saadhana.priority !== filter) return false;
+    if (filter !== 'all' && task.priority !== filter) return false;
     
     // Filter by search query
-    if (searchQuery && !saadhana.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     
     return true;
   });
 
-  // Sort saadhanas by priority and due date
-  const sortedSaadhanas = [...filteredSaadhanas].sort((a, b) => {
+  // Sort tasks by priority and due date
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
     // First by completion status
     if (a.completed !== b.completed) {
       return a.completed ? 1 : -1;
@@ -220,22 +220,22 @@ const Saadhanas = () => {
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'No Date';
     
-    const saadhanaDate = new Date(dateString);
+    const taskDate = new Date(dateString);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
     
-    const saadhanaDateStart = new Date(saadhanaDate);
-    saadhanaDateStart.setHours(0, 0, 0, 0);
+    const taskDateStart = new Date(taskDate);
+    taskDateStart.setHours(0, 0, 0, 0);
     
-    if (saadhanaDateStart.getTime() === today.getTime()) {
+    if (taskDateStart.getTime() === today.getTime()) {
       return 'Today';
-    } else if (saadhanaDateStart.getTime() === tomorrow.getTime()) {
+    } else if (taskDateStart.getTime() === tomorrow.getTime()) {
       return 'Tomorrow';
     } else {
-      return saadhanaDate.toLocaleDateString('en-US', {
+      return taskDate.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric'
       });
@@ -247,7 +247,7 @@ const Saadhanas = () => {
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
           <CheckSquare className="h-7 w-7 text-primary" />
-          Saadhanas
+          Tasks
         </h1>
         <p className="text-muted-foreground">
           Organize your spiritual practices and goals.
@@ -258,7 +258,7 @@ const Saadhanas = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input 
-            placeholder="Search saadhanas..."
+            placeholder="Search tasks..."
             className="pl-9"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -279,18 +279,18 @@ const Saadhanas = () => {
               <SelectItem value="low">Low</SelectItem>
             </SelectContent>
           </Select>
-          <Dialog open={isAddingSaadhana} onOpenChange={setIsAddingSaadhana}>
+          <Dialog open={isAddingTask} onOpenChange={setIsAddingTask}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Saadhana
+                Add Task
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle>Add New Saadhana</DialogTitle>
+                <DialogTitle>Add New Task</DialogTitle>
                 <DialogDescription>
-                  Create a new saadhana for your spiritual practice or goal.
+                  Create a new task for your spiritual practice or goal.
                 </DialogDescription>
               </DialogHeader>
               <div className="grid gap-4 py-4">
@@ -298,26 +298,26 @@ const Saadhanas = () => {
                   <Label htmlFor="title">Title</Label>
                   <Input
                     id="title"
-                    placeholder="Saadhana title"
-                    value={newSaadhana.title}
-                    onChange={(e) => setNewSaadhana({...newSaadhana, title: e.target.value})}
+                    placeholder="Task title"
+                    value={newTask.title}
+                    onChange={(e) => setNewTask({...newTask, title: e.target.value})}
                   />
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="description">Description</Label>
                   <Textarea
                     id="description"
-                    placeholder="Saadhana description"
-                    value={newSaadhana.description || ''}
-                    onChange={(e) => setNewSaadhana({...newSaadhana, description: e.target.value})}
+                    placeholder="Task description"
+                    value={newTask.description || ''}
+                    onChange={(e) => setNewTask({...newTask, description: e.target.value})}
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="category">Category</Label>
                     <Select
-                      value={newSaadhana.category}
-                      onValueChange={(value: 'daily' | 'goal') => setNewSaadhana({...newSaadhana, category: value})}
+                      value={newTask.category}
+                      onValueChange={(value: 'daily' | 'goal') => setNewTask({...newTask, category: value})}
                     >
                       <SelectTrigger id="category">
                         <SelectValue placeholder="Select category" />
@@ -331,8 +331,8 @@ const Saadhanas = () => {
                   <div className="grid gap-2">
                     <Label htmlFor="priority">Priority</Label>
                     <Select
-                      value={newSaadhana.priority}
-                      onValueChange={(value: 'low' | 'medium' | 'high') => setNewSaadhana({...newSaadhana, priority: value})}
+                      value={newTask.priority}
+                      onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask({...newTask, priority: value})}
                     >
                       <SelectTrigger id="priority">
                         <SelectValue placeholder="Select priority" />
@@ -351,8 +351,8 @@ const Saadhanas = () => {
                     <Input
                       id="dueDate"
                       type="date"
-                      value={newSaadhana.dueDate || ''}
-                      onChange={(e) => setNewSaadhana({...newSaadhana, dueDate: e.target.value})}
+                      value={newTask.dueDate || ''}
+                      onChange={(e) => setNewTask({...newTask, dueDate: e.target.value})}
                     />
                   </div>
                   <div className="grid gap-2">
@@ -360,15 +360,15 @@ const Saadhanas = () => {
                     <Input
                       id="time"
                       type="time"
-                      value={newSaadhana.time || ''}
-                      onChange={(e) => setNewSaadhana({...newSaadhana, time: e.target.value})}
+                      value={newTask.time || ''}
+                      onChange={(e) => setNewTask({...newTask, time: e.target.value})}
                     />
                   </div>
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddingSaadhana(false)}>Cancel</Button>
-                <Button onClick={handleAddSaadhana}>Add Saadhana</Button>
+                <Button variant="outline" onClick={() => setIsAddingTask(false)}>Cancel</Button>
+                <Button onClick={handleAddTask}>Add Task</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -384,56 +384,56 @@ const Saadhanas = () => {
           <TabsTrigger value="incomplete">Incomplete</TabsTrigger>
         </TabsList>
 
-        {/* Saadhana list for all tabs */}
+        {/* Task list for all tabs */}
         <TabsContent value={activeTab} className="mt-4">
-          {sortedSaadhanas.length === 0 ? (
+          {sortedTasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <CheckSquare className="h-16 w-16 text-muted-foreground/30 mb-4" />
-              <h3 className="text-xl font-medium mb-2">No saadhanas found</h3>
+              <h3 className="text-xl font-medium mb-2">No tasks found</h3>
               <p className="text-muted-foreground max-w-md">
                 {searchQuery || filter !== 'all' 
                   ? "Try changing your search or filter settings." 
-                  : "Create your first saadhana by clicking the 'Add Saadhana' button."}
+                  : "Create your first task by clicking the 'Add Task' button."}
               </p>
               <Button 
                 variant="outline" 
                 className="mt-4"
-                onClick={() => setIsAddingSaadhana(true)}
+                onClick={() => setIsAddingTask(true)}
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Add Saadhana
+                Add Task
               </Button>
             </div>
           ) : (
             <div className="space-y-4 mt-4">
-              {sortedSaadhanas.map(saadhana => (
-                <Card key={saadhana.id} className={`hover-lift transition-all ${saadhana.completed ? 'opacity-70' : ''}`}>
+              {sortedTasks.map(task => (
+                <Card key={task.id} className={`hover-lift transition-all ${task.completed ? 'opacity-70' : ''}`}>
                   <CardHeader className="pb-2">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         <Checkbox
-                          id={`saadhana-${saadhana.id}`}
-                          checked={saadhana.completed}
-                          onCheckedChange={() => toggleSaadhanaCompletion(saadhana.id)}
+                          id={`task-${task.id}`}
+                          checked={task.completed}
+                          onCheckedChange={() => toggleTaskCompletion(task.id)}
                           className="mt-1"
                         />
                         <div>
-                          <CardTitle className={`text-xl ${saadhana.completed ? 'line-through text-muted-foreground' : ''}`}>
-                            {saadhana.title}
+                          <CardTitle className={`text-xl ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                            {task.title}
                           </CardTitle>
-                          {saadhana.description && (
+                          {task.description && (
                             <CardDescription className="mt-1">
-                              {saadhana.description}
+                              {task.description}
                             </CardDescription>
                           )}
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Dialog open={editingSaadhana?.id === saadhana.id} onOpenChange={(open) => {
+                        <Dialog open={editingTask?.id === task.id} onOpenChange={(open) => {
                           if (open) {
-                            setEditingSaadhana(saadhana);
+                            setEditingTask(task);
                           } else {
-                            setEditingSaadhana(null);
+                            setEditingTask(null);
                           }
                         }}>
                           <DialogTrigger asChild>
@@ -443,37 +443,37 @@ const Saadhanas = () => {
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-[500px]">
                             <DialogHeader>
-                              <DialogTitle>Edit Saadhana</DialogTitle>
+                              <DialogTitle>Edit Task</DialogTitle>
                               <DialogDescription>
-                                Update your saadhana details.
+                                Update your task details.
                               </DialogDescription>
                             </DialogHeader>
-                            {editingSaadhana && (
+                            {editingTask && (
                               <div className="grid gap-4 py-4">
                                 <div className="grid gap-2">
                                   <Label htmlFor="edit-title">Title</Label>
                                   <Input
                                     id="edit-title"
-                                    placeholder="Saadhana title"
-                                    value={editingSaadhana.title}
-                                    onChange={(e) => setEditingSaadhana({...editingSaadhana, title: e.target.value})}
+                                    placeholder="Task title"
+                                    value={editingTask.title}
+                                    onChange={(e) => setEditingTask({...editingTask, title: e.target.value})}
                                   />
                                 </div>
                                 <div className="grid gap-2">
                                   <Label htmlFor="edit-description">Description</Label>
                                   <Textarea
                                     id="edit-description"
-                                    placeholder="Saadhana description"
-                                    value={editingSaadhana.description || ''}
-                                    onChange={(e) => setEditingSaadhana({...editingSaadhana, description: e.target.value})}
+                                    placeholder="Task description"
+                                    value={editingTask.description || ''}
+                                    onChange={(e) => setEditingTask({...editingTask, description: e.target.value})}
                                   />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                   <div className="grid gap-2">
                                     <Label htmlFor="edit-category">Category</Label>
                                     <Select
-                                      value={editingSaadhana.category}
-                                      onValueChange={(value: 'daily' | 'goal') => setEditingSaadhana({...editingSaadhana, category: value})}
+                                      value={editingTask.category}
+                                      onValueChange={(value: 'daily' | 'goal') => setEditingTask({...editingTask, category: value})}
                                     >
                                       <SelectTrigger id="edit-category">
                                         <SelectValue placeholder="Select category" />
@@ -487,8 +487,8 @@ const Saadhanas = () => {
                                   <div className="grid gap-2">
                                     <Label htmlFor="edit-priority">Priority</Label>
                                     <Select
-                                      value={editingSaadhana.priority}
-                                      onValueChange={(value: 'low' | 'medium' | 'high') => setEditingSaadhana({...editingSaadhana, priority: value})}
+                                      value={editingTask.priority}
+                                      onValueChange={(value: 'low' | 'medium' | 'high') => setEditingTask({...editingTask, priority: value})}
                                     >
                                       <SelectTrigger id="edit-priority">
                                         <SelectValue placeholder="Select priority" />
@@ -507,8 +507,8 @@ const Saadhanas = () => {
                                     <Input
                                       id="edit-dueDate"
                                       type="date"
-                                      value={editingSaadhana.dueDate || ''}
-                                      onChange={(e) => setEditingSaadhana({...editingSaadhana, dueDate: e.target.value})}
+                                      value={editingTask.dueDate || ''}
+                                      onChange={(e) => setEditingTask({...editingTask, dueDate: e.target.value})}
                                     />
                                   </div>
                                   <div className="grid gap-2">
@@ -516,16 +516,16 @@ const Saadhanas = () => {
                                     <Input
                                       id="edit-time"
                                       type="time"
-                                      value={editingSaadhana.time || ''}
-                                      onChange={(e) => setEditingSaadhana({...editingSaadhana, time: e.target.value})}
+                                      value={editingTask.time || ''}
+                                      onChange={(e) => setEditingTask({...editingTask, time: e.target.value})}
                                     />
                                   </div>
                                 </div>
                                 <div className="grid gap-2">
                                   <div className="flex items-center gap-2">
                                     <Switch 
-                                      checked={editingSaadhana.completed}
-                                      onCheckedChange={(checked) => setEditingSaadhana({...editingSaadhana, completed: checked})}
+                                      checked={editingTask.completed}
+                                      onCheckedChange={(checked) => setEditingTask({...editingTask, completed: checked})}
                                     />
                                     <Label>Mark as completed</Label>
                                   </div>
@@ -533,12 +533,12 @@ const Saadhanas = () => {
                               </div>
                             )}
                             <DialogFooter>
-                              <Button variant="outline" onClick={() => setEditingSaadhana(null)}>Cancel</Button>
-                              <Button onClick={handleUpdateSaadhana}>Save Changes</Button>
+                              <Button variant="outline" onClick={() => setEditingTask(null)}>Cancel</Button>
+                              <Button onClick={handleUpdateTask}>Save Changes</Button>
                             </DialogFooter>
                           </DialogContent>
                         </Dialog>
-                        <Button variant="ghost" size="icon" onClick={() => handleDeleteSaadhana(saadhana.id)}>
+                        <Button variant="ghost" size="icon" onClick={() => handleDeleteTask(task.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -546,12 +546,12 @@ const Saadhanas = () => {
                   </CardHeader>
                   <CardContent className="pb-4">
                     <div className="flex flex-wrap items-center gap-2 mt-2">
-                      <Badge variant="outline" className={`flex items-center gap-1 ${getPriorityColor(saadhana.priority)}`}>
+                      <Badge variant="outline" className={`flex items-center gap-1 ${getPriorityColor(task.priority)}`}>
                         <AlertCircle className="h-3 w-3" />
-                        {saadhana.priority.charAt(0).toUpperCase() + saadhana.priority.slice(1)} Priority
+                        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
                       </Badge>
                       <Badge variant="secondary" className="flex items-center gap-1">
-                        {saadhana.category === 'daily' ? (
+                        {task.category === 'daily' ? (
                           <>
                             <Clock3 className="h-3 w-3" />
                             Daily Ritual
@@ -563,16 +563,16 @@ const Saadhanas = () => {
                           </>
                         )}
                       </Badge>
-                      {saadhana.dueDate && (
+                      {task.dueDate && (
                         <Badge variant="outline" className="flex items-center gap-1">
                           <Calendar className="h-3 w-3" />
-                          {formatDate(saadhana.dueDate)}
+                          {formatDate(task.dueDate)}
                         </Badge>
                       )}
-                      {saadhana.time && (
+                      {task.time && (
                         <Badge variant="outline" className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
-                          {saadhana.time}
+                          {task.time}
                         </Badge>
                       )}
                     </div>
@@ -587,4 +587,4 @@ const Saadhanas = () => {
   );
 };
 
-export default Saadhanas;
+export default Tasks;
