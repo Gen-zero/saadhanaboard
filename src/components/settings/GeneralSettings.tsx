@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -16,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Settings2 } from 'lucide-react';
 import { SettingsType } from './SettingsTypes';
 
 interface GeneralSettingsProps {
@@ -28,7 +27,10 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({ settings, updateSetti
   return (
     <Card>
       <CardHeader>
-        <CardTitle>General Settings</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Settings2 className="h-5 w-5 text-primary" />
+          <span>General Settings</span>
+        </CardTitle>
         <CardDescription>Customize your app appearance and behavior</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -48,56 +47,59 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
 
             <Separator />
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
                 <Label className="text-base">Daily Ritual Reminders</Label>
-                <Switch
-                  disabled={!settings.notifications.enabled}
-                  checked={settings.notifications.ritualReminders}
-                  onCheckedChange={(checked) =>
-                    updateSettings(['notifications', 'ritualReminders'], checked)
-                  }
-                />
+                <p className="text-sm text-muted-foreground">
+                  Get notified about your daily spiritual practices
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Get notified about your daily spiritual practices
-              </p>
+              <Switch
+                disabled={!settings.notifications.enabled}
+                checked={settings.notifications.ritualReminders}
+                onCheckedChange={(checked) =>
+                  updateSettings(['notifications', 'ritualReminders'], checked)
+                }
+              />
             </div>
 
             <Separator />
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
                 <Label className="text-base">Goal Progress Updates</Label>
-                <Switch
-                  disabled={!settings.notifications.enabled}
-                  checked={settings.notifications.goalProgress}
-                  onCheckedChange={(checked) =>
-                    updateSettings(['notifications', 'goalProgress'], checked)
-                  }
-                />
+                <p className="text-sm text-muted-foreground">
+                  Receive updates on your spiritual journey progress
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Receive updates on your spiritual journey progress
-              </p>
+              <Switch
+                disabled={!settings.notifications.enabled}
+                checked={settings.notifications.goalProgress}
+                onCheckedChange={(checked) =>
+                  updateSettings(['notifications', 'goalProgress'], checked)
+                }
+              />
             </div>
 
             <Separator />
 
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
                 <Label className="text-base">Motivational Messages</Label>
-                <Switch
-                  disabled={!settings.notifications.enabled}
-                  checked={settings.notifications.motivationalMessages}
-                  onCheckedChange={(checked) =>
-                    updateSettings(['notifications', 'motivationalMessages'], checked)
-                  }
-                />
+                <p className="text-sm text-muted-foreground">
+                  Receive inspirational quotes and messages
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Receive inspirational quotes and messages
-              </p>
+              <Switch
+                disabled={!settings.notifications.enabled}
+                checked={settings.notifications.motivationalMessages}
+                onCheckedChange={(checked) =>
+                  updateSettings(
+                    ['notifications', 'motivationalMessages'],
+                    checked
+                  )
+                }
+              />
             </div>
           </div>
         </CardContent>
