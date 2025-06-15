@@ -1,25 +1,44 @@
 
 import React from 'react';
-import { MoonStar, Sparkles, Eye, Pencil } from 'lucide-react';
+import { MoonStar, Sparkles, Eye, Pencil, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SadhanaHeaderProps {
   isEditing: boolean;
   showManifestationForm: boolean;
   view3D: boolean;
+  showDashboard: boolean;
   setIsEditing: (value: boolean) => void;
   setShowManifestationForm: (value: boolean) => void;
   setView3D: (value: boolean) => void;
+  setShowDashboard: (value: boolean) => void;
 }
 
 const SadhanaHeader = ({
   isEditing,
   showManifestationForm,
   view3D,
+  showDashboard,
   setIsEditing,
   setShowManifestationForm,
-  setView3D
+  setView3D,
+  setShowDashboard
 }: SadhanaHeaderProps) => {
+
+  const handleDashboardToggle = () => {
+    setShowDashboard(!showDashboard);
+    if (!showDashboard) { // If turning dashboard ON
+      setIsEditing(false);
+    }
+  };
+
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
+    if (!isEditing) { // If turning edit mode ON
+      setShowDashboard(false);
+    }
+  };
+
   return (
     <div className="backdrop-blur-sm bg-background/70 p-4 rounded-lg border border-purple-500/20">
       <div className="flex justify-between items-center">
@@ -44,16 +63,25 @@ const SadhanaHeader = ({
               <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
             </span>
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
+            onClick={handleDashboardToggle}
+          >
+            <LayoutDashboard className="h-4 w-4" />
+            <span>{showDashboard ? 'View Saadhana' : 'View Progress'}</span>
+          </Button>
           <Button 
             variant="outline" 
             size="sm" 
             className="flex items-center gap-1 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
-            onClick={() => setIsEditing(!isEditing)}
+            onClick={handleEditToggle}
+            disabled={showDashboard}
           >
             {isEditing ? <Eye className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
             {isEditing ? 'Cosmic View' : 'Edit Details'}
           </Button>
-          {/* 3D view button removed */}
         </div>
       </div>
       <p className="text-muted-foreground font-light tracking-wide">
