@@ -1,10 +1,9 @@
 
 import React from 'react';
-import { MoonStar, Sparkles, Eye, Pencil, LayoutDashboard } from 'lucide-react';
+import { MoonStar, Sparkles, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface SadhanaHeaderProps {
-  isEditing: boolean;
   showManifestationForm: boolean;
   view3D: boolean;
   showDashboard: boolean;
@@ -15,7 +14,6 @@ interface SadhanaHeaderProps {
 }
 
 const SadhanaHeader = ({
-  isEditing,
   showManifestationForm,
   view3D,
   showDashboard,
@@ -29,13 +27,6 @@ const SadhanaHeader = ({
     setShowDashboard(!showDashboard);
     if (!showDashboard) { // If turning dashboard ON
       setIsEditing(false);
-    }
-  };
-
-  const handleEditToggle = () => {
-    setIsEditing(!isEditing);
-    if (!isEditing) { // If turning edit mode ON
-      setShowDashboard(false);
     }
   };
 
@@ -71,16 +62,6 @@ const SadhanaHeader = ({
           >
             <LayoutDashboard className="h-4 w-4" />
             <span>{showDashboard ? 'View Saadhana' : 'View Progress'}</span>
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-1 bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
-            onClick={handleEditToggle}
-            disabled={showDashboard}
-          >
-            {isEditing ? <Eye className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-            {isEditing ? 'Cosmic View' : 'Edit Details'}
           </Button>
         </div>
       </div>
