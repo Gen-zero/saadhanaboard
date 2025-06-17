@@ -9,7 +9,54 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      spiritual_books: {
+        Row: {
+          author: string
+          content: string
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          language: string | null
+          page_count: number | null
+          title: string
+          traditions: string[]
+          updated_at: string
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          author: string
+          content: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          language?: string | null
+          page_count?: number | null
+          title: string
+          traditions?: string[]
+          updated_at?: string
+          user_id: string
+          year?: number | null
+        }
+        Update: {
+          author?: string
+          content?: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          language?: string | null
+          page_count?: number | null
+          title?: string
+          traditions?: string[]
+          updated_at?: string
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

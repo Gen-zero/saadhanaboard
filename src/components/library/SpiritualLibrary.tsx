@@ -8,16 +8,19 @@ import LibraryHeader from "./LibraryHeader";
 import SubjectTabs from "./SubjectTabs";
 import SearchBar from "./SearchBar";
 import LibraryLoading from "./LibraryLoading";
+import BookUploadDialog from "./BookUploadDialog";
 import { spiritualBooks } from "@/data/spiritualBooks";
 import { SpiritualBook } from "@/types/books";
 import { fetchAllSpiritualBooks, fetchOpenLibrarySubject } from "@/lib/api";
+import { useSpiritualBooks } from "@/hooks/useSpiritualBooks";
 
 const SpiritualLibrary = () => {
   const { toast } = useToast();
+  const { books: allBooks, isLoading: booksLoading, refreshBooks } = useSpiritualBooks();
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState<"grid" | "list">("grid");
-  const [books, setBooks] = useState<SpiritualBook[]>(spiritualBooks);
+  const [books, setBooks] = useState<SpiritualBook[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dataSource, setDataSource] = useState<"local" | "api">("local");
   const [currentSubject, setCurrentSubject] = useState<string>("spirituality");
@@ -34,13 +37,20 @@ const SpiritualLibrary = () => {
     { id: "mysticism", name: "Mysticism" },
   ];
 
+  // Update books when allBooks changes
+  useEffect(() => {
+    if (dataSource === "local") {
+      setBooks(allBooks);
+    }
+  }, [allBooks, dataSource]);
+
   // Load data based on the selected subject
   const loadSubjectData = async (subject: string) => {
     setIsLoading(true);
     try {
       const subjectBooks = await fetchOpenLibrarySubject(subject);
       if (subjectBooks.length > 0) {
-        setBooks([...spiritualBooks, ...subjectBooks]);
+        setBooks([...allBooks, ...subjectBooks]);
         toast({
           title: `${subject} books loaded`,
           description: `Loaded ${subjectBooks.length} books from Open Library`,
@@ -61,7 +71,7 @@ const SpiritualLibrary = () => {
         variant: "destructive",
         duration: 3000,
       });
-      setBooks(spiritualBooks);
+      setBooks(allBooks);
     } finally {
       setIsLoading(false);
     }
@@ -74,7 +84,7 @@ const SpiritualLibrary = () => {
       fetchAllSpiritualBooks()
         .then(apiBooks => {
           if (apiBooks.length > 0) {
-            setBooks([...spiritualBooks, ...apiBooks]);
+            setBooks([...allBooks, ...apiBooks]);
             toast({
               title: "External books loaded",
               description: `Loaded ${apiBooks.length} books from external sources`,
@@ -101,9 +111,9 @@ const SpiritualLibrary = () => {
           setIsLoading(false);
         });
     } else {
-      setBooks(spiritualBooks);
+      setBooks(allBooks);
     }
-  }, [dataSource, toast]);
+  }, [dataSource, toast, allBooks]);
 
   useEffect(() => {
     if (dataSource === "api" && currentSubject) {
@@ -139,16 +149,30 @@ const SpiritualLibrary = () => {
     setView(view === "grid" ? "list" : "grid");
   };
 
+  const handleBookUploaded = () => {
+    refreshBooks();
+    toast({
+      title: "Library updated",
+      description: "Your uploaded book is now available in the library.",
+      duration: 3000,
+    });
+  };
+
+  const currentLoading = isLoading || booksLoading;
+
   return (
     <div className="cosmic-nebula-bg p-4 md:p-6 rounded-lg border border-purple-500/20">
       <div className="flex flex-col gap-4">
-        <LibraryHeader 
-          dataSource={dataSource}
-          view={view}
-          isLoading={isLoading}
-          toggleDataSource={toggleDataSource}
-          toggleView={toggleView}
-        />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <LibraryHeader 
+            dataSource={dataSource}
+            view={view}
+            isLoading={currentLoading}
+            toggleDataSource={toggleDataSource}
+            toggleView={toggleView}
+          />
+          <BookUploadDialog onBookUploaded={handleBookUploaded} />
+        </div>
         
         {dataSource === "api" && (
           <SubjectTabs 
@@ -164,7 +188,7 @@ const SpiritualLibrary = () => {
           placeholder="Search by title, author or tradition..."
         />
         
-        {isLoading ? (
+        {currentLoading ? (
           <LibraryLoading />
         ) : selectedBook ? (
           <BookViewer bookId={selectedBook} onClose={handleCloseBook} />
