@@ -1,21 +1,17 @@
 
 import React from "react";
-import { BookOpen, Sparkles, AlignCenter, Loader2 } from "lucide-react";
+import { BookOpen, AlignCenter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LibraryHeaderProps {
-  dataSource: "local" | "api";
   view: "grid" | "list";
   isLoading: boolean;
-  toggleDataSource: () => void;
   toggleView: () => void;
 }
 
 const LibraryHeader = ({
-  dataSource,
   view,
   isLoading,
-  toggleDataSource,
   toggleView
 }: LibraryHeaderProps) => {
   return (
@@ -32,29 +28,15 @@ const LibraryHeader = ({
         <Button
           variant="outline"
           size="sm"
-          className={`flex items-center gap-1 cosmic-highlight ${
-            dataSource === "api" 
-              ? "bg-primary/20 border-primary/50 text-primary"
-              : "bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
-          }`}
-          onClick={toggleDataSource}
+          className="flex items-center gap-1 cosmic-highlight bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
+          onClick={toggleView}
           disabled={isLoading}
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
           ) : (
-            <Sparkles className="h-4 w-4" />
+            <AlignCenter className="h-4 w-4" />
           )}
-          <span>{dataSource === "local" ? "Connect to Open Library" : "Local Books Only"}</span>
-        </Button>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex items-center gap-1 cosmic-highlight bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
-          onClick={toggleView}
-        >
-          <AlignCenter className="h-4 w-4" />
           <span>{view === "grid" ? "List View" : "Grid View"}</span>
         </Button>
       </div>
