@@ -8,21 +8,6 @@ interface FileUploadProps {
   onFileProcessed: (content: string, fileName: string) => void;
 }
 
-// Type declaration for pdf-parse since it doesn't have built-in types
-declare module 'pdf-parse' {
-  interface PDFData {
-    text: string;
-    numpages: number;
-    numrender: number;
-    info: any;
-    metadata: any;
-    version: string;
-  }
-  
-  function pdfParse(buffer: Buffer | Uint8Array): Promise<PDFData>;
-  export = pdfParse;
-}
-
 const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
@@ -49,7 +34,7 @@ const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
         
         // Dynamic import to handle pdf-parse
         const pdfParse = await import('pdf-parse');
-        const data = await pdfParse.default(uint8Array);
+        const data = await (pdfParse as any).default(uint8Array);
         
         resolve(data.text);
       } catch (error) {
