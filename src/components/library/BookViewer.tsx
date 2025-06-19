@@ -1,9 +1,11 @@
+
 import { useEffect, useRef, useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Maximize, Minimize, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSpiritualBooks } from '@/hooks/useSpiritualBooks';
+import { useToast } from '@/components/ui/use-toast';
 
 interface BookViewerProps {
   bookId: string;
@@ -15,10 +17,50 @@ const BookViewer = ({ bookId, onClose }: BookViewerProps) => {
   const book = books.find(b => b.id === bookId);
   const [currentPage, setCurrentPage] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
+  const [pdfContent, setPdfContent] = useState<string>('');
+  const [isLoadingPdf, setIsLoadingPdf] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  const pages = book?.content?.split('---PAGE---') || ['No content available'];
+  const { toast } = useToast();
   
+  // Handle PDF content loading
+  useEffect(() => {
+    const loadPdfContent = async () => {
+      if (book?.is_storage_file && book.storage_url && !pdfContent) {
+        setIsLoadingPdf(true);
+        try {
+          const response = await fetch(book.storage_url);
+          const arrayBuffer = await response.arrayBuffer();
+          const uint8Array = new Uint8Array(arrayBuffer);
+          
+          // Dynamic import to handle pdf-parse
+          const pdfParse = await import('pdf-parse');
+          const data = await (pdfParse as any).default(uint8Array);
+          
+          setPdfContent(data.text);
+          toast({
+            title: "PDF loaded successfully",
+            description: `Extracted ${data.numpages} pages from ${book.title}`,
+          });
+        } catch (error) {
+          console.error('Error loading PDF:', error);
+          setPdfContent('Failed to load PDF content. Please try again.');
+          toast({
+            title: "PDF loading failed",
+            description: "Could not extract text from the PDF file.",
+            variant: "destructive",
+          });
+        } finally {
+          setIsLoadingPdf(false);
+        }
+      }
+    };
+
+    loadPdfContent();
+  }, [book, pdfContent, toast]);
+
+  const content = book?.is_storage_file ? pdfContent : book?.content;
+  const pages = content?.split('---PAGE---') || ['No content available'];
   const totalPages = pages.length;
   
   useEffect(() => {
@@ -70,8 +112,19 @@ const BookViewer = ({ bookId, onClose }: BookViewerProps) => {
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-semibold">{book.title}</h2>
           <span className="text-sm text-muted-foreground">by {book.author}</span>
-          <span className="text-xs bg-green-500/20 text-green-700 px-2 py-1 rounded">
-            User Upload
+          <span className={`text-xs px-2 py-1 rounded ${
+            book.is_storage_file 
+              ? 'bg-blue-500/20 text-blue-700' 
+              : 'bg-green-500/20 text-green-700'
+          }`}>
+            {book.is_storage_file ? (
+              <>
+                <FileText className="inline h-3 w-3 mr-1" />
+                Storage PDF
+              </>
+            ) : (
+              'User Upload'
+            )}
           </span>
         </div>
         
@@ -118,13 +171,20 @@ const BookViewer = ({ bookId, onClose }: BookViewerProps) => {
           >
             <div className="max-w-2xl mx-auto">
               <div className="scroll-page animate-unfold parchment-glow flex flex-col">
-                <div className="text-content animate-ink-appear space-y-4 whitespace-pre-wrap">
-                  {pages[currentPage].split('\n\n').map((paragraph, idx) => (
-                    <p key={idx} className="text-base leading-relaxed">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
+                {isLoadingPdf ? (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
+                    <p className="text-muted-foreground">Loading PDF content...</p>
+                  </div>
+                ) : (
+                  <div className="text-content animate-ink-appear space-y-4 whitespace-pre-wrap">
+                    {pages[currentPage].split('\n\n').map((paragraph, idx) => (
+                      <p key={idx} className="text-base leading-relaxed">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </ScrollArea>

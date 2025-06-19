@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { BookMarked, BookOpen, BookText } from "lucide-react";
+import { BookMarked, BookOpen, BookText, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area"; 
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
@@ -54,12 +54,14 @@ interface BookCardProps {
 }
 
 const BookCard = ({ book, onSelect }: BookCardProps) => {
+  const BookIcon = book.is_storage_file ? FileText : BookMarked;
+  
   return (
     <div 
       className="group relative flex flex-col overflow-hidden rounded-lg border border-purple-500/20 bg-background/80 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-300 ease-in-out hover:-translate-y-1 hover:shadow-md cosmic-highlight p-4"
     >
       <div className="aspect-[2/3] w-full overflow-hidden rounded-md bg-gradient-to-b from-purple-600/20 via-purple-500/10 to-purple-400/20 flex items-center justify-center">
-        <BookMarked className="h-16 w-16 text-purple-500 opacity-80 group-hover:scale-110 transition-transform duration-300" />
+        <BookIcon className="h-16 w-16 text-purple-500 opacity-80 group-hover:scale-110 transition-transform duration-300" />
       </div>
       
       <div className="mt-3 space-y-1">
@@ -78,6 +80,13 @@ const BookCard = ({ book, onSelect }: BookCardProps) => {
             </Badge>
           )}
         </div>
+        
+        {book.is_storage_file && (
+          <div className="flex items-center gap-1 text-xs text-blue-600">
+            <FileText className="h-3 w-3" />
+            <span>PDF from Storage</span>
+          </div>
+        )}
       </div>
       
       <div className="mt-4 flex justify-end">
@@ -88,7 +97,7 @@ const BookCard = ({ book, onSelect }: BookCardProps) => {
           onClick={() => onSelect(book.id)}
         >
           <BookOpen className="mr-2 h-4 w-4" />
-          Read Now
+          {book.is_storage_file ? 'Open PDF' : 'Read Now'}
         </Button>
       </div>
       
@@ -98,6 +107,8 @@ const BookCard = ({ book, onSelect }: BookCardProps) => {
 };
 
 const BookListItem = ({ book, onSelect }: BookCardProps) => {
+  const BookIcon = book.is_storage_file ? FileText : BookMarked;
+  
   return (
     <div 
       className="group flex justify-between items-center p-3 my-2 rounded-md hover:bg-purple-500/10 transition-colors border border-transparent hover:border-purple-500/30 cursor-pointer"
@@ -105,11 +116,14 @@ const BookListItem = ({ book, onSelect }: BookCardProps) => {
     >
       <div className="flex items-center gap-3">
         <div className="h-10 w-10 bg-gradient-to-br from-purple-600/30 to-purple-400/30 rounded-md flex items-center justify-center">
-          <BookMarked className="h-5 w-5 text-purple-500" />
+          <BookIcon className="h-5 w-5 text-purple-500" />
         </div>
         <div>
           <h3 className="font-medium">{book.title}</h3>
           <p className="text-sm text-muted-foreground">{book.author}</p>
+          {book.is_storage_file && (
+            <span className="text-xs text-blue-600">PDF from Storage</span>
+          )}
         </div>
       </div>
       

@@ -11,6 +11,11 @@ export interface SpiritualBook {
   source?: string;
   language?: string;
   pageCount?: number;
+  created_at?: string;
+  updated_at?: string;
+  user_id?: string;
+  storage_url?: string;
+  is_storage_file?: boolean;
 }
 
 export interface AuthUser {
