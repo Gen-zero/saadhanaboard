@@ -1,8 +1,6 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { X, ChevronLeft, ChevronRight, Maximize, Minimize } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { spiritualBooks } from '@/data/spiritualBooks';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSpiritualBooks } from '@/hooks/useSpiritualBooks';
@@ -72,11 +70,9 @@ const BookViewer = ({ bookId, onClose }: BookViewerProps) => {
         <div className="flex items-center gap-2">
           <h2 className="text-xl font-semibold">{book.title}</h2>
           <span className="text-sm text-muted-foreground">by {book.author}</span>
-          {book.source === 'supabase' && (
-            <span className="text-xs bg-green-500/20 text-green-700 px-2 py-1 rounded">
-              User Upload
-            </span>
-          )}
+          <span className="text-xs bg-green-500/20 text-green-700 px-2 py-1 rounded">
+            User Upload
+          </span>
         </div>
         
         <div className="flex items-center gap-2">

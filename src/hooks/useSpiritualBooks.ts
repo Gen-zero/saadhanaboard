@@ -19,27 +19,27 @@ export interface SpiritualBook {
 }
 
 export const useSpiritualBooks = (searchTerm?: string, selectedSubjects?: string[]) => {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['spiritual-books', searchTerm, selectedSubjects],
     queryFn: async (): Promise<SpiritualBook[]> => {
-      let query = supabase
+      let dbQuery = supabase
         .from('spiritual_books')
         .select('*')
         .order('created_at', { ascending: false });
 
       // Apply search filter if provided
       if (searchTerm && searchTerm.trim()) {
-        query = query.or(
+        dbQuery = dbQuery.or(
           `title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
         );
       }
 
       // Apply subject/tradition filter if provided
       if (selectedSubjects && selectedSubjects.length > 0) {
-        query = query.overlaps('traditions', selectedSubjects);
+        dbQuery = dbQuery.overlaps('traditions', selectedSubjects);
       }
 
-      const { data, error } = await query;
+      const { data, error } = await dbQuery;
 
       if (error) {
         console.error('Error fetching books:', error);
@@ -49,6 +49,13 @@ export const useSpiritualBooks = (searchTerm?: string, selectedSubjects?: string
       return data || [];
     },
   });
+
+  return {
+    books: query.data || [],
+    isLoading: query.isLoading,
+    error: query.error,
+    refreshBooks: query.refetch
+  };
 };
 
 // Hook to get unique traditions from all books

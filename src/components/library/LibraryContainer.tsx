@@ -16,7 +16,8 @@ const LibraryContainer = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState<"grid" | "list">("grid");
   
-  const filteredBooks = books.filter(
+  // Add safety check to ensure books is an array before filtering
+  const filteredBooks = (books || []).filter(
     (book) => 
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
