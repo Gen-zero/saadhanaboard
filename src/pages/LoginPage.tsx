@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, LogIn, User, Key, Loader2 } from "lucide-react";
+import { LogIn, User, Key, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -9,19 +10,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters")
 });
+
 const LoginPage = () => {
-  const {
-    toast
-  } = useToast();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  const {
-    login
-  } = useAuth();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -29,6 +29,7 @@ const LoginPage = () => {
       password: ""
     }
   });
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
@@ -48,10 +49,16 @@ const LoginPage = () => {
       setIsLoading(false);
     }
   };
-  return <div className="min-h-screen flex flex-col items-center justify-center cosmic-nebula-bg p-4">
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center cosmic-nebula-bg p-4">
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         <div className="flex flex-col items-center text-center mb-8">
-          <BookOpen className="h-12 w-12 text-purple-500 mb-2" />
+          <img 
+            src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
+            alt="Saadhana Board Logo" 
+            className="h-12 w-12 mb-2" 
+          />
           <h1 className="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">Saadhana Board</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Access your spiritual journey
@@ -66,9 +73,11 @@ const LoginPage = () => {
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField control={form.control} name="email" render={({
-              field
-            }) => <FormItem>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
                       <div className="relative">
@@ -77,11 +86,15 @@ const LoginPage = () => {
                       </div>
                     </FormControl>
                     <FormMessage />
-                  </FormItem>} />
+                  </FormItem>
+                )}
+              />
 
-              <FormField control={form.control} name="password" render={({
-              field
-            }) => <FormItem>
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
                       <div className="relative">
@@ -90,16 +103,22 @@ const LoginPage = () => {
                       </div>
                     </FormControl>
                     <FormMessage />
-                  </FormItem>} />
+                  </FormItem>
+                )}
+              />
 
               <Button type="submit" className="w-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600" disabled={isLoading}>
-                {isLoading ? <>
+                {isLoading ? (
+                  <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Logging in...
-                  </> : <>
+                  </>
+                ) : (
+                  <>
                     <LogIn className="mr-2 h-4 w-4" />
                     Login
-                  </>}
+                  </>
+                )}
               </Button>
             </form>
           </Form>
@@ -118,6 +137,8 @@ const LoginPage = () => {
           <p>Demo account: demo@example.com / password</p>
         </div>
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default LoginPage;

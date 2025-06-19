@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { BookOpen, UserPlus, User, Key, Mail, Loader2 } from "lucide-react";
+import { UserPlus, User, Key, Mail, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -68,7 +68,11 @@ const SignupPage = () => {
     <div className="min-h-screen flex flex-col items-center justify-center cosmic-nebula-bg p-4">
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         <div className="flex flex-col items-center text-center mb-8">
-          <BookOpen className="h-12 w-12 text-purple-500 mb-2" />
+          <img 
+            src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
+            alt="Saadhana Board Logo" 
+            className="h-12 w-12 mb-2" 
+          />
           <h1 className="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
             Saadhana Yantra
           </h1>

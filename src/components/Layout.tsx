@@ -1,8 +1,6 @@
-
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  BookOpen, 
   Home, 
   CheckSquare, 
   User, 
@@ -10,10 +8,7 @@ import {
   Menu, 
   X, 
   ChevronRight,
-  AlarmClock,
   BookHeart,
-  WandSparkles,
-  Library,
   LogOut,
   LogIn
 } from 'lucide-react';
@@ -34,7 +29,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const navItems = [
     { name: 'Saadhana Board', icon: BookHeart, path: '/sadhana' },
-    { name: 'Spiritual Library', icon: BookOpen, path: '/library' },
+    { name: 'Spiritual Library', icon: BookHeart, path: '/library' },
     { name: 'Saadhanas', icon: CheckSquare, path: '/saadhanas' },
     { name: 'Settings', icon: Settings, path: '/settings' }
   ];
@@ -69,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
             <div className="flex items-center gap-2">
               <img 
-                src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" 
+                src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
                 alt="Saadhana Board Logo" 
                 className="h-12 w-12" 
               />
@@ -154,7 +149,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </button>
           <div className="ml-4 flex items-center gap-2">
             <img 
-              src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" 
+              src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
               alt="Saadhana Board Logo" 
               className="h-8 w-8" 
             />

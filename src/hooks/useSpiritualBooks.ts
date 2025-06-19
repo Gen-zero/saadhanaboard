@@ -1,74 +1,73 @@
 
-import { useState, useEffect } from "react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { spiritualBooks as localBooks } from "@/data/spiritualBooks";
-import { SpiritualBook } from "@/types/books";
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-export const useSpiritualBooks = () => {
-  const { toast } = useToast();
-  const [books, setBooks] = useState<SpiritualBook[]>(localBooks);
-  const [isLoading, setIsLoading] = useState(false);
+export interface SpiritualBook {
+  id: string;
+  title: string;
+  author: string;
+  traditions: string[];
+  content: string;
+  description?: string;
+  year?: number;
+  language: string;
+  page_count?: number;
+  cover_url?: string;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+}
 
-  const fetchSupabaseBooks = async () => {
-    try {
-      const { data, error } = await supabase
+export const useSpiritualBooks = (searchTerm?: string, selectedSubjects?: string[]) => {
+  return useQuery({
+    queryKey: ['spiritual-books', searchTerm, selectedSubjects],
+    queryFn: async (): Promise<SpiritualBook[]> => {
+      let query = supabase
         .from('spiritual_books')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      // Apply search filter if provided
+      if (searchTerm && searchTerm.trim()) {
+        query = query.or(
+          `title.ilike.%${searchTerm}%,author.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
+        );
+      }
 
-      const supabaseBooks: SpiritualBook[] = data.map(book => ({
-        id: book.id,
-        title: book.title,
-        author: book.author,
-        traditions: book.traditions || [],
-        content: book.content,
-        coverUrl: book.cover_url || undefined,
-        description: book.description || undefined,
-        year: book.year || undefined,
-        source: 'supabase',
-        language: book.language || undefined,
-        pageCount: book.page_count || undefined,
-      }));
+      // Apply subject/tradition filter if provided
+      if (selectedSubjects && selectedSubjects.length > 0) {
+        query = query.overlaps('traditions', selectedSubjects);
+      }
 
-      return supabaseBooks;
-    } catch (error) {
-      console.error('Error fetching books from Supabase:', error);
-      return [];
-    }
-  };
+      const { data, error } = await query;
 
-  const loadAllBooks = async () => {
-    setIsLoading(true);
-    try {
-      const supabaseBooks = await fetchSupabaseBooks();
-      const allBooks = [...localBooks, ...supabaseBooks];
-      setBooks(allBooks);
-    } catch (error) {
-      console.error('Error loading books:', error);
-      toast({
-        title: "Error loading books",
-        description: "Some books may not be available.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      if (error) {
+        console.error('Error fetching books:', error);
+        throw error;
+      }
 
-  const refreshBooks = () => {
-    loadAllBooks();
-  };
+      return data || [];
+    },
+  });
+};
 
-  useEffect(() => {
-    loadAllBooks();
-  }, []);
+// Hook to get unique traditions from all books
+export const useBookTraditions = () => {
+  return useQuery({
+    queryKey: ['book-traditions'],
+    queryFn: async (): Promise<string[]> => {
+      const { data, error } = await supabase
+        .from('spiritual_books')
+        .select('traditions');
 
-  return {
-    books,
-    isLoading,
-    refreshBooks,
-  };
+      if (error) {
+        console.error('Error fetching traditions:', error);
+        throw error;
+      }
+
+      // Extract unique traditions from all books
+      const allTraditions = data?.flatMap(book => book.traditions) || [];
+      return [...new Set(allTraditions)].sort();
+    },
+  });
 };
