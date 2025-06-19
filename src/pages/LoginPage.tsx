@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { LogIn, User, Key, Loader2 } from "lucide-react";
@@ -55,9 +54,9 @@ const LoginPage = () => {
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         <div className="flex flex-col items-center text-center mb-8">
           <img 
-            src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
+            src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" 
             alt="Saadhana Board Logo" 
-            className="h-12 w-12 mb-2" 
+            className="h-20 w-20 mb-4" 
           />
           <h1 className="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">Saadhana Board</h1>
           <p className="text-sm text-muted-foreground mt-1">

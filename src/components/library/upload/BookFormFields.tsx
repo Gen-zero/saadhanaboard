@@ -2,6 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import FileUpload from "./FileUpload";
 
 interface FormData {
   title: string;
@@ -18,6 +19,19 @@ interface BookFormFieldsProps {
 }
 
 const BookFormFields = ({ formData, onInputChange }: BookFormFieldsProps) => {
+  const handleFileProcessed = (content: string, fileName: string) => {
+    onInputChange("content", content);
+    
+    // Auto-fill title if it's empty and we have a filename
+    if (!formData.title && fileName) {
+      const titleFromFile = fileName
+        .replace(/\.(pdf|txt)$/i, '')
+        .replace(/[-_]/g, ' ')
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+      onInputChange("title", titleFromFile);
+    }
+  };
+
   return (
     <>
       <div className="grid grid-cols-2 gap-4">
@@ -79,12 +93,20 @@ const BookFormFields = ({ formData, onInputChange }: BookFormFieldsProps) => {
       </div>
 
       <div className="space-y-2">
+        <Label>Upload File (Optional)</Label>
+        <FileUpload onFileProcessed={handleFileProcessed} />
+        <p className="text-xs text-muted-foreground">
+          Upload a PDF or text file to automatically extract content, or manually enter content below.
+        </p>
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="content">Book Content *</Label>
         <Textarea
           id="content"
           value={formData.content}
           onChange={(e) => onInputChange("content", e.target.value)}
-          placeholder="Paste the complete text here. Use '---PAGE---' to separate pages/chapters."
+          placeholder="Paste the complete text here, upload a file above, or use '---PAGE---' to separate pages/chapters."
           rows={10}
           className="min-h-[200px] font-mono text-sm"
           required
