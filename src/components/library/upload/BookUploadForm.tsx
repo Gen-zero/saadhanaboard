@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { BookFormFields } from "./BookFormFields";
-import { TraditionManager } from "./TraditionManager";
+import BookFormFields from "./BookFormFields";
+import TraditionManager from "./TraditionManager";
 
 interface BookUploadFormProps {
   onBookUploaded?: () => void;
