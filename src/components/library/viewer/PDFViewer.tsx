@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCw, Download, Search, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,10 +9,12 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 // Set up PDF.js worker with fallback
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url,
-).toString();
+if (!pdfjs.GlobalWorkerOptions.workerSrc) {
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/build/pdf.worker.min.js',
+    import.meta.url,
+  ).toString();
+}
 
 interface PDFViewerProps {
   fileUrl: string;
@@ -29,6 +31,14 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const { toast } = useToast();
+
+  // Memoize PDF options to prevent unnecessary reloads
+  const pdfOptions = useMemo(() => ({
+    cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
+    cMapPacked: true,
+    standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
+    verbosity: 0, // Reduce console warnings
+  }), []);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
     console.log('PDF loaded successfully with pages:', numPages);
@@ -105,6 +115,13 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
       goToPage(page);
     }
   }
+
+  const handleRetry = useCallback(() => {
+    setError('');
+    setIsLoading(true);
+    setPageNumber(1);
+    setNumPages(0);
+  }, []);
 
   // Create a cross-origin proxy URL for better PDF loading
   const proxyUrl = fileUrl.startsWith('http') ? fileUrl : `${window.location.origin}${fileUrl}`;
@@ -256,10 +273,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
                 <span className="text-lg mb-2">Failed to load PDF</span>
                 <span className="text-sm">{error}</span>
                 <Button 
-                  onClick={() => {
-                    setError('');
-                    setIsLoading(true);
-                  }}
+                  onClick={handleRetry}
                   className="mt-4"
                 >
                   Retry
@@ -281,13 +295,9 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
                     <span>Failed to load PDF document</span>
                   </div>
                 }
-                options={{
-                  cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
-                  cMapPacked: true,
-                  standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
-                }}
+                options={pdfOptions}
               >
-                {!isLoading && numPages > 0 && (
+                {!isLoading && !error && numPages > 0 && (
                   <div className="shadow-lg">
                     <Page
                       pageNumber={pageNumber}
