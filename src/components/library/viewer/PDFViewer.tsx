@@ -9,8 +9,11 @@ import { useToast } from '@/hooks/use-toast';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
-// Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Set up PDF.js worker with fallback
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.js',
+  import.meta.url,
+).toString();
 
 interface PDFViewerProps {
   fileUrl: string;
@@ -25,11 +28,14 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
   const [searchText, setSearchText] = useState<string>('');
   const [showOutline, setShowOutline] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>('');
   const { toast } = useToast();
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
+    console.log('PDF loaded successfully with pages:', numPages);
     setNumPages(numPages);
     setIsLoading(false);
+    setError('');
     toast({
       title: "PDF loaded successfully",
       description: `${fileName} - ${numPages} pages`,
@@ -39,6 +45,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
   const onDocumentLoadError = useCallback((error: Error) => {
     console.error('PDF loading error:', error);
     setIsLoading(false);
+    setError(error.message || 'Failed to load PDF');
     toast({
       title: "Failed to load PDF",
       description: "The PDF file could not be loaded. Please try again.",
@@ -86,7 +93,6 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchText.trim()) {
-      // Basic search implementation - in a real app, you'd implement text search across pages
       toast({
         title: "Search functionality",
         description: "Advanced text search will be implemented in future updates.",
@@ -100,6 +106,9 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
       goToPage(page);
     }
   };
+
+  // Create a cross-origin proxy URL for better PDF loading
+  const proxyUrl = fileUrl.startsWith('http') ? fileUrl : `${window.location.origin}${fileUrl}`;
 
   return (
     <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
@@ -243,14 +252,29 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
         {/* PDF viewer */}
         <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900">
           <div className="flex justify-center p-4">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-96">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-                <span className="ml-2">Loading PDF...</span>
+            {error ? (
+              <div className="flex items-center justify-center h-96 text-red-500 flex-col">
+                <span className="text-lg mb-2">Failed to load PDF</span>
+                <span className="text-sm">{error}</span>
+                <Button 
+                  onClick={() => {
+                    setError('');
+                    setIsLoading(true);
+                  }}
+                  className="mt-4"
+                >
+                  Retry
+                </Button>
               </div>
             ) : (
               <Document
-                file={fileUrl}
+                file={{
+                  url: proxyUrl,
+                  httpHeaders: {
+                    'Accept': 'application/pdf',
+                  },
+                  withCredentials: false,
+                }}
                 onLoadSuccess={onDocumentLoadSuccess}
                 onLoadError={onDocumentLoadError}
                 loading={
@@ -261,27 +285,34 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
                 }
                 error={
                   <div className="flex items-center justify-center h-96 text-red-500">
-                    <span>Failed to load PDF</span>
+                    <span>Failed to load PDF document</span>
                   </div>
                 }
+                options={{
+                  cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+                  cMapPacked: true,
+                  standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/standard_fonts/',
+                }}
               >
-                <div className="shadow-lg">
-                  <Page
-                    pageNumber={pageNumber}
-                    scale={scale}
-                    rotate={rotation}
-                    loading={
-                      <div className="flex items-center justify-center h-96 bg-white">
-                        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
-                      </div>
-                    }
-                    error={
-                      <div className="flex items-center justify-center h-96 bg-white text-red-500">
-                        <span>Failed to load page</span>
-                      </div>
-                    }
-                  />
-                </div>
+                {!isLoading && numPages > 0 && (
+                  <div className="shadow-lg">
+                    <Page
+                      pageNumber={pageNumber}
+                      scale={scale}
+                      rotate={rotation}
+                      loading={
+                        <div className="flex items-center justify-center h-96 bg-white">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
+                        </div>
+                      }
+                      error={
+                        <div className="flex items-center justify-center h-96 bg-white text-red-500">
+                          <span>Failed to load page</span>
+                        </div>
+                      }
+                    />
+                  </div>
+                )}
               </Document>
             )}
           </div>
