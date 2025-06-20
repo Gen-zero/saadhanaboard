@@ -54,7 +54,7 @@ const LoginPage = () => {
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         <div className="flex flex-col items-center text-center mb-8">
           <img 
-            src="/lovable-uploads/baf52c18-e1e7-47de-bd88-8e29c7025df8.png" 
+            src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
             alt="Saadhana Board Logo" 
             className="h-20 w-20 mb-4" 
           />
