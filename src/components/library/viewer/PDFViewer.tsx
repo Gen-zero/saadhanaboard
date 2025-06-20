@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useMemo } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCw, Download, Search, Menu } from 'lucide-react';
@@ -32,7 +33,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
     cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
     cMapPacked: true,
     standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
-    verbosity: 0, // Reduce console warnings
+    verbosity: 0,
   }), []);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
@@ -118,19 +119,16 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
     setNumPages(0);
   }, []);
 
-  // Create a cross-origin proxy URL for better PDF loading
-  const proxyUrl = fileUrl.startsWith('http') ? fileUrl : `${window.location.origin}${fileUrl}`;
-
   return (
-    <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900">
+    <div className="flex flex-col h-full bg-background border border-border rounded-lg overflow-hidden">
       {/* Toolbar */}
-      <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex-wrap gap-2">
+      <div className="flex items-center justify-between p-3 bg-card border-b border-border flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setShowOutline(!showOutline)}
-            className="hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="hover:bg-accent hover:text-accent-foreground"
           >
             <Menu className="h-4 w-4" />
           </Button>
@@ -141,7 +139,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
               size="icon"
               onClick={goToPrevPage}
               disabled={pageNumber <= 1}
-              className="hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -151,11 +149,11 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
                 type="number"
                 value={pageNumber}
                 onChange={handlePageInputChange}
-                className="w-16 h-8 text-center"
+                className="w-16 h-8 text-center bg-input border-border"
                 min={1}
                 max={numPages}
               />
-              <span className="text-gray-600 dark:text-gray-400">
+              <span className="text-muted-foreground">
                 / {numPages || 0}
               </span>
             </div>
@@ -165,7 +163,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
               size="icon"
               onClick={goToNextPage}
               disabled={pageNumber >= numPages}
-              className="hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -179,9 +177,9 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
               placeholder="Search in PDF..."
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
-              className="w-40 h-8"
+              className="w-40 h-8 bg-input border-border"
             />
-            <Button type="submit" variant="ghost" size="icon" className="h-8 w-8">
+            <Button type="submit" variant="ghost" size="icon" className="h-8 w-8 hover:bg-accent">
               <Search className="h-3 w-3" />
             </Button>
           </form>
@@ -192,7 +190,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
               size="icon"
               onClick={zoomOut}
               disabled={scale <= 0.25}
-              className="hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
             >
               <ZoomOut className="h-4 w-4" />
             </Button>
@@ -200,7 +198,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
             <Button
               variant="ghost"
               onClick={resetZoom}
-              className="text-sm px-2 h-8 hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="text-sm px-2 h-8 hover:bg-accent hover:text-accent-foreground min-w-[60px]"
             >
               {Math.round(scale * 100)}%
             </Button>
@@ -210,7 +208,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
               size="icon"
               onClick={zoomIn}
               disabled={scale >= 3.0}
-              className="hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="hover:bg-accent hover:text-accent-foreground disabled:opacity-50"
             >
               <ZoomIn className="h-4 w-4" />
             </Button>
@@ -220,7 +218,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
             variant="ghost"
             size="icon"
             onClick={rotate}
-            className="hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="hover:bg-accent hover:text-accent-foreground"
           >
             <RotateCw className="h-4 w-4" />
           </Button>
@@ -229,7 +227,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
             variant="ghost"
             size="icon"
             onClick={downloadPDF}
-            className="hover:bg-gray-100 dark:hover:bg-gray-700"
+            className="hover:bg-accent hover:text-accent-foreground"
           >
             <Download className="h-4 w-4" />
           </Button>
@@ -240,16 +238,18 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
       <div className="flex flex-1 overflow-hidden">
         {/* Outline sidebar */}
         {showOutline && (
-          <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4">
-            <h3 className="font-semibold mb-4">Pages</h3>
+          <div className="w-64 bg-card border-r border-border p-4">
+            <h3 className="font-semibold mb-4 text-foreground">Pages</h3>
             <ScrollArea className="h-full">
               <div className="space-y-1">
                 {Array.from({ length: numPages }, (_, i) => i + 1).map((page) => (
                   <button
                     key={page}
                     onClick={() => goToPage(page)}
-                    className={`w-full text-left p-2 rounded text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                      page === pageNumber ? 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300' : ''
+                    className={`w-full text-left p-2 rounded text-sm transition-colors ${
+                      page === pageNumber 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'hover:bg-accent hover:text-accent-foreground text-foreground'
                     }`}
                   >
                     Page {page}
@@ -261,15 +261,16 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
         )}
 
         {/* PDF viewer */}
-        <div className="flex-1 overflow-auto bg-gray-100 dark:bg-gray-900">
+        <div className="flex-1 overflow-auto bg-muted">
           <div className="flex justify-center p-4">
             {error ? (
-              <div className="flex items-center justify-center h-96 text-red-500 flex-col">
+              <div className="flex items-center justify-center h-96 text-destructive flex-col">
                 <span className="text-lg mb-2">Failed to load PDF</span>
-                <span className="text-sm">{error}</span>
+                <span className="text-sm text-muted-foreground">{error}</span>
                 <Button 
                   onClick={handleRetry}
                   className="mt-4"
+                  variant="outline"
                 >
                   Retry
                 </Button>
@@ -281,30 +282,30 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
                 onLoadError={onDocumentLoadError}
                 loading={
                   <div className="flex items-center justify-center h-96">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
-                    <span className="ml-2">Loading PDF...</span>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    <span className="ml-2 text-foreground">Loading PDF...</span>
                   </div>
                 }
                 error={
-                  <div className="flex items-center justify-center h-96 text-red-500">
+                  <div className="flex items-center justify-center h-96 text-destructive">
                     <span>Failed to load PDF document</span>
                   </div>
                 }
                 options={pdfOptions}
               >
                 {!isLoading && !error && numPages > 0 && (
-                  <div className="shadow-lg">
+                  <div className="shadow-lg border border-border rounded-lg overflow-hidden">
                     <Page
                       pageNumber={pageNumber}
                       scale={scale}
                       rotate={rotation}
                       loading={
-                        <div className="flex items-center justify-center h-96 bg-white">
-                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500"></div>
+                        <div className="flex items-center justify-center h-96 bg-card">
+                          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
                         </div>
                       }
                       error={
-                        <div className="flex items-center justify-center h-96 bg-white text-red-500">
+                        <div className="flex items-center justify-center h-96 bg-card text-destructive">
                           <span>Failed to load page</span>
                         </div>
                       }

@@ -6,12 +6,11 @@ import BookShelf from "./BookShelf";
 import LibraryHeader from "./LibraryHeader";
 import SearchBar from "./SearchBar";
 import LibraryLoading from "./LibraryLoading";
-import BookUploadDialog from "./BookUploadDialog";
 import { useSpiritualBooks } from "@/hooks/useSpiritualBooks";
 
 const LibraryContainer = () => {
   const { toast } = useToast();
-  const { books, isLoading, refreshBooks } = useSpiritualBooks();
+  const { books, isLoading } = useSpiritualBooks();
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [view, setView] = useState<"grid" | "list">("grid");
@@ -41,25 +40,13 @@ const LibraryContainer = () => {
     setView(view === "grid" ? "list" : "grid");
   };
 
-  const handleBookUploaded = () => {
-    refreshBooks();
-    toast({
-      title: "Library updated",
-      description: "Your uploaded book is now available in the library.",
-      duration: 3000,
-    });
-  };
-
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <LibraryHeader 
-          view={view}
-          isLoading={isLoading}
-          toggleView={toggleView}
-        />
-        <BookUploadDialog onBookUploaded={handleBookUploaded} />
-      </div>
+      <LibraryHeader 
+        view={view}
+        isLoading={isLoading}
+        toggleView={toggleView}
+      />
       
       <SearchBar
         value={searchQuery}
