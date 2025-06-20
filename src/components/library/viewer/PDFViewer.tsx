@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCw, Download, Search, Menu } from 'lucide-react';
@@ -53,44 +52,44 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
     });
   }, [toast]);
 
-  const goToPrevPage = () => {
+  function goToPrevPage() {
     setPageNumber(prev => Math.max(1, prev - 1));
-  };
+  }
 
-  const goToNextPage = () => {
+  function goToNextPage() {
     setPageNumber(prev => Math.min(numPages, prev + 1));
-  };
+  }
 
-  const goToPage = (page: number) => {
+  function goToPage(page: number) {
     if (page >= 1 && page <= numPages) {
       setPageNumber(page);
     }
-  };
+  }
 
-  const zoomIn = () => {
+  function zoomIn() {
     setScale(prev => Math.min(3.0, prev + 0.25));
-  };
+  }
 
-  const zoomOut = () => {
+  function zoomOut() {
     setScale(prev => Math.max(0.25, prev - 0.25));
-  };
+  }
 
-  const resetZoom = () => {
+  function resetZoom() {
     setScale(1.0);
-  };
+  }
 
-  const rotate = () => {
+  function rotate() {
     setRotation(prev => (prev + 90) % 360);
-  };
+  }
 
-  const downloadPDF = () => {
+  function downloadPDF() {
     const link = document.createElement('a');
     link.href = fileUrl;
     link.download = fileName;
     link.click();
-  };
+  }
 
-  const handleSearch = (e: React.FormEvent) => {
+  function handleSearch(e: React.FormEvent) {
     e.preventDefault();
     if (searchText.trim()) {
       toast({
@@ -98,14 +97,14 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
         description: "Advanced text search will be implemented in future updates.",
       });
     }
-  };
+  }
 
-  const handlePageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  function handlePageInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     const page = parseInt(e.target.value);
     if (!isNaN(page)) {
       goToPage(page);
     }
-  };
+  }
 
   // Create a cross-origin proxy URL for better PDF loading
   const proxyUrl = fileUrl.startsWith('http') ? fileUrl : `${window.location.origin}${fileUrl}`;
@@ -268,13 +267,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
               </div>
             ) : (
               <Document
-                file={{
-                  url: proxyUrl,
-                  httpHeaders: {
-                    'Accept': 'application/pdf',
-                  },
-                  withCredentials: false,
-                }}
+                file={fileUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
                 onLoadError={onDocumentLoadError}
                 loading={
