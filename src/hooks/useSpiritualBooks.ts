@@ -82,8 +82,8 @@ export const useSpiritualBooks = (searchTerm?: string, selectedSubjects?: string
               title,
               author: 'Unknown Author',
               traditions: ['General'],
-              content: '', // Will be loaded when opened
-              description: `PDF file from storage: ${file.name}`,
+              content: '', // Empty for PDF files
+              description: `PDF file: ${file.name}`,
               language: 'English',
               created_at: file.created_at || new Date().toISOString(),
               updated_at: file.updated_at || new Date().toISOString(),
