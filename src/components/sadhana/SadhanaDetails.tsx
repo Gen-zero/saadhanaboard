@@ -5,35 +5,44 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart } from 'lucide-react';
+import { Heart, Save } from 'lucide-react';
+import { SadhanaData } from '@/hooks/useSadhanaData';
 
 interface SadhanaDetailsProps {
-  sadhanaData: {
-    purpose: string;
-    goal: string;
-    deity: string;
-    message: string;
-    offerings: string[];
-  };
+  sadhanaData: SadhanaData;
+  onUpdateSadhana: (data: SadhanaData) => void;
 }
 
-const SadhanaDetails = ({ sadhanaData }: SadhanaDetailsProps) => {
-  const [offerings, setOfferings] = useState([...sadhanaData.offerings]);
+const SadhanaDetails = ({ sadhanaData, onUpdateSadhana }: SadhanaDetailsProps) => {
+  const [formData, setFormData] = useState<SadhanaData>({ ...sadhanaData });
 
   const handleAddOffering = () => {
-    setOfferings([...offerings, '']);
+    setFormData(prev => ({
+      ...prev,
+      offerings: [...prev.offerings, '']
+    }));
   };
 
   const handleRemoveOffering = (index: number) => {
-    const newOfferings = [...offerings];
-    newOfferings.splice(index, 1);
-    setOfferings(newOfferings);
+    setFormData(prev => ({
+      ...prev,
+      offerings: prev.offerings.filter((_, i) => i !== index)
+    }));
   };
 
   const handleOfferingChange = (index: number, value: string) => {
-    const newOfferings = [...offerings];
-    newOfferings[index] = value;
-    setOfferings(newOfferings);
+    setFormData(prev => ({
+      ...prev,
+      offerings: prev.offerings.map((offering, i) => i === index ? value : offering)
+    }));
+  };
+
+  const handleSave = () => {
+    const validOfferings = formData.offerings.filter(o => o.trim());
+    onUpdateSadhana({
+      ...formData,
+      offerings: validOfferings
+    });
   };
 
   return (
@@ -49,7 +58,8 @@ const SadhanaDetails = ({ sadhanaData }: SadhanaDetailsProps) => {
               <Label htmlFor="purpose">Purpose</Label>
               <Textarea 
                 id="purpose" 
-                defaultValue={sadhanaData.purpose} 
+                value={formData.purpose}
+                onChange={(e) => setFormData(prev => ({ ...prev, purpose: e.target.value }))}
                 placeholder="What is the purpose of your spiritual practice?"
                 className="min-h-[100px]"
               />
@@ -58,7 +68,8 @@ const SadhanaDetails = ({ sadhanaData }: SadhanaDetailsProps) => {
               <Label htmlFor="goal">Goal</Label>
               <Textarea 
                 id="goal" 
-                defaultValue={sadhanaData.goal} 
+                value={formData.goal}
+                onChange={(e) => setFormData(prev => ({ ...prev, goal: e.target.value }))}
                 placeholder="What is your specific spiritual goal?"
                 className="min-h-[100px]"
               />
@@ -79,7 +90,8 @@ const SadhanaDetails = ({ sadhanaData }: SadhanaDetailsProps) => {
               <Label htmlFor="deity">Deity or Spiritual Focus</Label>
               <Input 
                 id="deity" 
-                defaultValue={sadhanaData.deity} 
+                value={formData.deity}
+                onChange={(e) => setFormData(prev => ({ ...prev, deity: e.target.value }))}
                 placeholder="Who or what is your spiritual focus?"
               />
             </div>
@@ -87,7 +99,8 @@ const SadhanaDetails = ({ sadhanaData }: SadhanaDetailsProps) => {
               <Label htmlFor="message">Your Message</Label>
               <Textarea 
                 id="message" 
-                defaultValue={sadhanaData.message} 
+                value={formData.message}
+                onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                 placeholder="What message would you like to share with your deity?"
                 className="min-h-[100px]"
               />
@@ -103,7 +116,7 @@ const SadhanaDetails = ({ sadhanaData }: SadhanaDetailsProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {offerings.map((offering, index) => (
+            {formData.offerings.map((offering, index) => (
               <div key={index} className="flex gap-2">
                 <Input 
                   value={offering} 
@@ -123,8 +136,14 @@ const SadhanaDetails = ({ sadhanaData }: SadhanaDetailsProps) => {
             <Button variant="outline" className="w-full mt-2" onClick={handleAddOffering}>
               + Add New Offering
             </Button>
+            <Button 
+              className="w-full mt-6 bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600" 
+              onClick={handleSave}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save Changes
+            </Button>
           </div>
-          <Button className="w-full mt-6">Save Changes</Button>
         </CardContent>
       </Card>
     </div>
