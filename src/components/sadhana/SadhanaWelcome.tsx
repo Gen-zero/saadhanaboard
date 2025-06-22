@@ -1,23 +1,16 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Sparkles, Heart, MoonStar } from 'lucide-react';
-
 interface SadhanaWelcomeProps {
   onStartSadhana: () => void;
 }
-
-const SadhanaWelcome = ({ onStartSadhana }: SadhanaWelcomeProps) => {
-  return (
-    <div className="cosmic-nebula-bg rounded-lg p-8 text-center">
+const SadhanaWelcome = ({
+  onStartSadhana
+}: SadhanaWelcomeProps) => {
+  return <div className="cosmic-nebula-bg rounded-lg p-8 text-center">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Cosmic header - removed animations */}
-        <div className="flex justify-center mb-6">
-          <div className="relative">
-            <MoonStar className="h-16 w-16 text-purple-500" />
-            <Sparkles className="h-6 w-6 text-fuchsia-400 absolute -top-2 -right-2" />
-          </div>
-        </div>
+        
 
         {/* Welcome text */}
         <div className="space-y-4">
@@ -43,11 +36,7 @@ const SadhanaWelcome = ({ onStartSadhana }: SadhanaWelcomeProps) => {
           <p className="text-muted-foreground">
             Ready to manifest your spiritual intentions and create your divine practice?
           </p>
-          <Button 
-            onClick={onStartSadhana}
-            size="lg"
-            className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white px-8 py-3 text-lg"
-          >
+          <Button onClick={onStartSadhana} size="lg" className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white px-8 py-3 text-lg">
             <Heart className="mr-2 h-5 w-5" />
             Start Your Sadhana
           </Button>
@@ -61,8 +50,6 @@ const SadhanaWelcome = ({ onStartSadhana }: SadhanaWelcomeProps) => {
           <p>⏰ Set your practice duration and commitment</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default SadhanaWelcome;
