@@ -5,8 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Heart, ArrowLeft, Sparkles } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Heart, ArrowLeft, Sparkles, Calendar } from 'lucide-react';
 import { SadhanaData } from '@/hooks/useSadhanaData';
+import { addDays, format } from 'date-fns';
 
 interface SadhanaSetupFormProps {
   onCreateSadhana: (data: SadhanaData) => void;
@@ -14,15 +16,42 @@ interface SadhanaSetupFormProps {
 }
 
 const SadhanaSetupForm = ({ onCreateSadhana, onCancel }: SadhanaSetupFormProps) => {
+  const today = format(new Date(), 'yyyy-MM-dd');
+  
   const [formData, setFormData] = useState<SadhanaData>({
     purpose: '',
     goal: '',
     deity: '',
     message: '',
-    offerings: ['']
+    offerings: [''],
+    startDate: today,
+    endDate: format(addDays(new Date(), 21), 'yyyy-MM-dd'),
+    durationDays: 21
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const handleDurationChange = (days: number) => {
+    const startDate = new Date(formData.startDate);
+    const endDate = addDays(startDate, days - 1);
+    
+    setFormData(prev => ({
+      ...prev,
+      durationDays: days,
+      endDate: format(endDate, 'yyyy-MM-dd')
+    }));
+  };
+
+  const handleStartDateChange = (startDate: string) => {
+    const start = new Date(startDate);
+    const endDate = addDays(start, formData.durationDays - 1);
+    
+    setFormData(prev => ({
+      ...prev,
+      startDate,
+      endDate: format(endDate, 'yyyy-MM-dd')
+    }));
+  };
 
   const handleAddOffering = () => {
     setFormData(prev => ({
@@ -59,6 +88,12 @@ const SadhanaSetupForm = ({ onCreateSadhana, onCancel }: SadhanaSetupFormProps) 
     }
     if (!formData.message.trim()) {
       newErrors.message = 'Message is required';
+    }
+    if (!formData.startDate) {
+      newErrors.startDate = 'Start date is required';
+    }
+    if (formData.durationDays < 1) {
+      newErrors.duration = 'Duration must be at least 1 day';
     }
     
     const validOfferings = formData.offerings.filter(o => o.trim());
@@ -132,6 +167,55 @@ const SadhanaSetupForm = ({ onCreateSadhana, onCancel }: SadhanaSetupFormProps) 
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5 text-primary" />
+                  <span>Duration & Timeline</span>
+                </CardTitle>
+                <CardDescription>Set your sadhana practice period</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">Start Date *</Label>
+                    <Input 
+                      id="startDate" 
+                      type="date"
+                      value={formData.startDate}
+                      onChange={(e) => handleStartDateChange(e.target.value)}
+                      min={today}
+                    />
+                    {errors.startDate && <p className="text-sm text-destructive">{errors.startDate}</p>}
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="duration">Duration</Label>
+                    <Select value={formData.durationDays.toString()} onValueChange={(value) => handleDurationChange(parseInt(value))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="7">7 days (1 week)</SelectItem>
+                        <SelectItem value="14">14 days (2 weeks)</SelectItem>
+                        <SelectItem value="21">21 days (3 weeks)</SelectItem>
+                        <SelectItem value="30">30 days (1 month)</SelectItem>
+                        <SelectItem value="40">40 days</SelectItem>
+                        <SelectItem value="60">60 days (2 months)</SelectItem>
+                        <SelectItem value="90">90 days (3 months)</SelectItem>
+                        <SelectItem value="108">108 days (Traditional)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {errors.duration && <p className="text-sm text-destructive">{errors.duration}</p>}
+                  </div>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  <p>End Date: {format(new Date(formData.endDate), 'MMMM dd, yyyy')}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
                   <Heart className="h-5 w-5 text-primary" />
                   <span>Divine Connection</span>
                 </CardTitle>
@@ -161,50 +245,50 @@ const SadhanaSetupForm = ({ onCreateSadhana, onCancel }: SadhanaSetupFormProps) 
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Offerings & Practices</CardTitle>
-              <CardDescription>What you'll be doing or offering for your spiritual practice</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {formData.offerings.map((offering, index) => (
-                  <div key={index} className="flex gap-2">
-                    <Input 
-                      value={offering} 
-                      onChange={(e) => handleOfferingChange(index, e.target.value)}
-                      placeholder={`Offering or practice ${index + 1}`}
-                    />
-                    {formData.offerings.length > 1 && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="shrink-0"
-                        onClick={() => handleRemoveOffering(index)}
-                      >
-                        ×
-                      </Button>
-                    )}
-                  </div>
-                ))}
-                {errors.offerings && <p className="text-sm text-destructive">{errors.offerings}</p>}
-                
-                <Button variant="outline" className="w-full mt-2" onClick={handleAddOffering}>
-                  + Add New Offering
-                </Button>
-                
-                <Button 
-                  className="w-full mt-6 bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600"
-                  onClick={handleSubmit}
-                >
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Begin Sacred Sadhana
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Offerings & Practices</CardTitle>
+                <CardDescription>What you'll be doing or offering for your spiritual practice</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {formData.offerings.map((offering, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Input 
+                        value={offering} 
+                        onChange={(e) => handleOfferingChange(index, e.target.value)}
+                        placeholder={`Offering or practice ${index + 1}`}
+                      />
+                      {formData.offerings.length > 1 && (
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="shrink-0"
+                          onClick={() => handleRemoveOffering(index)}
+                        >
+                          ×
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                  {errors.offerings && <p className="text-sm text-destructive">{errors.offerings}</p>}
+                  
+                  <Button variant="outline" className="w-full mt-2" onClick={handleAddOffering}>
+                    + Add New Offering
+                  </Button>
+                  
+                  <Button 
+                    className="w-full mt-6 bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600"
+                    onClick={handleSubmit}
+                  >
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Begin Sacred Sadhana
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

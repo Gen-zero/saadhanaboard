@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { addDays, format, isAfter, isSameDay } from 'date-fns';
 
 export interface SadhanaData {
   purpose: string;
@@ -7,6 +8,9 @@ export interface SadhanaData {
   deity: string;
   message: string;
   offerings: string[];
+  startDate: string;
+  endDate: string;
+  durationDays: number;
 }
 
 export interface SadhanaState {
@@ -14,6 +18,9 @@ export interface SadhanaState {
   isCreating: boolean;
   data: SadhanaData | null;
   startedAt?: string;
+  completedAt?: string;
+  brokenAt?: string;
+  status: 'active' | 'completed' | 'broken';
 }
 
 const STORAGE_KEY = 'sadhana-state';
@@ -31,7 +38,8 @@ const getInitialState = (): SadhanaState => {
   return {
     hasStarted: false,
     isCreating: false,
-    data: null
+    data: null,
+    status: 'active'
   };
 };
 
@@ -66,7 +74,8 @@ export const useSadhanaData = () => {
       hasStarted: true,
       isCreating: false,
       data,
-      startedAt: new Date().toISOString()
+      startedAt: new Date().toISOString(),
+      status: 'active'
     });
   };
 
@@ -78,11 +87,59 @@ export const useSadhanaData = () => {
   };
 
   const completeSadhana = () => {
+    setSadhanaState(prev => ({
+      ...prev,
+      completedAt: new Date().toISOString(),
+      status: 'completed'
+    }));
+  };
+
+  const breakSadhana = () => {
+    setSadhanaState(prev => ({
+      ...prev,
+      brokenAt: new Date().toISOString(),
+      status: 'broken'
+    }));
+  };
+
+  const resetSadhana = () => {
     setSadhanaState({
       hasStarted: false,
       isCreating: false,
-      data: null
+      data: null,
+      status: 'active'
     });
+  };
+
+  const canComplete = (): boolean => {
+    if (!sadhanaState.data) return false;
+    const today = new Date();
+    const endDate = new Date(sadhanaState.data.endDate);
+    return isAfter(today, endDate) || isSameDay(today, endDate);
+  };
+
+  const getDaysRemaining = (): number => {
+    if (!sadhanaState.data) return 0;
+    const today = new Date();
+    const endDate = new Date(sadhanaState.data.endDate);
+    const diffTime = endDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return Math.max(0, diffDays);
+  };
+
+  const getDaysCompleted = (): number => {
+    if (!sadhanaState.data) return 0;
+    const today = new Date();
+    const startDate = new Date(sadhanaState.data.startDate);
+    const diffTime = today.getTime() - startDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return Math.max(1, Math.min(diffDays, sadhanaState.data.durationDays));
+  };
+
+  const getProgress = (): number => {
+    if (!sadhanaState.data) return 0;
+    const completed = getDaysCompleted();
+    return Math.min(100, (completed / sadhanaState.data.durationDays) * 100);
   };
 
   const formatPaperContent = (data: SadhanaData): string => {
@@ -95,6 +152,9 @@ ${data.goal}
 
 Divine Focus:
 ${data.deity}
+
+Duration:
+${data.durationDays} days (${format(new Date(data.startDate), 'MMM dd, yyyy')} - ${format(new Date(data.endDate), 'MMM dd, yyyy')})
 
 Message:
 "${data.message}"
@@ -112,6 +172,12 @@ ${data.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
     cancelSadhanaCreation,
     createSadhana,
     updateSadhana,
-    completeSadhana
+    completeSadhana,
+    breakSadhana,
+    resetSadhana,
+    canComplete: canComplete(),
+    daysRemaining: getDaysRemaining(),
+    daysCompleted: getDaysCompleted(),
+    progress: getProgress()
   };
 };

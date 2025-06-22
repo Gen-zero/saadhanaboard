@@ -11,11 +11,11 @@ const SadhanaWelcome = ({ onStartSadhana }: SadhanaWelcomeProps) => {
   return (
     <div className="cosmic-nebula-bg rounded-lg p-8 text-center">
       <div className="max-w-2xl mx-auto space-y-6">
-        {/* Cosmic header */}
+        {/* Cosmic header - removed animations */}
         <div className="flex justify-center mb-6">
           <div className="relative">
-            <MoonStar className="h-16 w-16 text-purple-500 animate-pulse" />
-            <Sparkles className="h-6 w-6 text-fuchsia-400 absolute -top-2 -right-2 animate-bounce" />
+            <MoonStar className="h-16 w-16 text-purple-500" />
+            <Sparkles className="h-6 w-6 text-fuchsia-400 absolute -top-2 -right-2" />
           </div>
         </div>
 
@@ -58,6 +58,7 @@ const SadhanaWelcome = ({ onStartSadhana }: SadhanaWelcomeProps) => {
           <p>✨ Set your spiritual purpose and goals</p>
           <p>🙏 Choose your divine focus and offerings</p>
           <p>📜 Create your personalized sacred paper</p>
+          <p>⏰ Set your practice duration and commitment</p>
         </div>
       </div>
     </div>
