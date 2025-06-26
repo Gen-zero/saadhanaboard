@@ -87,6 +87,21 @@ export const useSadhanaData = () => {
   };
 
   const completeSadhana = () => {
+    if (!sadhanaState.data) return;
+    
+    // Save to history before resetting
+    const historicalSadhana = {
+      id: Date.now().toString(),
+      title: `${sadhanaState.data.durationDays}-Day Spiritual Practice`,
+      ...sadhanaState.data,
+      completedAt: new Date().toISOString(),
+      status: 'completed' as const,
+      actualDuration: sadhanaState.data.durationDays
+    };
+    
+    // Dispatch custom event for profile data to listen to
+    window.dispatchEvent(new CustomEvent('sadhana-completed', { detail: historicalSadhana }));
+    
     setSadhanaState(prev => ({
       ...prev,
       completedAt: new Date().toISOString(),
@@ -95,6 +110,27 @@ export const useSadhanaData = () => {
   };
 
   const breakSadhana = () => {
+    if (!sadhanaState.data) return;
+    
+    // Calculate actual duration based on start date
+    const today = new Date();
+    const startDate = new Date(sadhanaState.data.startDate);
+    const diffTime = today.getTime() - startDate.getTime();
+    const actualDuration = Math.max(1, Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1);
+    
+    // Save to history before resetting
+    const historicalSadhana = {
+      id: Date.now().toString(),
+      title: `${sadhanaState.data.durationDays}-Day Spiritual Practice (Broken)`,
+      ...sadhanaState.data,
+      brokenAt: new Date().toISOString(),
+      status: 'broken' as const,
+      actualDuration
+    };
+    
+    // Dispatch custom event for profile data to listen to
+    window.dispatchEvent(new CustomEvent('sadhana-broken', { detail: historicalSadhana }));
+    
     setSadhanaState(prev => ({
       ...prev,
       brokenAt: new Date().toISOString(),
