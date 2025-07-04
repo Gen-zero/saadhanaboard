@@ -15,7 +15,7 @@ const TextContent = ({ content }: TextContentProps) => {
       color="#36454F" // Charcoal text color
       anchorX="center"
       anchorY="middle"
-      font="/fonts/poppins-v20-latin-regular.woff"
+      font="/fonts/sf-pro-display-regular.woff"
     >
       {content}
     </Text>
