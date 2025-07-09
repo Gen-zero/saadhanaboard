@@ -29,7 +29,12 @@ const getInitialState = (): SadhanaState => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
-      return JSON.parse(stored);
+      const parsedState = JSON.parse(stored);
+      // Ensure sadhanaId exists for existing sadhanas
+      if (parsedState.hasStarted && parsedState.data && !parsedState.sadhanaId) {
+        parsedState.sadhanaId = Date.now();
+      }
+      return parsedState;
     }
   } catch (error) {
     console.log('Could not load sadhana state from localStorage');
@@ -166,7 +171,10 @@ export const useSadhanaData = () => {
   };
 
   const breakSadhana = () => {
-    if (!sadhanaState.data || !sadhanaState.sadhanaId) return;
+    if (!sadhanaState.data) return;
+    
+    // Ensure we have a sadhanaId, create one if missing
+    const sadhanaId = sadhanaState.sadhanaId || Date.now();
     
     // Calculate actual duration based on start date
     const today = new Date();
@@ -187,8 +195,8 @@ export const useSadhanaData = () => {
     // Dispatch custom event for profile data to listen to
     window.dispatchEvent(new CustomEvent('sadhana-broken', { detail: historicalSadhana }));
     
-    // Remove sadhana tasks from localStorage using stored sadhana ID
-    removeSadhanaTasksFromLocalStorage(sadhanaState.sadhanaId);
+    // Remove sadhana tasks from localStorage using sadhana ID
+    removeSadhanaTasksFromLocalStorage(sadhanaId);
     
     setSadhanaState(prev => ({
       ...prev,
