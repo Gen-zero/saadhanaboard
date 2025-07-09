@@ -28,13 +28,20 @@ const SadhanaGroup = ({
     return null;
   }
 
+  const handleToggleCompletion = (id: number) => {
+    const sadhana = sadhanas.find(s => s.id === id);
+    if (sadhana) {
+      onToggleCompletion(sadhana);
+    }
+  };
+
   const content = (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {sadhanas.map(sadhana => (
         <SadhanaCard
           key={sadhana.id}
           sadhana={sadhana}
-          onToggleCompletion={onToggleCompletion}
+          onToggleCompletion={handleToggleCompletion}
           onDelete={onDelete}
           onUpdate={onUpdate}
         />
