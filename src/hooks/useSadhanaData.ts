@@ -43,6 +43,56 @@ const getInitialState = (): SadhanaState => {
   };
 };
 
+// Helper function to create daily tasks from sadhana offerings
+const createSadhanaTasksInLocalStorage = (sadhanaData: SadhanaData) => {
+  try {
+    const existingTasks = JSON.parse(localStorage.getItem('saadhanas') || '[]');
+    const newTasks = [];
+    
+    // Create tasks for each day of the sadhana period
+    for (let day = 0; day < sadhanaData.durationDays; day++) {
+      const taskDate = addDays(new Date(sadhanaData.startDate), day);
+      const formattedDate = format(taskDate, 'yyyy-MM-dd');
+      
+      // Create a task for each offering on each day
+      sadhanaData.offerings.forEach((offering, index) => {
+        const task = {
+          id: Date.now() + day * 1000 + index, // Unique ID
+          title: offering,
+          description: `Daily offering for your ${sadhanaData.durationDays}-day spiritual practice dedicated to ${sadhanaData.deity}`,
+          completed: false,
+          category: 'daily' as const,
+          dueDate: formattedDate,
+          priority: 'high' as const,
+          tags: ['sadhana', 'offering'],
+          sadhanaId: Date.now() // Link to the sadhana
+        };
+        newTasks.push(task);
+      });
+    }
+    
+    // Combine with existing tasks and save
+    const allTasks = [...existingTasks, ...newTasks];
+    localStorage.setItem('saadhanas', JSON.stringify(allTasks));
+    
+    console.log(`Created ${newTasks.length} sadhana tasks for ${sadhanaData.durationDays} days`);
+  } catch (error) {
+    console.log('Could not create sadhana tasks:', error);
+  }
+};
+
+// Helper function to remove sadhana tasks when sadhana is broken/reset
+const removeSadhanaTasksFromLocalStorage = (sadhanaId: number) => {
+  try {
+    const existingTasks = JSON.parse(localStorage.getItem('saadhanas') || '[]');
+    const filteredTasks = existingTasks.filter((task: any) => task.sadhanaId !== sadhanaId);
+    localStorage.setItem('saadhanas', JSON.stringify(filteredTasks));
+    console.log('Removed sadhana tasks from localStorage');
+  } catch (error) {
+    console.log('Could not remove sadhana tasks:', error);
+  }
+};
+
 export const useSadhanaData = () => {
   const [sadhanaState, setSadhanaState] = useState<SadhanaState>(getInitialState);
 
@@ -70,6 +120,8 @@ export const useSadhanaData = () => {
   };
 
   const createSadhana = (data: SadhanaData) => {
+    const sadhanaId = Date.now();
+    
     setSadhanaState({
       hasStarted: true,
       isCreating: false,
@@ -77,6 +129,9 @@ export const useSadhanaData = () => {
       startedAt: new Date().toISOString(),
       status: 'active'
     });
+    
+    // Create daily tasks from offerings
+    createSadhanaTasksInLocalStorage(data);
   };
 
   const updateSadhana = (data: SadhanaData) => {
@@ -131,6 +186,10 @@ export const useSadhanaData = () => {
     // Dispatch custom event for profile data to listen to
     window.dispatchEvent(new CustomEvent('sadhana-broken', { detail: historicalSadhana }));
     
+    // Remove sadhana tasks from localStorage
+    const sadhanaId = Date.now(); // This should be stored when creating sadhana
+    removeSadhanaTasksFromLocalStorage(sadhanaId);
+    
     setSadhanaState(prev => ({
       ...prev,
       brokenAt: new Date().toISOString(),
@@ -139,6 +198,12 @@ export const useSadhanaData = () => {
   };
 
   const resetSadhana = () => {
+    // Remove sadhana tasks from localStorage when resetting
+    if (sadhanaState.data) {
+      const sadhanaId = Date.now(); // This should be stored when creating sadhana
+      removeSadhanaTasksFromLocalStorage(sadhanaId);
+    }
+    
     setSadhanaState({
       hasStarted: false,
       isCreating: false,

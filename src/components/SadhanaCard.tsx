@@ -1,140 +1,146 @@
 
 import { useState } from 'react';
 import { Sadhana } from '@/types/sadhana';
-import { 
-  Calendar, CheckSquare, Clock, Star, Trash2, Edit3, Clock3, AlertCircle, MessageSquare 
-} from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import SadhanaForm from './SadhanaForm';
-
-const getPriorityColor = (priority: string) => {
-  switch (priority) {
-    case 'high': return 'text-red-500';
-    case 'medium': return 'text-yellow-500';
-    case 'low': return 'text-green-500';
-    default: return 'text-primary';
-  }
-};
-
-const formatDate = (dateString?: string) => {
-  if (!dateString) return 'No Date';
-  const sadhanaDate = new Date(dateString);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  const sadhanaDateStart = new Date(sadhanaDate);
-  sadhanaDateStart.setHours(0, 0, 0, 0);
-  if (sadhanaDateStart.getTime() === today.getTime()) return 'Today';
-  if (sadhanaDateStart.getTime() === tomorrow.getTime()) return 'Tomorrow';
-  return sadhanaDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-};
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { MoreHorizontal, Edit, Trash2, MessageSquare, Clock, Calendar, Sparkles } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 interface SadhanaCardProps {
   sadhana: Sadhana;
-  onToggleCompletion: (sadhana: Sadhana) => void;
-  onDelete: (id: number) => void;
   onUpdate: (sadhana: Sadhana) => void;
+  onDelete: (id: number) => void;
+  onToggleCompletion: (id: number) => void;
 }
 
-const SadhanaCard = ({ sadhana, onToggleCompletion, onDelete, onUpdate }: SadhanaCardProps) => {
+const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion }: SadhanaCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editingSadhana, setEditingSadhana] = useState<Sadhana>(sadhana);
 
-  const handleSaveChanges = () => {
-    onUpdate(editingSadhana);
-    setIsEditing(false);
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'bg-red-100 text-red-800 border-red-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'low': return 'bg-green-100 text-green-800 border-green-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'daily': return <Clock className="h-3 w-3" />;
+      case 'goal': return <Calendar className="h-3 w-3" />;
+      default: return null;
+    }
+  };
+
+  const isSadhanaTask = sadhana.tags?.includes('sadhana') || sadhana.sadhanaId;
+
+  const handleReflection = () => {
+    // This would open a reflection dialog - implementation depends on parent component
+    console.log('Open reflection for:', sadhana.id);
   };
 
   return (
-    <Card className={`flex flex-col hover-lift transition-all ${sadhana.completed ? 'bg-card/60 border-green-500/30' : ''}`}>
-      <CardHeader className="pb-4">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex-grow">
-            <CardTitle className={`text-xl ${sadhana.completed ? 'line-through text-muted-foreground' : ''}`}>
-              {sadhana.title}
-            </CardTitle>
-            {sadhana.description && (
-              <CardDescription className="mt-1">
-                {sadhana.description}
-              </CardDescription>
-            )}
+    <Card className={cn(
+      "group hover:shadow-md transition-all duration-200",
+      sadhana.completed && "opacity-75",
+      isSadhanaTask && "border-purple-200 bg-gradient-to-r from-purple-50/50 to-fuchsia-50/50"
+    )}>
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <Checkbox
+              checked={sadhana.completed}
+              onCheckedChange={() => onToggleCompletion(sadhana.id)}
+              className="mt-0.5 shrink-0"
+            />
+            
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className={cn(
+                  "font-medium text-sm leading-tight",
+                  sadhana.completed && "line-through text-muted-foreground"
+                )}>
+                  {sadhana.title}
+                </h3>
+                {isSadhanaTask && (
+                  <Sparkles className="h-3 w-3 text-purple-500 shrink-0" />
+                )}
+              </div>
+              
+              {sadhana.description && (
+                <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                  {sadhana.description}
+                </p>
+              )}
+              
+              <div className="flex flex-wrap items-center gap-1.5">
+                <Badge variant="outline" className={cn("text-xs px-1.5 py-0.5 h-auto", getPriorityColor(sadhana.priority))}>
+                  {sadhana.priority}
+                </Badge>
+                
+                <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto flex items-center gap-1">
+                  {getCategoryIcon(sadhana.category)}
+                  {sadhana.category}
+                </Badge>
+                
+                {sadhana.dueDate && (
+                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+                    {format(new Date(sadhana.dueDate), 'MMM dd')}
+                  </Badge>
+                )}
+                
+                {sadhana.time && (
+                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+                    {sadhana.time}
+                  </Badge>
+                )}
+
+                {sadhana.tags?.map((tag) => (
+                  <Badge 
+                    key={tag} 
+                    variant="secondary" 
+                    className={cn(
+                      "text-xs px-1.5 py-0.5 h-auto",
+                      tag === 'sadhana' && "bg-purple-100 text-purple-700 border-purple-200"
+                    )}
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="shrink-0">
-            <Button
-              variant={sadhana.completed ? 'secondary' : 'default'}
-              size="sm"
-              onClick={() => onToggleCompletion(sadhana)}
-              className="w-full"
-            >
-              <CheckSquare className="h-4 w-4 mr-2" />
-              {sadhana.completed ? 'Undo' : 'Complete'}
-            </Button>
-          </div>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              {sadhana.completed && (
+                <DropdownMenuItem onClick={handleReflection}>
+                  <MessageSquare className="mr-2 h-4 w-4" />
+                  Add Reflection
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={() => onDelete(sadhana.id)} className="text-destructive">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </CardHeader>
-      <CardContent className="pb-4 flex-grow space-y-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant="outline" className={`flex items-center gap-1 ${getPriorityColor(sadhana.priority)}`}>
-            <AlertCircle className="h-3 w-3" />
-            {sadhana.priority.charAt(0).toUpperCase() + sadhana.priority.slice(1)} Priority
-          </Badge>
-          <Badge variant="secondary" className="flex items-center gap-1">
-            {sadhana.category === 'daily' ? (
-              <><Clock3 className="h-3 w-3" /> Daily Ritual</>
-            ) : (
-              <><Star className="h-3 w-3" /> Goal Oriented</>
-            )}
-          </Badge>
-          {sadhana.dueDate && (
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
-              {formatDate(sadhana.dueDate)}
-            </Badge>
-          )}
-          {sadhana.time && (
-            <Badge variant="outline" className="flex items-center gap-1">
-              <Clock className="h-3 w-3" />
-              {sadhana.time}
-            </Badge>
-          )}
-        </div>
-        {sadhana.reflection && (
-          <div className="mt-4 p-3 bg-background/50 rounded-lg border border-border">
-            <p className="text-sm font-semibold flex items-center gap-2 text-primary">
-              <MessageSquare className="h-4 w-4" />
-              Reflection
-            </p>
-            <p className="text-sm text-muted-foreground mt-1 italic">"{sadhana.reflection}"</p>
-          </div>
-        )}
       </CardContent>
-      <CardFooter className="pt-0 flex justify-end gap-2">
-        <Dialog open={isEditing} onOpenChange={setIsEditing}>
-          <DialogTrigger asChild>
-            <Button variant="ghost" size="icon" onClick={() => setEditingSadhana(sadhana)}>
-              <Edit3 className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Edit Sadhana</DialogTitle>
-              <DialogDescription>Update your sadhana details.</DialogDescription>
-            </DialogHeader>
-            <SadhanaForm sadhana={editingSadhana} setSadhana={setEditingSadhana} isEditing />
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
-              <Button onClick={handleSaveChanges}>Save Changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        <Button variant="ghost" size="icon" onClick={() => onDelete(sadhana.id)}>
-          <Trash2 className="h-4 w-4" />
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

@@ -10,4 +10,5 @@ export interface Sadhana {
   priority: 'low' | 'medium' | 'high';
   tags?: string[];
   reflection?: string;
+  sadhanaId?: number; // Link to the sadhana that created this task
 }
