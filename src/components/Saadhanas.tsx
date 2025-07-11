@@ -1,4 +1,3 @@
-
 import { 
   CheckSquare, 
   Filter, 
@@ -8,6 +7,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Sadhana } from '@/types/sadhana';
 import { useSaadhanas } from '@/hooks/useSaadhanas';
 import SadhanaGroup from './SadhanaGroup';
 import AddSadhana from './AddSadhana';
@@ -32,7 +32,12 @@ const Saadhanas = () => {
   // Wrapper function to handle the return type expected by AddSadhana
   const handleAddSadhanaWrapper = (newSadhana: Omit<Sadhana, 'id' | 'reflection'>): boolean => {
     try {
-      handleAddSadhana(newSadhana);
+      // Convert the type to match what handleAddSadhana expects
+      const sadhanaToAdd: Omit<Sadhana, 'id'> = {
+        ...newSadhana,
+        reflection: undefined
+      };
+      handleAddSadhana(sadhanaToAdd);
       return true;
     } catch (error) {
       console.error('Failed to add sadhana:', error);
