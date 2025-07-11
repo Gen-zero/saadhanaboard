@@ -1,189 +1,148 @@
-import { useState, useEffect, useMemo } from 'react';
-import { useToast } from '@/hooks/use-toast';
+
+import { useState, useEffect } from 'react';
 import { Sadhana } from '@/types/sadhana';
+import { isToday, isPast, isFuture, parseISO } from 'date-fns';
+
+interface GroupedSaadhanas {
+  overdue: Sadhana[];
+  today: Sadhana[];
+  upcoming: Sadhana[];
+  noDueDate: Sadhana[];
+  completed: Sadhana[];
+}
+
+const STORAGE_KEY = 'saadhanas';
 
 export const useSaadhanas = () => {
   const [saadhanas, setSaadhanas] = useState<Sadhana[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [reflectingSadhana, setReflectingSadhana] = useState<Sadhana | null>(null);
   const [reflectionText, setReflectionText] = useState('');
-  
-  const { toast } = useToast();
 
+  // Load saadhanas from localStorage on mount
   useEffect(() => {
-    const savedSaadhanas = localStorage.getItem('saadhanas');
-    if (savedSaadhanas) {
+    const loadSaadhanas = () => {
       try {
-        setSaadhanas(JSON.parse(savedSaadhanas));
-      } catch (e) {
-        console.error('Failed to parse saadhanas from localStorage:', e);
-        setSaadhanas([]);
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          const parsedSaadhanas = JSON.parse(stored);
+          setSaadhanas(parsedSaadhanas);
+        }
+      } catch (error) {
+        console.log('Could not load saadhanas from localStorage');
       }
-    }
+    };
+
+    loadSaadhanas();
+
+    // Listen for storage changes (in case other tabs modify the data)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) {
+        loadSaadhanas();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
+  // Save saadhanas to localStorage whenever they change
   useEffect(() => {
-    localStorage.setItem('saadhanas', JSON.stringify(saadhanas));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(saadhanas));
+    } catch (error) {
+      console.log('Could not save saadhanas to localStorage');
+    }
   }, [saadhanas]);
 
-  const handleAddSadhana = (newSadhana: Omit<Sadhana, 'id' | 'reflection'>) => {
-    if (!newSadhana.title.trim()) {
-      toast({
-        title: "Sadhana title required",
-        description: "Please provide a title for your sadhana.",
-        variant: "destructive"
-      });
-      return false;
-    }
-    
-    const newSadhanaWithId: Sadhana = { ...newSadhana, id: Date.now() };
-    setSaadhanas(prev => [...prev, newSadhanaWithId]);
-    
-    toast({
-      title: "Sadhana added",
-      description: "Your sadhana has been successfully added."
-    });
-    return true;
+  const handleAddSadhana = (newSadhana: Omit<Sadhana, 'id'>) => {
+    const sadhana: Sadhana = {
+      ...newSadhana,
+      id: Date.now(),
+    };
+    setSaadhanas(prev => [...prev, sadhana]);
   };
 
-  const handleUpdateSadhana = (sadhanaToUpdate: Sadhana) => {
-    if (!sadhanaToUpdate.title.trim()) {
-      toast({
-        title: "Sadhana title required",
-        description: "Please provide a title for your sadhana.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    setSaadhanas(saadhanas.map(s => s.id === sadhanaToUpdate.id ? sadhanaToUpdate : s));
-    
-    toast({
-      title: "Sadhana updated",
-      description: "Your sadhana has been successfully updated."
-    });
+  const handleUpdateSadhana = (updatedSadhana: Sadhana) => {
+    setSaadhanas(prev => 
+      prev.map(sadhana => 
+        sadhana.id === updatedSadhana.id ? updatedSadhana : sadhana
+      )
+    );
   };
 
   const handleDeleteSadhana = (id: number) => {
-    setSaadhanas(saadhanas.filter(s => s.id !== id));
-    toast({
-      title: "Sadhana deleted",
-      description: "Your sadhana has been deleted."
-    });
+    setSaadhanas(prev => prev.filter(sadhana => sadhana.id !== id));
   };
 
-  const handleToggleCompletion = (sadhanaToToggle: Sadhana) => {
-    if (sadhanaToToggle.completed) {
-      setSaadhanas(prev =>
-        prev.map(s =>
-          s.id === sadhanaToToggle.id ? { ...s, completed: false, reflection: undefined } : s
-        )
-      );
-      toast({
-        title: "Sadhana incomplete",
-        description: "Your sadhana has been marked as incomplete."
-      });
-    } else {
-      setReflectingSadhana(sadhanaToToggle);
+  const handleToggleCompletion = (sadhana: Sadhana) => {
+    const updatedSadhana = { ...sadhana, completed: !sadhana.completed };
+    handleUpdateSadhana(updatedSadhana);
+    
+    if (updatedSadhana.completed) {
+      setReflectingSadhana(updatedSadhana);
+      setReflectionText(updatedSadhana.reflection || '');
     }
   };
 
   const handleSaveReflection = () => {
-    if (!reflectingSadhana) return;
-
-    setSaadhanas(prev =>
-      prev.map(s =>
-        s.id === reflectingSadhana.id ? { ...s, completed: true, reflection: reflectionText } : s
-      )
-    );
-
-    toast({
-      title: "Sadhana Completed!",
-      description: "Great job on your practice. Your reflection is saved."
-    });
-
-    setReflectingSadhana(null);
-    setReflectionText('');
+    if (reflectingSadhana) {
+      const updatedSadhana = { ...reflectingSadhana, reflection: reflectionText };
+      handleUpdateSadhana(updatedSadhana);
+      setReflectingSadhana(null);
+      setReflectionText('');
+    }
   };
 
-  const groupedSaadhanas = useMemo(() => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
+  // Filter and search saadhanas
+  const filteredSaadhanas = saadhanas.filter(sadhana => {
+    const matchesSearch = sadhana.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         sadhana.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         sadhana.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesFilter = filter === 'all' || sadhana.priority === filter;
+    
+    return matchesSearch && matchesFilter;
+  });
 
-    const groups: {
-      overdue: Sadhana[];
-      today: Sadhana[];
-      upcoming: Sadhana[];
-      noDueDate: Sadhana[];
-      completed: Sadhana[];
-    } = {
-      overdue: [],
-      today: [],
-      upcoming: [],
-      noDueDate: [],
-      completed: [],
-    };
-
-    const filtered = saadhanas.filter(sadhana => {
-      if (filter !== 'all' && sadhana.priority !== filter) return false;
-      if (searchQuery && !sadhana.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-      return true;
-    });
-
-    for (const sadhana of filtered) {
+  // Group saadhanas by status and due date
+  const groupedSaadhanas: GroupedSaadhanas = filteredSaadhanas.reduce(
+    (groups, sadhana) => {
       if (sadhana.completed) {
         groups.completed.push(sadhana);
-        continue;
-      }
-      if (sadhana.category === 'daily') {
-        groups.today.push(sadhana);
-        continue;
-      }
-      if (sadhana.dueDate) {
-        const dueDate = new Date(sadhana.dueDate);
-        if (dueDate.getTime() < now.getTime()) {
-          groups.overdue.push(sadhana);
-        } else if (dueDate.getFullYear() === now.getFullYear() && dueDate.getMonth() === now.getMonth() && dueDate.getDate() === now.getDate()) {
+      } else if (!sadhana.dueDate) {
+        groups.noDueDate.push(sadhana);
+      } else {
+        const dueDate = parseISO(sadhana.dueDate);
+        if (isToday(dueDate)) {
           groups.today.push(sadhana);
-        } else {
+        } else if (isPast(dueDate)) {
+          groups.overdue.push(sadhana);
+        } else if (isFuture(dueDate)) {
           groups.upcoming.push(sadhana);
         }
-      } else {
-        groups.noDueDate.push(sadhana);
       }
+      return groups;
+    },
+    {
+      overdue: [] as Sadhana[],
+      today: [] as Sadhana[],
+      upcoming: [] as Sadhana[],
+      noDueDate: [] as Sadhana[],
+      completed: [] as Sadhana[]
     }
-
-    const priorityOrder = { high: 0, medium: 1, low: 2 };
-    const baseSort = (a: Sadhana, b: Sadhana) => {
-      if (a.priority !== b.priority) return priorityOrder[a.priority] - priorityOrder[b.priority];
-      return a.title.localeCompare(b.title);
-    };
-
-    groups.overdue.sort((a, b) => {
-        const aDate = new Date(a.dueDate!).getTime();
-        const bDate = new Date(b.dueDate!).getTime();
-        if (aDate !== bDate) return aDate - bDate;
-        return baseSort(a,b);
-    });
-    groups.today.sort(baseSort);
-    groups.upcoming.sort((a, b) => {
-        const aDate = new Date(a.dueDate!).getTime();
-        const bDate = new Date(b.dueDate!).getTime();
-        if (aDate !== bDate) return aDate - bDate;
-        return baseSort(a,b);
-    });
-    groups.noDueDate.sort(baseSort);
-    groups.completed.sort((a, b) => b.id - a.id);
-
-    return groups;
-  }, [saadhanas, filter, searchQuery]);
+  );
 
   return {
-    searchQuery, setSearchQuery,
-    filter, setFilter,
-    reflectingSadhana, setReflectingSadhana,
-    reflectionText, setReflectionText,
+    searchQuery,
+    setSearchQuery,
+    filter,
+    setFilter,
+    reflectingSadhana,
+    setReflectingSadhana,
+    reflectionText,
+    setReflectionText,
     groupedSaadhanas,
     handleAddSadhana,
     handleUpdateSadhana,

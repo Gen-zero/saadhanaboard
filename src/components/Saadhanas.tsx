@@ -102,7 +102,7 @@ const Saadhanas = () => {
               onToggleCompletion={handleToggleCompletion}
             />
             <SadhanaGroup 
-              title="Today's Practice"
+              title="Daily Rituals"
               sadhanas={groupedSaadhanas.today}
               onUpdate={handleUpdateSadhana}
               onDelete={handleDeleteSadhana}
