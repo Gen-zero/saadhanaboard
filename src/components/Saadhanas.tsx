@@ -29,6 +29,24 @@ const Saadhanas = () => {
 
   const totalSaadhanas = Object.values(groupedSaadhanas).reduce((sum, arr) => sum + arr.length, 0);
 
+  // Wrapper function to handle the return type expected by AddSadhana
+  const handleAddSadhanaWrapper = (newSadhana: Omit<Sadhana, 'id' | 'reflection'>): boolean => {
+    try {
+      handleAddSadhana(newSadhana);
+      return true;
+    } catch (error) {
+      console.error('Failed to add sadhana:', error);
+      return false;
+    }
+  };
+
+  // Type-safe filter handler
+  const handleFilterChange = (value: string) => {
+    if (value === 'all' || value === 'high' || value === 'medium' || value === 'low') {
+      setFilter(value);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col gap-2">
@@ -52,7 +70,7 @@ const Saadhanas = () => {
           />
         </div>
         <div className="flex gap-2">
-          <Select value={filter} onValueChange={setFilter}>
+          <Select value={filter} onValueChange={handleFilterChange}>
             <SelectTrigger className="w-[130px]">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
@@ -66,7 +84,7 @@ const Saadhanas = () => {
               <SelectItem value="low">Low</SelectItem>
             </SelectContent>
           </Select>
-          <AddSadhana onAddSadhana={handleAddSadhana} />
+          <AddSadhana onAddSadhana={handleAddSadhanaWrapper} />
         </div>
       </div>
 
@@ -82,7 +100,7 @@ const Saadhanas = () => {
             </p>
             <div className="mt-4">
               <AddSadhana 
-                onAddSadhana={handleAddSadhana}
+                onAddSadhana={handleAddSadhanaWrapper}
                 triggerButton={
                   <Button variant="outline">
                     <Plus className="mr-2 h-4 w-4" />
