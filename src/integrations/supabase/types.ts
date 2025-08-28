@@ -14,6 +14,211 @@ export type Database = {
   }
   public: {
     Tables: {
+      mentorship_relationships: {
+        Row: {
+          accepted_at: string | null
+          ended_at: string | null
+          guru_id: string
+          id: string
+          notes: string | null
+          requested_at: string | null
+          shishya_id: string
+          status: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          ended_at?: string | null
+          guru_id: string
+          id?: string
+          notes?: string | null
+          requested_at?: string | null
+          shishya_id: string
+          status?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          ended_at?: string | null
+          guru_id?: string
+          id?: string
+          notes?: string | null
+          requested_at?: string | null
+          shishya_id?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          mentorship_id: string | null
+          message_type: string | null
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          mentorship_id?: string | null
+          message_type?: string | null
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          mentorship_id?: string | null
+          message_type?: string | null
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_mentorship_id_fkey"
+            columns: ["mentorship_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          available_for_guidance: boolean | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          display_name: string
+          experience_level: string | null
+          id: string
+          location: string | null
+          traditions: string[] | null
+          updated_at: string | null
+        }
+        Insert: {
+          available_for_guidance?: boolean | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name: string
+          experience_level?: string | null
+          id: string
+          location?: string | null
+          traditions?: string[] | null
+          updated_at?: string | null
+        }
+        Update: {
+          available_for_guidance?: boolean | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          display_name?: string
+          experience_level?: string | null
+          id?: string
+          location?: string | null
+          traditions?: string[] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      sadhana_progress: {
+        Row: {
+          completed: boolean | null
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          notes: string | null
+          progress_date: string | null
+          sadhana_id: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          progress_date?: string | null
+          sadhana_id: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          progress_date?: string | null
+          sadhana_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sadhana_progress_sadhana_id_fkey"
+            columns: ["sadhana_id"]
+            isOneToOne: false
+            referencedRelation: "sadhanas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sadhanas: {
+        Row: {
+          assigned_by: string | null
+          category: string | null
+          completed: boolean | null
+          created_at: string | null
+          description: string | null
+          due_date: string | null
+          due_time: string | null
+          id: string
+          priority: string | null
+          reflection: string | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          category?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          due_time?: string | null
+          id?: string
+          priority?: string | null
+          reflection?: string | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          assigned_by?: string | null
+          category?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          due_time?: string | null
+          id?: string
+          priority?: string | null
+          reflection?: string | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       spiritual_books: {
         Row: {
           author: string
@@ -62,15 +267,46 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "guru" | "shishya"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -197,6 +433,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["guru", "shishya"],
+    },
   },
 } as const
