@@ -32,16 +32,20 @@ const LoginPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      await login(values.email, values.password);
-      toast({
-        title: "Login successful",
-        description: "Welcome to Saadhana Yantra"
-      });
+      const { error } = await login(values.email, values.password);
+      if (error) {
+        toast({
+          title: "Login failed",
+          description: error.message || "Invalid email or password",
+          variant: "destructive"
+        });
+        return;
+      }
       navigate("/");
     } catch (error) {
       toast({
         title: "Login failed",
-        description: "Invalid email or password. Try demo@example.com / password",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive"
       });
     } finally {
@@ -133,7 +137,7 @@ const LoginPage = () => {
         </div>
 
         <div className="text-center text-xs text-muted-foreground">
-          <p>Demo account: demo@example.com / password</p>
+          <p>Create an account to begin your spiritual journey</p>
         </div>
       </div>
     </div>

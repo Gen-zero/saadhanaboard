@@ -46,16 +46,21 @@ const SignupPage = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setIsLoading(true);
-      await signup(values.email, values.password, values.name);
-      toast({
-        title: "Account created",
-        description: "Welcome to Saadhana Yantra",
-      });
-      navigate("/");
+      const { error } = await signup(values.email, values.password, values.name);
+      if (error) {
+        toast({
+          title: "Registration failed",
+          description: error.message || "There was a problem creating your account",
+          variant: "destructive",
+        });
+        return;
+      }
+      // Navigate to role selection after successful signup
+      navigate("/role-selection");
     } catch (error) {
       toast({
         title: "Registration failed",
-        description: "There was a problem creating your account",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {

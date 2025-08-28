@@ -12,19 +12,26 @@ import LibraryPage from "./pages/LibraryPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import { AuthProvider, useAuth } from "./lib/auth-context";
+import { useUserRole } from "./hooks/useUserRole";
+import RoleSelectionPage from "./pages/RoleSelectionPage";
 
 const queryClient = new QueryClient();
 
-// Protected route component that checks for authentication
+// Protected route component that checks for authentication and role
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, isLoading } = useAuth();
+  const { role, isLoading: roleLoading } = useUserRole();
   
-  if (isLoading) {
+  if (isLoading || roleLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (!role) {
+    return <Navigate to="/role-selection" replace />;
   }
   
   return children;
@@ -35,6 +42,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route path="/role-selection" element={<RoleSelectionPage />} />
       <Route path="/" element={<Navigate to="/sadhana" replace />} />
       <Route path="/sadhana" element={<ProtectedRoute><SadhanaPage /></ProtectedRoute>} />
       <Route path="/saadhanas" element={<ProtectedRoute><SaadhanasPage /></ProtectedRoute>} />

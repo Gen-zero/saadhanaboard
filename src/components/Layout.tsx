@@ -100,10 +100,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="flex flex-col space-y-2">
               {user ? (
                 <div className="flex flex-col space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90">
-                    <User size={16} className="text-primary" />
-                    <span className="truncate">{user.displayName || user.email}</span>
-                  </div>
+                   <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90">
+                     <User size={16} className="text-primary" />
+                     <span className="truncate">{user.user_metadata?.display_name || user.email}</span>
+                   </div>
                   <Button 
                     variant="outline" 
                     size="sm" 
