@@ -42,20 +42,30 @@ export const useUserRole = () => {
   }, [user]);
 
   const setUserRole = async (newRole: 'guru' | 'shishya') => {
-    if (!user) return { error: new Error('No user logged in') };
+    if (!user) {
+      console.error('No user logged in when trying to set role');
+      return { error: new Error('No user logged in') };
+    }
 
     try {
       setIsLoading(true);
       
-      const { error } = await supabase
+      console.log('Attempting to set role:', newRole, 'for user:', user.id);
+      
+      const { data, error } = await supabase
         .from('user_roles')
         .upsert({
           user_id: user.id,
           role: newRole
-        });
+        })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error setting role:', error);
+        throw error;
+      }
 
+      console.log('Role set successfully:', data);
       setRole(newRole);
       return { error: null };
     } catch (error: any) {

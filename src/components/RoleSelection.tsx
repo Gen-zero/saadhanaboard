@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { UserRole, useUserRole } from '@/hooks/useUserRole';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/lib/auth-context';
 import { Loader2, Crown, BookOpen } from 'lucide-react';
 
 interface RoleSelectionProps {
@@ -12,11 +13,21 @@ interface RoleSelectionProps {
 
 export const RoleSelection: React.FC<RoleSelectionProps> = ({ onRoleSelected }) => {
   const { setUserRole } = useUserRole();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<'guru' | 'shishya' | null>(null);
 
   const handleRoleSelect = async (role: 'guru' | 'shishya') => {
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to select a role.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
       setSelectedRole(role);
