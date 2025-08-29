@@ -22,11 +22,18 @@ export const useUserRole = () => {
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .maybeSingle();
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
 
         if (error) {
-          console.error('Error fetching user role:', error);
-          setRole(null);
+          if (error.code === 'PGRST116') {
+            // No rows found, user has no role yet
+            setRole(null);
+          } else {
+            console.error('Error fetching user role:', error);
+            setRole(null);
+          }
         } else {
           setRole(data?.role || null);
         }
@@ -52,9 +59,16 @@ export const useUserRole = () => {
       
       console.log('Attempting to set role:', newRole, 'for user:', user.id);
       
+      // First delete any existing roles for this user
+      await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', user.id);
+      
+      // Then insert the new role
       const { data, error } = await supabase
         .from('user_roles')
-        .upsert({
+        .insert({
           user_id: user.id,
           role: newRole
         })
