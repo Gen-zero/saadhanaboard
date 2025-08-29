@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
+import { useUserRole } from '@/hooks/useUserRole';
+import GuruBrowser from './GuruBrowser';
 
 interface Task {
   id: number;
@@ -35,6 +37,7 @@ const inspirationalQuotes = [
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { isShishya } = useUserRole();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -253,6 +256,11 @@ const Dashboard = () => {
           Continue your spiritual journey with purpose and intention.
         </p>
       </div>
+
+      {/* Guru Browser for Shishya users */}
+      {isShishya && (
+        <GuruBrowser />
+      )}
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
