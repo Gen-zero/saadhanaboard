@@ -59,18 +59,14 @@ export const useUserRole = () => {
       
       console.log('Attempting to set role:', newRole, 'for user:', user.id);
       
-      // First delete any existing roles for this user
-      await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', user.id);
-      
-      // Then insert the new role
+      // Use upsert to handle existing roles
       const { data, error } = await supabase
         .from('user_roles')
-        .insert({
+        .upsert({
           user_id: user.id,
           role: newRole
+        }, {
+          onConflict: 'user_id,role'
         })
         .select();
 
