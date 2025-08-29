@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from './useAuth';
+import { useAuth } from '@/lib/auth-context';
 
 export type UserRole = 'guru' | 'shishya' | null;
 
@@ -48,7 +48,7 @@ export const useUserRole = () => {
     fetchUserRole();
   }, [user]);
 
-  const setUserRole = async (newRole: 'guru' | 'shishya') => {
+  const setUserRole = async (newRole: 'guru' | 'shishya'): Promise<{ error: Error | null }> => {
     if (!user) {
       console.error('No user logged in when trying to set role');
       return { error: new Error('No user logged in') };
@@ -82,9 +82,9 @@ export const useUserRole = () => {
       console.log('Role set successfully:', data);
       setRole(newRole);
       return { error: null };
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error setting user role:', error);
-      return { error };
+      return { error: error as Error };
     } finally {
       setIsLoading(false);
     }
