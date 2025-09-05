@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Sadhana } from '@/types/sadhana';
-import { isToday, isPast, isFuture, parseISO } from 'date-fns';
+import { isToday, isPast, isFuture, parseISO, format } from 'date-fns';
 
 interface GroupedSaadhanas {
   overdue: Sadhana[];
@@ -11,7 +11,22 @@ interface GroupedSaadhanas {
   completed: Sadhana[];
 }
 
+interface Task {
+  id: number;
+  title: string;
+  description?: string;
+  completed: boolean;
+  category: 'daily' | 'goal';
+  dueDate?: string;
+  time?: string;
+  priority: 'low' | 'medium' | 'high';
+  tags?: string[];
+  sadhanaId?: number;
+  isRecurring?: boolean;
+}
+
 const STORAGE_KEY = 'saadhanas';
+const TASKS_STORAGE_KEY = 'saadhanaTasks';
 
 export const useSaadhanas = () => {
   const [saadhanas, setSaadhanas] = useState<Sadhana[]>([]);
@@ -24,11 +39,41 @@ export const useSaadhanas = () => {
   useEffect(() => {
     const loadSaadhanas = () => {
       try {
+        let allSaadhanas: Sadhana[] = [];
+        
+        // Load regular saadhanas
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
           const parsedSaadhanas = JSON.parse(stored);
-          setSaadhanas(parsedSaadhanas);
+          allSaadhanas = [...parsedSaadhanas];
         }
+        
+        // Load and convert sadhana tasks to saadhana format
+        const tasksStored = localStorage.getItem(TASKS_STORAGE_KEY);
+        if (tasksStored) {
+          const tasks: Task[] = JSON.parse(tasksStored);
+          
+          // Filter for sadhana tasks and convert to Sadhana format
+          const sadhanaTasksConverted = tasks
+            .filter(task => task.sadhanaId && task.category === 'daily')
+            .map(task => ({
+              id: task.id,
+              title: task.title,
+              description: task.description || `🙏 Daily sadhana practice - ${task.title}`,
+              completed: task.completed,
+              category: task.category,
+              dueDate: task.dueDate || format(new Date(), 'yyyy-MM-dd'),
+              time: task.time,
+              priority: task.priority,
+              tags: [...(task.tags || []), 'sadhana', 'daily-practice'],
+              sadhanaId: task.sadhanaId,
+              isSadhanaTask: true // Mark as sadhana task
+            } as Sadhana & { isSadhanaTask: boolean }));
+          
+          allSaadhanas = [...allSaadhanas, ...sadhanaTasksConverted];
+        }
+        
+        setSaadhanas(allSaadhanas);
       } catch (error) {
         console.log('Could not load saadhanas from localStorage');
       }
@@ -36,21 +81,32 @@ export const useSaadhanas = () => {
 
     loadSaadhanas();
 
-    // Listen for storage changes (in case other tabs modify the data)
+    // Listen for storage changes
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) {
+      if (e.key === STORAGE_KEY || e.key === TASKS_STORAGE_KEY) {
         loadSaadhanas();
       }
     };
+    
+    // Listen for sadhana task refresh events
+    const handleTasksRefreshed = () => {
+      loadSaadhanas();
+    };
 
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('sadhana-tasks-refreshed', handleTasksRefreshed);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('sadhana-tasks-refreshed', handleTasksRefreshed);
+    };
   }, []);
 
-  // Save saadhanas to localStorage whenever they change
+  // Save only regular saadhanas to localStorage (not sadhana tasks)
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(saadhanas));
+      const regularSaadhanas = saadhanas.filter(sadhana => !('isSadhanaTask' in sadhana));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(regularSaadhanas));
     } catch (error) {
       console.log('Could not save saadhanas to localStorage');
     }
@@ -78,6 +134,25 @@ export const useSaadhanas = () => {
 
   const handleToggleCompletion = (sadhana: Sadhana) => {
     const updatedSadhana = { ...sadhana, completed: !sadhana.completed };
+    
+    // If this is a sadhana task, update it in the tasks storage as well
+    if ('isSadhanaTask' in sadhana && (sadhana as any).isSadhanaTask) {
+      try {
+        const tasksStored = localStorage.getItem(TASKS_STORAGE_KEY);
+        if (tasksStored) {
+          const tasks: Task[] = JSON.parse(tasksStored);
+          const updatedTasks = tasks.map(task => 
+            task.id === sadhana.id 
+              ? { ...task, completed: updatedSadhana.completed }
+              : task
+          );
+          localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(updatedTasks));
+        }
+      } catch (error) {
+        console.log('Could not update task completion in tasks storage');
+      }
+    }
+    
     handleUpdateSadhana(updatedSadhana);
     
     if (updatedSadhana.completed) {

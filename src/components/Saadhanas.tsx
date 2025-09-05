@@ -4,6 +4,7 @@ import {
   Plus, 
   Search
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,6 +13,25 @@ import { useSaadhanas } from '@/hooks/useSaadhanas';
 import SadhanaGroup from './SadhanaGroup';
 import AddSadhana from './AddSadhana';
 import ReflectionDialog from './ReflectionDialog';
+import CosmicBackgroundSimple from './sadhana/CosmicBackgroundSimple';
+
+const CosmicParticle = ({ delay }: { delay: number }) => {
+  return (
+    <div 
+      className="absolute rounded-full bg-purple-500 opacity-0"
+      style={{
+        width: `${Math.random() * 3 + 1}px`,
+        height: `${Math.random() * 3 + 1}px`,
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        animation: `float ${Math.random() * 5 + 3}s ease-in-out infinite, 
+                    cosmic-pulse ${Math.random() * 4 + 2}s ease-in-out infinite`,
+        animationDelay: `${delay}s`,
+        opacity: Math.random() * 0.5 + 0.2
+      }}
+    ></div>
+  );
+};
 
 const Saadhanas = () => {
   const {
@@ -26,6 +46,14 @@ const Saadhanas = () => {
     handleToggleCompletion,
     handleSaveReflection
   } = useSaadhanas();
+
+  const [cosmicParticles, setCosmicParticles] = useState<number[]>([]);
+  
+  useEffect(() => {
+    // Create cosmic particles
+    const particles = Array.from({ length: 50 }, (_, i) => i);
+    setCosmicParticles(particles);
+  }, []);
 
   const totalSaadhanas = Object.values(groupedSaadhanas).reduce((sum, arr) => sum + arr.length, 0);
 
@@ -53,10 +81,18 @@ const Saadhanas = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <CheckSquare className="h-7 w-7 text-primary" />
+    <div className="space-y-6 animate-fade-in cosmic-nebula-bg relative">
+      <CosmicBackgroundSimple />
+      
+      {/* Cosmic particles */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        {cosmicParticles.map((_, index) => (
+          <CosmicParticle key={index} delay={index * 0.1} />
+        ))}
+      </div>
+      <div className="backdrop-blur-sm bg-background/70 p-6 rounded-lg border border-purple-500/20">
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
+          <CheckSquare className="h-7 w-7 text-purple-500" />
           Saadhanas
         </h1>
         <p className="text-muted-foreground">
@@ -64,55 +100,59 @@ const Saadhanas = () => {
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row justify-between gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search saadhanas..."
-            className="pl-9"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-2">
-          <Select value={filter} onValueChange={handleFilterChange}>
-            <SelectTrigger className="w-[130px]">
-              <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4" />
-                <span>Priority</span>
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All</SelectItem>
-              <SelectItem value="high">High</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="low">Low</SelectItem>
-            </SelectContent>
-          </Select>
-          <AddSadhana onAddSadhana={handleAddSadhanaWrapper} />
+      <div className="backdrop-blur-sm bg-background/70 p-4 rounded-lg border border-purple-500/20">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search saadhanas..."
+              className="pl-9 glass-effect"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="flex gap-2">
+            <Select value={filter} onValueChange={handleFilterChange}>
+              <SelectTrigger className="w-[130px] glass-effect">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  <span>Priority</span>
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="high">High</SelectItem>
+                <SelectItem value="medium">Medium</SelectItem>
+                <SelectItem value="low">Low</SelectItem>
+              </SelectContent>
+            </Select>
+            <AddSadhana onAddSadhana={handleAddSadhanaWrapper} />
+          </div>
         </div>
       </div>
 
       <div className="mt-4 space-y-8">
         {totalSaadhanas === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <CheckSquare className="h-16 w-16 text-muted-foreground/30 mb-4" />
-            <h3 className="text-xl font-medium mb-2">No saadhanas found</h3>
-            <p className="text-muted-foreground max-w-md">
-              {searchQuery || filter !== 'all' 
-                ? "Try changing your search or filter settings." 
-                : "Create your first sadhana by clicking the 'Add Sadhana' button."}
-            </p>
-            <div className="mt-4">
-              <AddSadhana 
-                onAddSadhana={handleAddSadhanaWrapper}
-                triggerButton={
-                  <Button variant="outline">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Add Sadhana
-                  </Button>
-                }
-              />
+          <div className="backdrop-blur-sm bg-background/70 p-8 rounded-lg border border-purple-500/20">
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <CheckSquare className="h-16 w-16 text-purple-500/30 mb-4" />
+              <h3 className="text-xl font-medium mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">No saadhanas found</h3>
+              <p className="text-muted-foreground max-w-md">
+                {searchQuery || filter !== 'all' 
+                  ? "Try changing your search or filter settings." 
+                  : "Create your first sadhana by clicking the 'Add Sadhana' button."}
+              </p>
+              <div className="mt-4">
+                <AddSadhana 
+                  onAddSadhana={handleAddSadhanaWrapper}
+                  triggerButton={
+                    <Button variant="outline" className="cosmic-button">
+                      <Plus className="mr-2 h-4 w-4" />
+                      Add Sadhana
+                    </Button>
+                  }
+                />
+              </div>
             </div>
           </div>
         ) : (

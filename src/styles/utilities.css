@@ -83,3 +83,22 @@
 .cosmic-highlight:hover::after {
   opacity: 0.7;
 }
+
+/* Cosmic button styling */
+.cosmic-button {
+  @apply bg-purple-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300 transition-all duration-300;
+}
+
+.cosmic-button:hover {
+  @apply shadow-lg shadow-purple-500/25;
+}
+
+/* Hide scrollbars for horizontal scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

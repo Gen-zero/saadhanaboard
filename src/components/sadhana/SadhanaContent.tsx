@@ -5,13 +5,16 @@ import SadhanaViewer from './SadhanaViewer';
 import PaperScroll2D from './PaperScroll2D';
 import SadhanaWelcome from './SadhanaWelcome';
 import SadhanaSetupForm from './SadhanaSetupForm';
+import SadhanaSelection from './SadhanaSelection';
 import { SadhanaData } from '@/hooks/useSadhanaData';
+import { StoreSadhana } from '@/types/store';
 
 interface SadhanaContentProps {
   isEditing: boolean;
   view3D: boolean;
   hasStarted: boolean;
   isCreating: boolean;
+  isSelecting: boolean;
   sadhanaData: SadhanaData | null;
   paperContent: string;
   setView3D: (value: boolean) => void;
@@ -19,6 +22,8 @@ interface SadhanaContentProps {
   onCancelSadhana: () => void;
   onCreateSadhana: (data: SadhanaData) => void;
   onUpdateSadhana: (data: SadhanaData) => void;
+  onSelectStoreSadhana: (sadhana: StoreSadhana) => void;
+  onCreateCustomSadhana: () => void;
 }
 
 const SadhanaContent = ({
@@ -26,19 +31,35 @@ const SadhanaContent = ({
   view3D,
   hasStarted,
   isCreating,
+  isSelecting,
   sadhanaData,
   paperContent,
   setView3D,
   onStartSadhana,
   onCancelSadhana,
   onCreateSadhana,
-  onUpdateSadhana
+  onUpdateSadhana,
+  onSelectStoreSadhana,
+  onCreateCustomSadhana
 }: SadhanaContentProps) => {
-  // If no sadhana has been started, show welcome screen
-  if (!hasStarted && !isCreating) {
+  // If no sadhana has been started and not creating/selecting, show welcome screen
+  if (!hasStarted && !isCreating && !isSelecting) {
     return (
       <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
         <SadhanaWelcome onStartSadhana={onStartSadhana} />
+      </div>
+    );
+  }
+
+  // If user is selecting a sadhana, show the selection screen
+  if (isSelecting) {
+    return (
+      <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
+        <SadhanaSelection 
+          onSelectStoreSadhana={onSelectStoreSadhana}
+          onCreateCustomSadhana={onCreateCustomSadhana}
+          onCancel={onCancelSadhana}
+        />
       </div>
     );
   }

@@ -5,7 +5,9 @@ import Saadhanas from "@/components/Saadhanas";
 const SaadhanasPage = () => {
   return (
     <Layout>
-      <Saadhanas />
+      <div className="animate-fade-in">
+        <Saadhanas />
+      </div>
     </Layout>
   );
 };

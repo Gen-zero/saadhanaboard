@@ -11,43 +11,64 @@ import NotFound from "./pages/NotFound";
 import LibraryPage from "./pages/LibraryPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import OnboardingPage from "./pages/OnboardingPage";
+import WalkthroughPage from "./pages/WalkthroughPage";
 import { AuthProvider, useAuth } from "./lib/auth-context";
-import { useUserRole } from "./hooks/useUserRole";
-import RoleSelectionPage from "./pages/RoleSelectionPage";
+import { useDailySadhanaRefresh } from "./hooks/useDailySadhanaRefresh";
+
 
 const queryClient = new QueryClient();
 
-// Protected route component that checks for authentication and role
+// Protected route component that checks for authentication
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const { user, isLoading } = useAuth();
-  const { role, isLoading: roleLoading } = useUserRole();
   
-  if (isLoading || roleLoading) {
+  if (isLoading) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
   if (!user) {
     return <Navigate to="/login" replace />;
   }
+  
+  return children;
+};
 
-  if (!role) {
-    return <Navigate to="/role-selection" replace />;
+// Onboarding route component that checks for onboarding completion
+const OnboardingRoute = ({ children }: { children: JSX.Element }) => {
+  const { user, isLoading, isOnboardingComplete } = useAuth();
+  
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (isOnboardingComplete === false) {
+    return <Navigate to="/onboarding" replace />;
   }
   
   return children;
 };
 
 const AppRoutes = () => {
+  // Initialize daily sadhana refresh globally
+  useDailySadhanaRefresh();
+  
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
-      <Route path="/role-selection" element={<RoleSelectionPage />} />
+      <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
+      <Route path="/walkthrough" element={<ProtectedRoute><WalkthroughPage /></ProtectedRoute>} />
+
       <Route path="/" element={<Navigate to="/sadhana" replace />} />
-      <Route path="/sadhana" element={<ProtectedRoute><SadhanaPage /></ProtectedRoute>} />
-      <Route path="/saadhanas" element={<ProtectedRoute><SaadhanasPage /></ProtectedRoute>} />
-      <Route path="/library" element={<ProtectedRoute><LibraryPage /></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
+      <Route path="/sadhana" element={<OnboardingRoute><SadhanaPage /></OnboardingRoute>} />
+      <Route path="/saadhanas" element={<OnboardingRoute><SaadhanasPage /></OnboardingRoute>} />
+      <Route path="/library" element={<OnboardingRoute><LibraryPage /></OnboardingRoute>} />
+      <Route path="/settings" element={<OnboardingRoute><SettingsPage /></OnboardingRoute>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

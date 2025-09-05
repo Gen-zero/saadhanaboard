@@ -20,6 +20,8 @@ const SaadhanaBoard = () => {
     paperContent, 
     startSadhanaCreation,
     cancelSadhanaCreation,
+    createCustomSadhana,
+    selectStoreSadhana,
     createSadhana,
     updateSadhana,
     completeSadhana,
@@ -202,6 +204,7 @@ const SaadhanaBoard = () => {
                 view3D={view3D}
                 hasStarted={sadhanaState.hasStarted}
                 isCreating={sadhanaState.isCreating}
+                isSelecting={sadhanaState.isSelecting}
                 sadhanaData={sadhanaData}
                 paperContent={paperContent}
                 setView3D={setView3D}
@@ -209,6 +212,8 @@ const SaadhanaBoard = () => {
                 onCancelSadhana={cancelSadhanaCreation}
                 onCreateSadhana={createSadhana}
                 onUpdateSadhana={updateSadhana}
+                onSelectStoreSadhana={selectStoreSadhana}
+                onCreateCustomSadhana={createCustomSadhana}
               />
             </div>
           </div>

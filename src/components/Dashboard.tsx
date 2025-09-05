@@ -1,13 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlarmClock, CheckSquare, BookOpen, Lightbulb, Calendar, PieChart } from 'lucide-react';
+import { AlarmClock, CheckSquare, BookOpen, Lightbulb, Calendar, PieChart, RotateCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
-import { useUserRole } from '@/hooks/useUserRole';
-import GuruBrowser from './GuruBrowser';
+import { useDailySadhanaRefresh } from '@/hooks/useDailySadhanaRefresh';
+
 
 interface Task {
   id: number;
@@ -37,7 +37,8 @@ const inspirationalQuotes = [
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { isShishya } = useUserRole();
+  const { manualRefresh } = useDailySadhanaRefresh();
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [completedCount, setCompletedCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -48,9 +49,8 @@ const Dashboard = () => {
   const [totalDays, setTotalDays] = useState(40);
   const [currentDay, setCurrentDay] = useState(15);
 
-  // Initialize tasks from localStorage
-  useEffect(() => {
-    // Get today's date
+  // Function to load tasks from localStorage
+  const loadTasks = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -63,8 +63,12 @@ const Dashboard = () => {
         taskList = JSON.parse(savedTasks);
         setTasks(taskList);
         
-        // Calculate today's progress
-        const todayTasks = taskList.filter(task => task.category === 'daily');
+        // Calculate today's progress - filter for today's date
+        const todayStr = today.toISOString().split('T')[0];
+        const todayTasks = taskList.filter(task => 
+          task.category === 'daily' && 
+          (!task.dueDate || task.dueDate === todayStr)
+        );
         const completedTodayTasks = todayTasks.filter(task => task.completed);
         
         setCompletedCount(completedTodayTasks.length);
@@ -76,9 +80,11 @@ const Dashboard = () => {
         
         // Get urgent tasks (upcoming or due today)
         const urgent = taskList.filter(task => {
-          // For daily tasks that are not completed
+          // For daily tasks that are not completed and due today
           if (task.category === 'daily' && !task.completed) {
-            return true;
+            if (!task.dueDate || task.dueDate === todayStr) {
+              return true;
+            }
           }
           
           // For goal-oriented tasks with due dates
@@ -119,8 +125,24 @@ const Dashboard = () => {
         console.error("Failed to parse tasks:", e);
       }
     }
+  };
+
+  // Initialize tasks from localStorage
+  useEffect(() => {
+    loadTasks();
     
+    // Listen for sadhana task refresh events
+    const handleTasksRefreshed = () => {
+      loadTasks();
+    };
+    
+    window.addEventListener('sadhana-tasks-refreshed', handleTasksRefreshed);
+    
+    return () => {
+      window.removeEventListener('sadhana-tasks-refreshed', handleTasksRefreshed);
+    };
     // Get or set daily intention
+    const today = new Date();
     const savedIntention = localStorage.getItem('dailyIntention');
     const lastIntentionDate = localStorage.getItem('lastIntentionDate');
     
@@ -167,6 +189,15 @@ const Dashboard = () => {
       setGoalProgress(Math.floor((15 / 40) * 100));
     }
   }, []);
+
+  // Manual refresh function for sadhana tasks
+  const handleRefreshSadhanaTasks = () => {
+    manualRefresh();
+    toast({
+      title: "Tasks Refreshed",
+      description: "Your daily sadhana practices have been refreshed."
+    });
+  };
 
   // Complete task handler
   const completeTask = (taskId: number) => {
@@ -257,10 +288,7 @@ const Dashboard = () => {
         </p>
       </div>
 
-      {/* Guru Browser for Shishya users */}
-      {isShishya && (
-        <GuruBrowser />
-      )}
+
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
@@ -268,9 +296,20 @@ const Dashboard = () => {
             <AlarmClock className="h-5 w-5 text-primary" />
             <span>Tasks Requiring Attention</span>
           </CardTitle>
-          <Button variant="outline" size="sm" onClick={() => navigate('/tasks')}>
-            View All Tasks
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleRefreshSadhanaTasks}
+              className="flex items-center gap-1 text-xs"
+            >
+              <RotateCw className="h-3 w-3" />
+              Refresh Sadhana
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => navigate('/tasks')}>
+              View All Tasks
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           {urgentTasks.length === 0 ? (

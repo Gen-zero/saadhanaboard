@@ -22,10 +22,10 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion }: Sadhan
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'high': return 'bg-red-500/20 text-red-300 border-red-500/30';
+      case 'medium': return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30';
+      case 'low': return 'bg-green-500/20 text-green-300 border-green-500/30';
+      default: return 'bg-purple-500/20 text-purple-300 border-purple-500/30';
     }
   };
 
@@ -46,9 +46,11 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion }: Sadhan
 
   return (
     <Card className={cn(
-      "group hover:shadow-md transition-all duration-200",
+      "group hover:shadow-md transition-all duration-300 cosmic-highlight",
+      "backdrop-blur-sm border border-purple-500/20 bg-transparent",
       sadhana.completed && "opacity-75",
-      isSadhanaTask && "border-purple-200 bg-gradient-to-r from-purple-50/50 to-fuchsia-50/50"
+      isSadhanaTask && "border-purple-300 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 shadow-lg shadow-purple-500/10",
+      !isSadhanaTask && "bg-gradient-to-r from-purple-900/10 to-indigo-900/10 hover:border-purple-500/40 hover:shadow-purple-500/20 hover:from-purple-900/20 hover:to-indigo-900/20"
     )}>
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-3">
@@ -83,19 +85,19 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion }: Sadhan
                   {sadhana.priority}
                 </Badge>
                 
-                <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto flex items-center gap-1">
+                <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto flex items-center gap-1 bg-purple-500/10 text-purple-300 border-purple-500/30">
                   {getCategoryIcon(sadhana.category)}
                   {sadhana.category}
                 </Badge>
                 
                 {sadhana.dueDate && (
-                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto bg-cyan-500/10 text-cyan-300 border-cyan-500/30">
                     {format(new Date(sadhana.dueDate), 'MMM dd')}
                   </Badge>
                 )}
                 
                 {sadhana.time && (
-                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto">
+                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto bg-slate-500/10 text-slate-300 border-slate-500/30">
                     {sadhana.time}
                   </Badge>
                 )}
@@ -106,7 +108,8 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion }: Sadhan
                     variant="secondary" 
                     className={cn(
                       "text-xs px-1.5 py-0.5 h-auto",
-                      tag === 'sadhana' && "bg-purple-100 text-purple-700 border-purple-200"
+                      tag === 'sadhana' && "bg-purple-500/20 text-purple-300 border-purple-500/40",
+                      tag !== 'sadhana' && "bg-accent/20 text-accent-foreground border-accent/30"
                     )}
                   >
                     {tag}

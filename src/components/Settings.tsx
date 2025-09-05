@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   Settings as SettingsIcon,
   User,
@@ -145,10 +146,10 @@ const Settings = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-          <SettingsIcon className="h-7 w-7 text-primary" />
+    <div className="space-y-6 animate-fade-in cosmic-nebula-bg relative">
+      <div className="backdrop-blur-sm bg-background/70 p-6 rounded-lg border border-purple-500/20">
+        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
+          <SettingsIcon className="h-7 w-7 text-purple-500" />
           <span>Settings</span>
         </h1>
         <p className="text-muted-foreground">Customize your Saadhana Board experience.</p>
@@ -156,51 +157,62 @@ const Settings = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         <nav className="lg:col-span-1">
-          <ul className="space-y-1">
-            {settingsTabs.map((tab) => (
-              <li key={tab.id}>
-                <Button
-                  variant={activeTab === tab.id ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
-                  onClick={() => setActiveTab(tab.id)}
-                >
-                  <tab.icon className="mr-2 h-4 w-4" />
-                  {tab.label}
-                </Button>
-              </li>
-            ))}
-          </ul>
+          <div className="backdrop-blur-sm bg-background/70 p-4 rounded-lg border border-purple-500/20">
+            <ul className="space-y-1">
+              {settingsTabs.map((tab) => (
+                <li key={tab.id}>
+                  <Button
+                    variant={activeTab === tab.id ? 'secondary' : 'ghost'}
+                    className={cn(
+                      "w-full justify-start cosmic-highlight transition-all duration-300",
+                      activeTab === tab.id && "bg-purple-500/20 text-purple-300 border-purple-500/30"
+                    )}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
+                    <tab.icon className="mr-2 h-4 w-4" />
+                    {tab.label}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </nav>
 
         <div className="lg:col-span-3">
-          {activeTab === 'profile' && <ProfileSettings />}
-          {activeTab === 'general' && (
-            <GeneralSettings settings={settings} updateSettings={updateSettings} />
-          )}
-          {activeTab === 'notifications' && (
-            <NotificationsSettings settings={settings} updateSettings={updateSettings} />
-          )}
-          {activeTab === 'appearance' && (
-            <AppearanceSettings settings={settings} updateSettings={updateSettings} />
-          )}
-          {activeTab === 'privacy' && (
-            <PrivacySettings settings={settings} updateSettings={updateSettings} />
-          )}
-          {activeTab === 'meditation' && (
-            <MeditationSettings settings={settings} updateSettings={updateSettings} />
-          )}
-          {activeTab === 'accessibility' && (
-            <AccessibilitySettings settings={settings} updateSettings={updateSettings} />
-          )}
-          {activeTab === 'advanced' && <AdvancedSettings />}
+          <div className="backdrop-blur-sm bg-background/70 p-6 rounded-lg border border-purple-500/20">
+            {activeTab === 'profile' && <ProfileSettings />}
+            {activeTab === 'general' && (
+              <GeneralSettings settings={settings} updateSettings={updateSettings} />
+            )}
+            {activeTab === 'notifications' && (
+              <NotificationsSettings settings={settings} updateSettings={updateSettings} />
+            )}
+            {activeTab === 'appearance' && (
+              <AppearanceSettings settings={settings} updateSettings={updateSettings} />
+            )}
+            {activeTab === 'privacy' && (
+              <PrivacySettings settings={settings} updateSettings={updateSettings} />
+            )}
+            {activeTab === 'meditation' && (
+              <MeditationSettings settings={settings} updateSettings={updateSettings} />
+            )}
+            {activeTab === 'accessibility' && (
+              <AccessibilitySettings settings={settings} updateSettings={updateSettings} />
+            )}
+            {activeTab === 'advanced' && <AdvancedSettings />}
+          </div>
         </div>
       </div>
 
-      <div className="flex justify-end gap-4 pt-6 border-t">
-        <Button variant="outline" onClick={handleReset}>
-          Reset to Defaults
-        </Button>
-        <Button onClick={handleSave}>Save Changes</Button>
+      <div className="backdrop-blur-sm bg-background/70 p-4 rounded-lg border border-purple-500/20">
+        <div className="flex justify-end gap-4 pt-6 border-t border-purple-500/20">
+          <Button variant="outline" onClick={handleReset} className="cosmic-button">
+            Reset to Defaults
+          </Button>
+          <Button onClick={handleSave} className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600">
+            Save Changes
+          </Button>
+        </div>
       </div>
     </div>
   );

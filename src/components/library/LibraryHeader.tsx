@@ -20,7 +20,7 @@ const LibraryHeader = ({
         <BookOpen className="h-6 w-6 text-purple-500" />
         <span>Spiritual Library</span>
         <span className="text-sm text-muted-foreground ml-1 italic font-normal">
-          Ancient Wisdom Repository
+          Sacred Texts & Practices
         </span>
       </h1>
       

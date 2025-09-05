@@ -55,8 +55,8 @@ const SignupPage = () => {
         });
         return;
       }
-      // Navigate to role selection after successful signup
-      navigate("/role-selection");
+      // Navigate to onboarding after successful signup
+      navigate("/onboarding");
     } catch (error) {
       toast({
         title: "Registration failed",

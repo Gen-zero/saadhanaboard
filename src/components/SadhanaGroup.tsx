@@ -53,14 +53,14 @@ const SadhanaGroup = ({
     return (
       <Collapsible defaultOpen={defaultOpen}>
         <CollapsibleTrigger className="w-full group">
-          <div className="flex justify-between items-center border-b pb-2">
-            <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2">
+          <div className="flex justify-between items-center border-b border-purple-500/20 pb-2">
+            <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
               {title}
-              <span className="text-sm font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+              <span className="text-sm font-normal text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full">
                 {sadhanas.length}
               </span>
             </h2>
-            <Button variant="ghost" size="sm" className="w-auto p-2">
+            <Button variant="ghost" size="sm" className="w-auto p-2 cosmic-highlight">
               <ChevronDown className="h-4 w-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             </Button>
           </div>
@@ -74,9 +74,9 @@ const SadhanaGroup = ({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2 border-b pb-2">
+      <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2 border-b border-purple-500/20 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
         {title} 
-        <span className="text-sm font-normal text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+        <span className="text-sm font-normal text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full">
           {sadhanas.length}
         </span>
       </h2>
