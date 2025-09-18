@@ -20,41 +20,41 @@ This document tracks incomplete tasks and features that need to be implemented i
 - [x] Fix TypeScript prop typing issues in Sadhana components
 - [x] Implement functional "Download Saadhana" button in 3D viewer
 - [x] Implement functional "Print" functionality in 3D viewer
-- [ ] Implement advanced text search in PDF viewer
-- [ ] Implement full "Search in PDF" functionality
+- [x] Implement advanced text search in PDF viewer
+- [x] Implement full "Search in PDF" functionality
 
 ### Technical Improvements
 
 #### Performance
-- [ ] Optimize 3D rendering for lower-end devices
-- [ ] Implement code splitting for faster initial loads
-- [ ] Add service worker for offline support
+- [x] Optimize 3D rendering for lower-end devices
+- [x] Implement code splitting for faster initial loads
+- [x] Add service worker for offline support
 
 #### Backend
-- [ ] Add more robust error handling for API calls
+- [x] Add more robust error handling for API calls
 
 ### Component Structure
-- [ ] Refactor complex components into smaller, more manageable pieces
-- [ ] Implement consistent prop interfaces across related components
-- [ ] Add comprehensive prop validation for all components
+- [x] Refactor complex components into smaller, more manageable pieces
+- [x] Implement consistent prop interfaces across related components
+- [x] Add comprehensive prop validation for all components
 
 ## Tasks That Require Supabase Integration
 
 ### Core Features
 
 #### Sadhana Tracking
-- [ ] Add reminder notifications for practice sessions
-- [ ] Implement streak tracking and visualization
+- [x] Add reminder notifications for practice sessions
+- [x] Implement streak tracking and visualization
 - [ ] Add community sharing features for sadhanas
 
 #### Spiritual Library
-- [ ] Implement bookmarking system for books
-- [ ] Add highlighting and note-taking capabilities
-- [ ] Create reading progress tracking
-- [ ] Implement full-text search for book content in database
+- [x] Implement bookmarking system for books
+- [x] Add highlighting and note-taking capabilities
+- [x] Create reading progress tracking
+- [x] Implement full-text search for book content in database
 
 #### User Profiles
-- [ ] Add achievement badges system
+- [x] Add achievement badges system
 - [ ] Implement social features (following, groups)
 - [ ] Add detailed progress analytics dashboard
 
