@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -22,6 +21,17 @@ const MeditationSettings: React.FC<MeditationSettingsProps> = ({
   settings,
   updateSettings,
 }) => {
+  // Guard against undefined settings or settings still loading
+  if (!settings || !settings.meditation) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -42,7 +52,7 @@ const MeditationSettings: React.FC<MeditationSettingsProps> = ({
                 </p>
               </div>
               <Switch
-                checked={settings.meditation.backgroundSounds}
+                checked={settings.meditation?.backgroundSounds ?? true}
                 onCheckedChange={(checked) =>
                   updateSettings(['meditation', 'backgroundSounds'], checked)
                 }
@@ -56,7 +66,7 @@ const MeditationSettings: React.FC<MeditationSettingsProps> = ({
             <Label>Default Timer Duration</Label>
             <div className="flex items-center space-x-2">
               <Slider
-                value={[settings.meditation.timerDuration]}
+                value={[settings.meditation?.timerDuration || 15]}
                 min={5}
                 max={60}
                 step={5}
@@ -66,7 +76,7 @@ const MeditationSettings: React.FC<MeditationSettingsProps> = ({
                 className="w-full"
               />
               <span className="w-12 text-right">
-                {settings.meditation.timerDuration} min
+                {settings.meditation?.timerDuration || 15} min
               </span>
             </div>
           </div>
@@ -82,7 +92,7 @@ const MeditationSettings: React.FC<MeditationSettingsProps> = ({
                 </p>
               </div>
               <Switch
-                checked={settings.meditation.intervalBell}
+                checked={settings.meditation?.intervalBell ?? true}
                 onCheckedChange={(checked) =>
                   updateSettings(['meditation', 'intervalBell'], checked)
                 }

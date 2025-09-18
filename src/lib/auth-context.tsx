@@ -1,11 +1,9 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useAuth as useSupabaseAuth } from '@/hooks/useAuth';
-import { User } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
+import { useAuth as useLocalAuth } from '@/hooks/useAuth';
+import api from '@/services/api';
 
 interface AuthContextType {
-  user: User | null;
+  user: any;
   isLoading: boolean;
   isOnboardingComplete: boolean | null;
   checkOnboardingStatus: () => Promise<boolean>;
@@ -25,37 +23,38 @@ export const useAuth = () => {
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user, isLoading, signIn, signUp, signOut } = useSupabaseAuth();
+  const { user, isLoading, signIn, signUp, signOut } = useLocalAuth();
   const [isOnboardingComplete, setIsOnboardingComplete] = useState<boolean | null>(null);
+  const [isOnboardingLoading, setIsOnboardingLoading] = useState<boolean>(false);
 
   const checkOnboardingStatus = async (): Promise<boolean> => {
     if (!user?.id) return false;
 
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('onboarding_completed')
-        .eq('id', user.id)
-        .single();
-
-      if (error) {
-        console.error('Error checking onboarding status:', error);
-        return false;
-      }
-
-      const completed = data?.onboarding_completed || false;
+      setIsOnboardingLoading(true);
+      const data = await api.getProfile();
+      const completed = data.profile?.onboarding_completed || false;
       setIsOnboardingComplete(completed);
       return completed;
     } catch (error) {
-      console.error('Error in checkOnboardingStatus:', error);
-      return false;
+      console.error('Error checking onboarding status:', error);
+      // Set onboarding as complete on error to prevent blocking the app
+      setIsOnboardingComplete(true);
+      return true;
+    } finally {
+      setIsOnboardingLoading(false);
     }
   };
 
   // Check onboarding status when user changes
   useEffect(() => {
     if (user && !isLoading) {
-      checkOnboardingStatus();
+      // Add a small delay to ensure the profile is properly created
+      const timer = setTimeout(() => {
+        checkOnboardingStatus();
+      }, 100);
+      
+      return () => clearTimeout(timer);
     } else if (!user) {
       setIsOnboardingComplete(null);
     }
@@ -71,19 +70,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     await signOut();
-    setIsOnboardingComplete(null);
+  };
+
+  const value = {
+    user,
+    isLoading: isLoading || isOnboardingLoading,
+    isOnboardingComplete,
+    checkOnboardingStatus,
+    login,
+    signup,
+    logout
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isLoading, 
-      isOnboardingComplete, 
-      checkOnboardingStatus, 
-      login, 
-      signup, 
-      logout 
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

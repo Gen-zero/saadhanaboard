@@ -1,13 +1,16 @@
-
 import React from 'react';
 import SadhanaDetails from './SadhanaDetails';
 import SadhanaViewer from './SadhanaViewer';
+import { useState, useEffect } from 'react';
 import PaperScroll2D from './PaperScroll2D';
+import AnimatedParchment from './AnimatedParchment';
 import SadhanaWelcome from './SadhanaWelcome';
 import SadhanaSetupForm from './SadhanaSetupForm';
 import SadhanaSelection from './SadhanaSelection';
 import { SadhanaData } from '@/hooks/useSadhanaData';
 import { StoreSadhana } from '@/types/store';
+import { useSettings } from '@/hooks/useSettings';
+import { Dispatch, SetStateAction } from 'react';
 
 interface SadhanaContentProps {
   isEditing: boolean;
@@ -17,13 +20,14 @@ interface SadhanaContentProps {
   isSelecting: boolean;
   sadhanaData: SadhanaData | null;
   paperContent: string;
-  setView3D: (value: boolean) => void;
+  setView3D: Dispatch<SetStateAction<boolean>>;
   onStartSadhana: () => void;
   onCancelSadhana: () => void;
   onCreateSadhana: (data: SadhanaData) => void;
   onUpdateSadhana: (data: SadhanaData) => void;
   onSelectStoreSadhana: (sadhana: StoreSadhana) => void;
   onCreateCustomSadhana: () => void;
+  status?: 'active' | 'completed' | 'broken'; // Add status prop
 }
 
 const SadhanaContent = ({
@@ -40,71 +44,61 @@ const SadhanaContent = ({
   onCreateSadhana,
   onUpdateSadhana,
   onSelectStoreSadhana,
-  onCreateCustomSadhana
+  onCreateCustomSadhana,
+  status = 'active' // Default to active
 }: SadhanaContentProps) => {
-  // If no sadhana has been started and not creating/selecting, show welcome screen
-  if (!hasStarted && !isCreating && !isSelecting) {
-    return (
-      <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
-        <SadhanaWelcome onStartSadhana={onStartSadhana} />
-      </div>
-    );
-  }
+  const { settings } = useSettings();
+  
+  // Check if Shiva theme is active
+  const isShivaTheme = settings?.appearance?.colorScheme === 'shiva';
 
-  // If user is selecting a sadhana, show the selection screen
+  // Render different components based on state
   if (isSelecting) {
     return (
-      <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
-        <SadhanaSelection 
-          onSelectStoreSadhana={onSelectStoreSadhana}
-          onCreateCustomSadhana={onCreateCustomSadhana}
-          onCancel={onCancelSadhana}
-        />
-      </div>
+      <SadhanaSelection 
+        onSelectStoreSadhana={onSelectStoreSadhana}
+        onCreateCustomSadhana={onCreateCustomSadhana}
+        onCancel={onCancelSadhana}
+      />
     );
   }
 
-  // If user is creating a sadhana, show the setup form
   if (isCreating) {
     return (
-      <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
-        <SadhanaSetupForm 
-          onCreateSadhana={onCreateSadhana}
-          onCancel={onCancelSadhana}
-        />
-      </div>
+      <SadhanaSetupForm 
+        onCreateSadhana={onCreateSadhana}
+        onCancel={onCancelSadhana}
+      />
     );
   }
 
-  // If sadhana exists and user is editing, show details form
-  if (hasStarted && sadhanaData && isEditing) {
+  if (!hasStarted) {
     return (
-      <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
-        <SadhanaDetails 
-          sadhanaData={sadhanaData} 
-          onUpdateSadhana={onUpdateSadhana}
-        />
-      </div>
+      <SadhanaWelcome onStartSadhana={onStartSadhana} />
     );
   }
 
-  // If sadhana exists and user wants 3D view, show viewer
-  if (hasStarted && view3D) {
-    return (
-      <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
-        <SadhanaViewer paperContent={paperContent} />
-      </div>
-    );
-  }
-
-  // Default: show the 2D paper scroll
   return (
     <div className="transition-all duration-500 ease-in-out transform hover:scale-[1.01]">
-      <div className="cosmic-nebula-bg rounded-lg p-6">
-        <PaperScroll2D 
-          content={paperContent} 
-          onClick={() => {}} 
-        />
+      <div className={`rounded-lg p-6 ${isShivaTheme ? 'bg-background/50' : 'cosmic-nebula-bg'}`}>
+        {isEditing ? (
+          <SadhanaDetails 
+            sadhanaData={sadhanaData}
+            onUpdateSadhana={onUpdateSadhana}
+            setView3D={setView3D}
+            view3D={view3D}
+          />
+        ) : view3D ? (
+          <SadhanaViewer 
+            sadhanaData={sadhanaData}
+            setView3D={setView3D}
+          />
+        ) : (
+          <AnimatedParchment 
+            content={paperContent} 
+            isCompleted={status === 'completed'}
+          />
+        )}
       </div>
     </div>
   );

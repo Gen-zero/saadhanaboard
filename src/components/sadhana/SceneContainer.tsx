@@ -1,4 +1,3 @@
-
 import { useRef } from 'react';
 import { PerspectiveCamera, Environment } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
@@ -6,12 +5,14 @@ import * as THREE from 'three';
 import YantraGroup, { YantraProps } from './YantraGroup';
 import PaperScroll from './PaperScroll';
 import EnvironmentEffects from './EnvironmentEffects';
+import { useSettings } from '@/hooks/useSettings';
 
 interface SceneContainerProps {
   paperContent: string;
 }
 
 const SceneContainer = ({ paperContent }: SceneContainerProps) => {
+  const { settings } = useSettings();
   const { camera } = useThree();
   
   // Create multiple yantras for a more complex visual experience
@@ -29,6 +30,9 @@ const SceneContainer = ({ paperContent }: SceneContainerProps) => {
     camera.lookAt(0, 0, 0);
   });
 
+  // Check if Shiva theme is active
+  const isShivaTheme = settings?.appearance?.colorScheme === 'shiva';
+
   return (
     <>
       <PerspectiveCamera makeDefault position={[0, 0, 4.8]} fov={45} />
@@ -36,7 +40,7 @@ const SceneContainer = ({ paperContent }: SceneContainerProps) => {
       <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} castShadow />
       <pointLight position={[-10, -10, -10]} intensity={0.5} />
       
-      <EnvironmentEffects />
+      <EnvironmentEffects showCosmicParticles={!isShivaTheme} />
       
       <YantraGroup yantras={yantras} />
       

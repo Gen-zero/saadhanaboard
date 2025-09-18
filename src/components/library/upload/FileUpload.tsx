@@ -1,11 +1,10 @@
-
 import { useState } from "react";
-import { Upload, FileText, X } from "lucide-react";
+import { Upload, FileText, X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
 interface FileUploadProps {
-  onFileProcessed: (content: string, fileName: string) => void;
+  onFileProcessed: (content: string, fileName: string, file?: File) => void;
 }
 
 const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
@@ -13,6 +12,7 @@ const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const processTextFile = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -38,41 +38,46 @@ const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
         
         resolve(data.text);
       } catch (error) {
-        reject(new Error("Failed to parse PDF file"));
+        reject(new Error("Failed to parse PDF file. The file may be corrupted or password-protected."));
       }
     });
   };
 
   const processFile = async (file: File) => {
     setIsProcessing(true);
+    setError(null);
     
     try {
-      let content = "";
+      // Validate file size (max 50MB)
+      if (file.size > 50 * 1024 * 1024) {
+        throw new Error("File size exceeds 50MB limit. Please choose a smaller file.");
+      }
       
+      // For PDF files, we'll pass the file object directly
+      // For text files, we'll extract the content
       if (file.type === "text/plain" || file.name.endsWith('.txt')) {
-        content = await processTextFile(file);
+        const content = await processTextFile(file);
+        onFileProcessed(content, file.name, file);
       } else if (file.type === "application/pdf" || file.name.endsWith('.pdf')) {
-        content = await processPDFFile(file);
+        // For PDF files, we pass the file object directly without extracting content
+        onFileProcessed("", file.name, file);
       } else {
         throw new Error("Unsupported file type. Please upload a PDF or text file.");
       }
 
-      if (!content.trim()) {
-        throw new Error("No text content found in the file.");
-      }
-
-      onFileProcessed(content, file.name);
       setUploadedFile(file);
       
       toast({
         title: "File processed successfully",
-        description: `Extracted text from ${file.name}`,
+        description: `File ${file.name} is ready for upload`,
       });
     } catch (error) {
       console.error('File processing error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      setError(errorMessage);
       toast({
         title: "File processing failed",
-        description: error instanceof Error ? error.message : "Unknown error occurred",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -109,7 +114,8 @@ const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
 
   const removeFile = () => {
     setUploadedFile(null);
-    onFileProcessed("", "");
+    setError(null);
+    onFileProcessed("", "", undefined);
   };
 
   return (
@@ -120,7 +126,7 @@ const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
             isDragging
               ? "border-purple-500 bg-purple-500/10"
               : "border-gray-300 hover:border-purple-400"
-          }`}
+          } ${error ? "border-red-500 bg-red-500/10" : ""}`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -140,10 +146,16 @@ const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
             </label>
           </p>
           <p className="text-xs text-gray-500">
-            Supports PDF and text files
+            Supports PDF and text files (max 50MB)
           </p>
           {isProcessing && (
             <p className="text-sm text-purple-600 mt-2">Processing file...</p>
+          )}
+          {error && (
+            <div className="mt-3 flex items-center justify-center text-red-500 text-sm">
+              <AlertCircle className="h-4 w-4 mr-1" />
+              {error}
+            </div>
           )}
         </div>
       ) : (
@@ -151,12 +163,16 @@ const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5 text-purple-600" />
             <span className="text-sm font-medium">{uploadedFile.name}</span>
+            {isProcessing && (
+              <span className="text-xs text-purple-600">(Processing...)</span>
+            )}
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={removeFile}
             className="text-gray-500 hover:text-red-600"
+            disabled={isProcessing}
           >
             <X className="h-4 w-4" />
           </Button>

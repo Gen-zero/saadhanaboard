@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -10,8 +9,14 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { SlidersHorizontal } from 'lucide-react';
+import { SettingsType } from './SettingsTypes';
 
-const AdvancedSettings = () => {
+interface AdvancedSettingsProps {
+  settings: SettingsType;
+  updateSettings: (path: (string | number)[], value: any) => void;
+}
+
+const AdvancedSettings = ({ settings, updateSettings }: AdvancedSettingsProps) => {
   return (
     <Card>
       <CardHeader>

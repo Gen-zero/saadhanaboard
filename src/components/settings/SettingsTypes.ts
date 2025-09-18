@@ -1,8 +1,11 @@
-
 export type SettingsType = {
   theme: string;
   language: string;
   startPage: string;
+  general: {
+    displayName: string;
+    email: string;
+  };
   notifications: {
     enabled: boolean;
     ritualReminders: boolean;
@@ -35,4 +38,16 @@ export type SettingsType = {
     largeText: boolean;
     reducedMotion: boolean;
   };
+  profile: {
+    showName: boolean;
+    showVarna: boolean;
+    showDeity: boolean;
+    showGotra: boolean;
+    showDikshitStatus: boolean;
+    showDOB: boolean;
+    showGrowthLevel: boolean;
+    showPet: boolean;
+    showLocation: boolean;
+  };
+  // Removed divine themes
 };

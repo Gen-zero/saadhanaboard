@@ -1,20 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  Home, 
-  CheckSquare, 
-  User, 
-  Settings, 
-  Menu, 
-  X, 
+import {
+  Home,
+  CheckSquare,
+  User,
+  Settings,
+  Menu,
+  X,
   ChevronRight,
   BookHeart,
   LogOut,
-  LogIn
+  LogIn,
+  Zap,
+  Sword,
+  Waves,
+  Flame,
+  Moon,
+  Sun,
+  Mountain,
+  Leaf,
+  Sparkles,
+  LayoutDashboard,
+  ShoppingCart,
+  Plus
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
-import { Button } from './ui/button';
+import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useSettings } from '@/hooks/useSettings';
+import { useDivineSounds } from '@/hooks/useDivineSounds';
+import { useUserProgression } from '@/hooks/useUserProgression';
+import EnhancedDeityIcon from './EnhancedDeityIcon';
+import { useTranslation } from 'react-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,16 +39,98 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [mantraIndex, setMantraIndex] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { progression } = useUserProgression();
   const { toast } = useToast();
+  const { settings, isLoading } = useSettings();
+  const { playButtonClick, playNotification } = useDivineSounds();
+  const { t } = useTranslation();
 
+  // Hindu mantras for ambient display
+  const hinduMantras = [
+    "ॐ गं गणपतये नमः",
+    "ॐ नमः शिवाय",
+    "ॐ नमो भगवते वासुदेवाय",
+    "ॐ श्रीं महालक्ष्म्यै नमः",
+    "ॐ ह्रीं क्लीं चामुण्डायै विच्चे",
+    "ॐ तारे तुत्तारे तुरे स्वाहा",
+    "ॐ सर्वे भवन्तु सुखिनः",
+    "ॐ भूर्भुवः स्वः",
+    "ॐ तत्सत्वितुर्वरेण्यं",
+    "ॐ शांतिः शांतिः शांतिः",
+    "ॐ नमो नारायणाय",
+    "ॐ नमः शिवाय शंभवे च विष्णवे देवाय च ध्रुवाय च"
+  ];
+
+  // Cycle through mantras
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMantraIndex((prev) => (prev + 1) % hinduMantras.length);
+    }, 10000); // Change mantra every 10 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Play ambient sound on mount
+  useEffect(() => {
+    // Play ambient sound when component mounts
+    // Note: This might be blocked by browser autoplay policies
+  }, []);
+
+  // Don't render anything if settings are still loading
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Map themes to deity icons and names
+  const themeData = {
+    default: { 
+      icon: <Zap className="h-16 w-16 text-purple-400" />,
+      name: "Cosmic Energy",
+      element: "Ether"
+    },
+    earth: { 
+      icon: <EnhancedDeityIcon src="/icons/Bhagwan_Krishna.png" alt="Krishna" className="bg-transparent" size="xl" />,
+      name: "Lord Krishna",
+      element: "Earth"
+    },
+    water: { 
+      icon: <EnhancedDeityIcon src="/icons/Bhagwan_Vishnu.png" alt="Vishnu" className="bg-transparent" size="xl" />,
+      name: "Lord Vishnu",
+      element: "Water"
+    },
+    fire: { 
+      icon: <EnhancedDeityIcon src="/icons/Maa_Durga_icon.png" alt="Durga" className="bg-transparent" size="xl" />,
+      name: "Maa Durga",
+      element: "Fire"
+    },
+    shiva: { 
+      icon: <EnhancedDeityIcon src="/icons/Bhagwan_Shiva_icon.png" alt="Shiva" className="bg-transparent" size="xl" />,
+      name: "Lord Shiva",
+      element: "Air"
+    },
+    bhairava: { 
+      icon: <EnhancedDeityIcon src="/icons/Bhairava.png" alt="Bhairava" className="bg-transparent" size="xl" />,
+      name: "Lord Bhairava",
+      element: "Fire"
+    },
+  };
+
+  // Updated navigation items - removed Dashboard and using translations
   const navItems = [
-    { name: 'Saadhana Board', icon: BookHeart, path: '/sadhana' },
-    { name: 'Spiritual Library', icon: BookHeart, path: '/library' },
-    { name: 'Saadhanas', icon: CheckSquare, path: '/saadhanas' },
-    { name: 'Settings', icon: Settings, path: '/settings' }
+    { name: t('saadhana_board'), icon: BookHeart, path: '/sadhana' },
+    { name: t('library'), icon: BookHeart, path: '/library' },
+    { name: t('sadhanas'), icon: CheckSquare, path: '/saadhanas' },
+    { name: t('your_yantras'), icon: Sparkles, path: '/your-atma-yantra' },
+    { name: t('store'), icon: ShoppingCart, path: '/store' },
+    { name: t('settings'), icon: Settings, path: '/settings' }
   ];
 
   const isActive = (path: string) => {
@@ -41,6 +140,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleLogout = () => {
+    playButtonClick();
     logout();
     toast({
       title: "Logged out",
@@ -50,64 +150,181 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleLoginNavigation = () => {
+    playButtonClick();
     navigate('/login');
   };
 
+  const handleBuySP = () => {
+    playButtonClick();
+    navigate('/store');
+  };
+
+  // Get the current theme
+  const currentTheme = settings?.appearance?.colorScheme || 'default';
+  const currentThemeData = themeData[currentTheme as keyof typeof themeData] || themeData.default;
+
   return (
-    <div className="min-h-screen flex bg-pattern">
-      <div 
-        className={`fixed inset-y-0 left-0 z-50 w-64 h-screen bg-sidebar border-r border-sidebar-border transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } md:translate-x-0`}
-      >
-        <div className="h-full flex flex-col">
-          <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-            <div className="flex items-center gap-2">
-              <img 
-                src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
-                alt="Saadhana Board Logo" 
-                className="h-12 w-12" 
-              />
-              <h1 className="text-xl font-semibold text-sidebar-foreground">Saadhana Board</h1>
-            </div>
-            <button 
-              className="p-1 rounded-md text-sidebar-foreground hover:bg-sidebar-accent md:hidden"
-              onClick={() => setIsSidebarOpen(false)}
-            >
-              <X size={20} />
-            </button>
+    <div className="min-h-screen flex bg-transparent relative overflow-hidden">
+      {/* Ambient floating lotus petals */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        {[...Array(20)].map((_, i) => (
+          <div 
+            key={i}
+            className="absolute animate-float-petal"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 2}s`,
+              animationDuration: `${20 + Math.random() * 20}s`,
+              opacity: 0.3 + Math.random() * 0.4
+            }}
+          >
+            <Leaf className="h-8 w-8 text-pink-300/50" />
           </div>
+        ))}
+      </div>
+
+      {/* Mandala background pattern */}
+      <div className="fixed inset-0 pointer-events-none z-[-1] opacity-5">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full border border-purple-500/30 animate-spin" style={{ animationDuration: '60s' }}></div>
+        <div className="absolute top-1/3 right-1/3 w-48 h-48 rounded-full border border-pink-500/30 animate-spin" style={{ animationDuration: '40s', animationDirection: 'reverse' }}></div>
+        <div className="absolute bottom-1/4 left-1/3 w-32 h-32 rounded-full border border-blue-500/30 animate-spin" style={{ animationDuration: '30s' }}></div>
+        
+        {/* Additional mandala elements */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 border border-purple-500/20 rounded-full"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 border border-pink-500/20 rounded-full"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 border border-blue-500/20 rounded-full"></div>
+      </div>
+
+      {/* Floating yantra patterns in the background */}
+      <div className="fixed inset-0 pointer-events-none z-[-1] opacity-3">
+        {[...Array(8)].map((_, i) => (
+          <div 
+            key={i}
+            className="absolute animate-float-diagonal"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 5}s`,
+              animationDuration: `${30 + Math.random() * 30}s`,
+              opacity: 0.1 + Math.random() * 0.2,
+              fontSize: `${2 + Math.random() * 2}rem`
+            }}
+          >
+            ▲▼▲
+          </div>
+        ))}
+      </div>
+
+      {/* Fixed sidebar - always visible and fixed in place */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 h-screen sidebar-seamless border-r border-purple-500/10`}
+        style={{ width: '256px' }}
+      >
+        <div className="h-full flex flex-col relative">
+          {/* Ambient mantra display */}
+          <div className="absolute inset-x-0 top-0 h-8 overflow-hidden z-10">
+            <div className="text-center text-xs text-purple-300/60 font-sans animate-pulse-slow whitespace-nowrap">
+              {hinduMantras[mantraIndex]}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between p-4 border-b border-purple-500/10 pt-10">
+            <div className="flex items-center gap-2">
+              <img
+                src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png"
+                alt="Saadhana Board Logo"
+                className="h-16 w-16 cursor-pointer transition-transform duration-300 hover:scale-110"
+                onClick={() => {
+                  playButtonClick();
+                  navigate('/');
+                }}
+              />
+              <h1 
+                className="text-2xl font-semibold text-sidebar-foreground cursor-pointer transition-all duration-300 hover:text-purple-300"
+                onClick={() => {
+                  playButtonClick();
+                  navigate('/');
+                }}
+              >
+                Saadhana Board
+              </h1>
+            </div>
+          </div>
+          
+          {/* Theme deity display */}
+          <div className="flex flex-col items-center justify-center p-4 space-y-2">
+            <div className="flex items-center justify-center transition-transform duration-500 hover:scale-105 cursor-pointer"
+              onClick={() => {
+                playButtonClick();
+                navigate('/settings');
+              }}
+            >
+              {currentThemeData.icon}
+            </div>
+            <>
+              <div className="text-center">
+                <h3 className="text-lg font-medium text-sidebar-foreground">{currentThemeData.name}</h3>
+                <p className="text-xs text-sidebar-foreground/70">{currentThemeData.element} Element</p>
+              </div>
+              <div className="w-full h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
+            </>
+          </div>
+          
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors duration-200 group ${
+                className={`flex items-center rounded-lg transition-all duration-300 ${
                   isActive(item.path)
-                    ? 'bg-sidebar-primary text-sidebar-primary-foreground'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                }`}
+                    ? 'bg-purple-500/20 text-foreground border border-purple-500/20 scale-[1.02] shadow-md'
+                    : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground border border-transparent hover:border-purple-500/20 hover:scale-[1.01]'
+                } p-3 group`}
+                onClick={() => playButtonClick()}
               >
-                <item.icon size={20} />
-                <span>{item.name}</span>
+                <item.icon 
+                  size={24} 
+                  className={`transition-transform duration-300 ${
+                    isActive(item.path) ? 'text-purple-400' : 'group-hover:text-purple-400'
+                  }`} 
+                />
+                <span className="ml-3">{item.name}</span>
                 {isActive(item.path) && (
-                  <ChevronRight size={16} className="ml-auto" />
+                  <ChevronRight size={16} className="ml-auto text-purple-400" />
                 )}
               </Link>
             ))}
           </nav>
-          <div className="p-4 border-t border-sidebar-border">
+          <div className="p-4 border-t border-purple-500/10">
             <div className="flex flex-col space-y-2">
               {user ? (
                 <div className="flex flex-col space-y-2">
-                   <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90">
-                     <User size={16} className="text-primary" />
-                     <span className="truncate">{user.user_metadata?.display_name || user.email}</span>
-                   </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full justify-start text-sidebar-foreground cosmic-highlight relative overflow-hidden group"
+                  <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90">
+                    <User size={16} className="text-primary" />
+                    <span className="truncate">{user.display_name || user.email}</span>
+                  </div>
+                  <Link
+                    to="/profile"
+                    className={`flex items-center rounded-lg transition-all duration-300 ${
+                      isActive('/profile')
+                        ? 'bg-purple-500/20 text-foreground border border-purple-500/20 scale-[1.02] shadow-md'
+                        : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground border border-transparent hover:border-purple-500/20 hover:scale-[1.01]'
+                    } p-3 justify-start group`}
+                    onClick={() => playButtonClick()}
+                  >
+                    <User 
+                      size={16} 
+                      className={`transition-transform duration-300 ${
+                        isActive('/profile') ? 'text-purple-400' : 'group-hover:text-purple-400'
+                      }`} 
+                    />
+                    <span className="ml-3">Profile</span>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={`w-full cosmic-highlight relative overflow-hidden group border-purple-500/20 hover:bg-purple-500/10 justify-start interactive transition-all duration-300`}
                     onClick={handleLogout}
                   >
                     <div className="absolute inset-0 bg-gradient-to-r from-destructive/0 via-destructive/20 to-destructive/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform translate-x-[-100%] group-hover:translate-x-[100%]"></div>
@@ -118,49 +335,79 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </Button>
                 </div>
               ) : (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full justify-start cosmic-highlight relative overflow-hidden group"
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`w-full cosmic-highlight relative overflow-hidden group border-purple-500/20 hover:bg-purple-500/10 justify-start interactive transition-all duration-300`}
                   onClick={handleLoginNavigation}
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform translate-x-[-100%] group-hover:translate-x-[100%]"></div>
                   <LogIn size={16} className="mr-2 text-primary group-hover:scale-110 transition-transform duration-300" />
-                  <span className="text-sidebar-foreground group-hover:text-primary group-hover:font-medium transition-all duration-300">
+                  <span className="text-primary/90 group-hover:text-primary group-hover:font-medium transition-all duration-300">
                     Sign In
                   </span>
                 </Button>
               )}
+              
+              {/* Buy SP Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full cosmic-highlight relative overflow-hidden group border-yellow-500/20 hover:bg-yellow-500/10 justify-start interactive transition-all duration-300"
+                onClick={handleBuySP}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/0 via-yellow-500/20 to-yellow-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform translate-x-[-100%] group-hover:translate-x-[100%]"></div>
+                <Sparkles size={16} className="mr-2 text-yellow-500 group-hover:scale-110 transition-transform duration-300" />
+                <span className="text-yellow-500/90 group-hover:text-yellow-500 group-hover:font-medium transition-all duration-300">
+                  Buy SP
+                </span>
+                <span className="ml-auto text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full">
+                  {progression?.spiritualPoints || 0}
+                </span>
+              </Button>
             </div>
-            <div className="mt-4 text-xs text-sidebar-foreground/70 text-center">
-              <p>Manifest your spiritual journey into reality</p>
+            
+            {/* Theme selector */}
+            <div className="mt-4 pt-4 border-t border-purple-500/10">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-sidebar-foreground/70">Theme</span>
+                <span className="text-xs text-sidebar-foreground/50 capitalize">
+                  {settings?.appearance?.colorScheme || 'default'}
+                </span>
+              </div>
+              <div className="flex gap-1">
+                {['default', 'earth', 'water', 'fire', 'shiva'].map((theme) => (
+                  <button
+                    key={theme}
+                    className={`flex-1 h-8 rounded-md text-xs transition-all duration-200 ${
+                      settings?.appearance?.colorScheme === theme
+                        ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                        : 'bg-sidebar-accent text-sidebar-foreground/70 hover:bg-purple-500/10'
+                    }`}
+                    onClick={() => {
+                      playButtonClick();
+                      // Update theme setting
+                      if (settings) {
+                        // This would need to be implemented in the settings update function
+                      }
+                    }}
+                  >
+                    {theme.charAt(0).toUpperCase() + theme.slice(1)}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col min-w-0 md:ml-64">
-        <header className="bg-background border-b border-border p-4 flex items-center md:hidden sticky top-0 z-40">
-          <button
-            className="p-1 rounded-md text-muted-foreground hover:bg-secondary"
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <Menu size={24} />
-          </button>
-          <div className="ml-4 flex items-center gap-2">
-            <img 
-              src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
-              alt="Saadhana Board Logo" 
-              className="h-8 w-8" 
-            />
-            <h1 className="text-lg font-semibold">Saadhana Board</h1>
-          </div>
-        </header>
-
-        <main className="flex-1 p-4 md:p-8 overflow-auto">
-          {children}
-        </main>
-      </div>
+      {/* Main content - adjusted to account for fixed sidebar */}
+      <main 
+        className="flex-1 transition-all duration-300"
+        style={{ marginLeft: '256px' }}
+      >
+        {children}
+      </main>
     </div>
   );
 };

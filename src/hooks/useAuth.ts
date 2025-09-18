@@ -1,56 +1,73 @@
 import { useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import api from '@/services/api';
+
+// Define a local User type since we're removing Supabase
+interface User {
+  id: string;
+  email: string;
+  display_name: string;
+  created_at?: string;
+  updated_at?: string;
+  // Removed welcome_quiz_completed field
+}
+
+interface AuthResponse {
+  user: User;
+  token?: string;
+}
+
+interface AuthError {
+  message: string;
+}
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setIsLoading(false);
+  const initializeAuth = async () => {
+    try {
+      if (api.token) {
+        const data = await api.getCurrentUser();
+        setUser(data.user);
       }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    } catch (error) {
+      console.error('Error initializing auth:', error);
+      // Clear token if it's invalid
+      api.clearToken();
+    } finally {
       setIsLoading(false);
-    });
+    }
+  };
 
-    return () => subscription.unsubscribe();
+  useEffect(() => {
+    // Check for existing session
+    initializeAuth();
   }, []);
+
+  const refreshUser = async () => {
+    try {
+      if (api.token) {
+        const data = await api.getCurrentUser();
+        setUser(data.user);
+      }
+    } catch (error) {
+      console.error('Error refreshing user:', error);
+    }
+  };
 
   const signUp = async (email: string, password: string, displayName: string) => {
     try {
       setIsLoading(true);
-      const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            display_name: displayName
-          }
-        }
-      });
-
-      if (error) throw error;
+      const data: AuthResponse = await api.register(email, password, displayName);
 
       toast({
         title: "Success!",
-        description: "Check your email to confirm your account."
+        description: "Account created successfully."
       });
 
+      setUser(data.user);
       return { error: null };
     } catch (error: any) {
       console.error('Signup error:', error);
@@ -64,18 +81,14 @@ export const useAuth = () => {
     try {
       setIsLoading(true);
       
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) throw error;
+      const data: AuthResponse = await api.login(email, password);
 
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in."
       });
 
+      setUser(data.user);
       return { error: null };
     } catch (error: any) {
       console.error('Signin error:', error);
@@ -88,8 +101,9 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await api.logout();
+      
+      setUser(null);
       
       toast({
         title: "Signed out",
@@ -109,10 +123,10 @@ export const useAuth = () => {
 
   return {
     user,
-    session,
     isLoading,
     signUp,
     signIn,
-    signOut
+    signOut,
+    refreshUser // Add refreshUser function
   };
 };

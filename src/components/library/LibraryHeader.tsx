@@ -1,7 +1,7 @@
-
 import React from "react";
-import { BookOpen, AlignCenter, Loader2 } from "lucide-react";
+import { BookOpen, AlignCenter, Loader2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 interface LibraryHeaderProps {
   view: "grid" | "list";
@@ -14,6 +14,8 @@ const LibraryHeader = ({
   isLoading,
   toggleView
 }: LibraryHeaderProps) => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex justify-between items-center flex-wrap gap-3">
       <h1 className="text-2xl md:text-3xl font-bold tracking-tight flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">

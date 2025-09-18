@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -21,6 +20,17 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({
   settings,
   updateSettings,
 }) => {
+  // Guard against undefined settings or settings still loading
+  if (!settings || !settings.accessibility) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -41,7 +51,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({
                 </p>
               </div>
               <Switch
-                checked={settings.accessibility.screenReader}
+                checked={settings.accessibility?.screenReader ?? false}
                 onCheckedChange={(checked) =>
                   updateSettings(['accessibility', 'screenReader'], checked)
                 }
@@ -60,7 +70,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({
                 </p>
               </div>
               <Switch
-                checked={settings.accessibility.largeText}
+                checked={settings.accessibility?.largeText ?? false}
                 onCheckedChange={(checked) =>
                   updateSettings(['accessibility', 'largeText'], checked)
                 }
@@ -79,7 +89,7 @@ const AccessibilitySettings: React.FC<AccessibilitySettingsProps> = ({
                 </p>
               </div>
               <Switch
-                checked={settings.accessibility.reducedMotion}
+                checked={settings.accessibility?.reducedMotion ?? false}
                 onCheckedChange={(checked) =>
                   updateSettings(['accessibility', 'reducedMotion'], checked)
                 }

@@ -1,14 +1,19 @@
-
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useState } from 'react';
+import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Heart, ArrowLeft, Sparkles, Calendar } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Calendar, 
+  Heart, 
+  Sparkles 
+} from 'lucide-react';
+import { useSettings } from '@/hooks/useSettings';
 import { SadhanaData } from '@/hooks/useSadhanaData';
-import { addDays, format } from 'date-fns';
 
 interface SadhanaSetupFormProps {
   onCreateSadhana: (data: SadhanaData) => void;
@@ -16,107 +21,114 @@ interface SadhanaSetupFormProps {
 }
 
 const SadhanaSetupForm = ({ onCreateSadhana, onCancel }: SadhanaSetupFormProps) => {
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const { settings } = useSettings();
+  const today = new Date().toISOString().split('T')[0];
   
-  const [formData, setFormData] = useState<SadhanaData>({
+  const [formData, setFormData] = useState({
     purpose: '',
     goal: '',
+    startDate: today,
+    durationDays: 40,
+    endDate: new Date(Date.now() + 40 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     deity: '',
     message: '',
-    offerings: [''],
-    startDate: today,
-    endDate: format(addDays(new Date(), 21), 'yyyy-MM-dd'),
-    durationDays: 21
+    offerings: ['']
   });
-
+  
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const handleDurationChange = (days: number) => {
-    const startDate = new Date(formData.startDate);
-    const endDate = addDays(startDate, days - 1);
-    
-    setFormData(prev => ({
-      ...prev,
-      durationDays: days,
-      endDate: format(endDate, 'yyyy-MM-dd')
-    }));
-  };
+  // Check if Shiva theme is active
+  const isShivaTheme = settings?.appearance?.colorScheme === 'shiva';
 
-  const handleStartDateChange = (startDate: string) => {
-    const start = new Date(startDate);
-    const endDate = addDays(start, formData.durationDays - 1);
-    
-    setFormData(prev => ({
-      ...prev,
-      startDate,
-      endDate: format(endDate, 'yyyy-MM-dd')
-    }));
-  };
-
-  const handleAddOffering = () => {
-    setFormData(prev => ({
-      ...prev,
-      offerings: [...prev.offerings, '']
-    }));
-  };
-
-  const handleRemoveOffering = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      offerings: prev.offerings.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleOfferingChange = (index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      offerings: prev.offerings.map((offering, i) => i === index ? value : offering)
-    }));
-  };
-
-  const validateForm = (): boolean => {
+  const validateForm = () => {
     const newErrors: Record<string, string> = {};
-
+    
     if (!formData.purpose.trim()) {
       newErrors.purpose = 'Purpose is required';
     }
+    
     if (!formData.goal.trim()) {
       newErrors.goal = 'Goal is required';
     }
-    if (!formData.deity.trim()) {
-      newErrors.deity = 'Divine focus is required';
-    }
-    if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
-    }
+    
     if (!formData.startDate) {
       newErrors.startDate = 'Start date is required';
     }
-    if (formData.durationDays < 1) {
-      newErrors.duration = 'Duration must be at least 1 day';
+    
+    if (!formData.deity.trim()) {
+      newErrors.deity = 'Deity or spiritual focus is required';
     }
     
-    const validOfferings = formData.offerings.filter(o => o.trim());
-    if (validOfferings.length === 0) {
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    }
+    
+    const hasOfferings = formData.offerings.some(offering => offering.trim() !== '');
+    if (!hasOfferings) {
       newErrors.offerings = 'At least one offering is required';
     }
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleStartDateChange = (date: string) => {
+    const startDate = new Date(date);
+    const endDate = new Date(startDate.getTime() + formData.durationDays * 24 * 60 * 60 * 1000);
+    
+    setFormData(prev => ({
+      ...prev,
+      startDate: date,
+      endDate: endDate.toISOString().split('T')[0]
+    }));
+  };
+
+  const handleDurationChange = (days: number) => {
+    const startDate = new Date(formData.startDate);
+    const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+    
+    setFormData(prev => ({
+      ...prev,
+      durationDays: days,
+      endDate: endDate.toISOString().split('T')[0]
+    }));
+  };
+
+  const handleOfferingChange = (index: number, value: string) => {
+    const newOfferings = [...formData.offerings];
+    newOfferings[index] = value;
+    setFormData(prev => ({ ...prev, offerings: newOfferings }));
+  };
+
+  const handleAddOffering = () => {
+    setFormData(prev => ({ ...prev, offerings: [...prev.offerings, ''] }));
+  };
+
+  const handleRemoveOffering = (index: number) => {
+    if (formData.offerings.length <= 1) return;
+    
+    const newOfferings = [...formData.offerings];
+    newOfferings.splice(index, 1);
+    setFormData(prev => ({ ...prev, offerings: newOfferings }));
+  };
+
   const handleSubmit = () => {
     if (validateForm()) {
-      const validOfferings = formData.offerings.filter(o => o.trim());
       onCreateSadhana({
-        ...formData,
-        offerings: validOfferings
+        purpose: formData.purpose,
+        goal: formData.goal,
+        startDate: formData.startDate,
+        durationDays: formData.durationDays,
+        endDate: formData.endDate,
+        deity: formData.deity,
+        message: formData.message,
+        offerings: formData.offerings.filter(o => o.trim() !== '')
       });
     }
   };
 
   return (
-    <div className="cosmic-nebula-bg rounded-lg p-6">
+    <div className={`rounded-lg p-6 ${isShivaTheme ? 'bg-background/50' : 'cosmic-nebula-bg'}`}>
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-4 mb-6">
           <Button variant="ghost" size="sm" onClick={onCancel}>

@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -5,101 +6,152 @@ import {
   CardTitle,
   CardDescription,
 } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Moon, Sun, Settings2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Settings as SettingsIcon } from 'lucide-react';
 import { SettingsType } from './SettingsTypes';
+import { useTranslation } from 'react-i18next';
 
 interface GeneralSettingsProps {
   settings: SettingsType;
   updateSettings: (path: (string | number)[], value: any) => void;
 }
 
-const GeneralSettings: React.FC<GeneralSettingsProps> = ({ settings, updateSettings }) => {
+const GeneralSettings: React.FC<GeneralSettingsProps> = ({
+  settings,
+  updateSettings,
+}) => {
+  const [displayName, setDisplayName] = useState(settings.general?.displayName || '');
+  const [email, setEmail] = useState(settings.general?.email || '');
+  const { t } = useTranslation();
+
+  // Update local state when settings change
+  useEffect(() => {
+    setDisplayName(settings.general?.displayName || '');
+    setEmail(settings.general?.email || '');
+  }, [settings]);
+
+  // Handle display name change
+  const handleDisplayNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDisplayName(value);
+    updateSettings(['general', 'displayName'], value);
+  };
+
+  // Handle email change
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    updateSettings(['general', 'email'], value);
+  };
+
+  // Guard against undefined settings or settings still loading
+  if (!settings) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Settings2 className="h-5 w-5 text-primary" />
-          <span>General Settings</span>
+          <SettingsIcon className="h-5 w-5 text-primary" />
+          <span>{t('general_settings')}</span>
         </CardTitle>
-        <CardDescription>Customize your app appearance and behavior</CardDescription>
+        <CardDescription>{t('manage_preferences')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label htmlFor="theme-mode">Dark Mode</Label>
-              <p className="text-sm text-muted-foreground">
-                Toggle between light and dark themes
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Sun className="h-4 w-4 text-muted-foreground" />
-              <Switch
-                id="theme-mode"
-                checked={settings.theme === 'dark'}
-                onCheckedChange={(checked) =>
-                  updateSettings(['theme'], checked ? 'dark' : 'light')
-                }
-              />
-              <Moon className="h-4 w-4 text-muted-foreground" />
-            </div>
+          {/* Display Name */}
+          <div className="space-y-2">
+            <Label htmlFor="display-name">{t('display_name')}</Label>
+            <Input
+              id="display-name"
+              value={displayName}
+              onChange={handleDisplayNameChange}
+              placeholder={t('enter_display_name')}
+            />
           </div>
 
           <Separator />
 
-          <div className="space-y-3">
-            <Label htmlFor="language">Language</Label>
-            <Select
-              value={settings.language}
+          {/* Email */}
+          <div className="space-y-2">
+            <Label htmlFor="email">{t('email')}</Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={handleEmailChange}
+              placeholder={t('enter_email')}
+            />
+          </div>
+
+          <Separator />
+
+          {/* Theme */}
+          <div className="space-y-2">
+            <Label htmlFor="theme">{t('theme')}</Label>
+            <Select 
+              value={settings.theme || 'light'} 
+              onValueChange={(value) => updateSettings(['theme'], value)}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={t('select_theme')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">{t('light')}</SelectItem>
+                <SelectItem value="dark">{t('dark')}</SelectItem>
+                <SelectItem value="system">{t('system')}</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Separator />
+
+          {/* Language - Limited to English and Hindi */}
+          <div className="space-y-2">
+            <Label htmlFor="language">{t('language')}</Label>
+            <Select 
+              value={settings.language || 'english'} 
               onValueChange={(value) => updateSettings(['language'], value)}
             >
-              <SelectTrigger id="language" className="w-full">
-                <SelectValue placeholder="Select language" />
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={t('select_language')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="english">English</SelectItem>
-                <SelectItem value="hindi">Hindi</SelectItem>
-                <SelectItem value="sanskrit">Sanskrit</SelectItem>
-                <SelectItem value="spanish">Spanish</SelectItem>
-                <SelectItem value="arabic">Arabic</SelectItem>
+                <SelectItem value="english">{t('english')}</SelectItem>
+                <SelectItem value="hindi">{t('hindi')}</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-sm text-muted-foreground">
-              Select your preferred language for the app interface
-            </p>
           </div>
 
           <Separator />
 
-          <div className="space-y-3">
-            <Label htmlFor="start-page">Default Start Page</Label>
-            <Select
-              value={settings.startPage}
+          {/* Start Page */}
+          <div className="space-y-2">
+            <Label htmlFor="start-page">{t('start_page')}</Label>
+            <Select 
+              value={settings.startPage || 'dashboard'} 
               onValueChange={(value) => updateSettings(['startPage'], value)}
             >
-              <SelectTrigger id="start-page" className="w-full">
-                <SelectValue placeholder="Select start page" />
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder={t('select_start_page')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="dashboard">Dashboard</SelectItem>
-                <SelectItem value="sadhana">Saadhana Board</SelectItem>
-                <SelectItem value="tasks">Tasks</SelectItem>
-                <SelectItem value="library">Spiritual Library</SelectItem>
+                <SelectItem value="dashboard">{t('dashboard')}</SelectItem>
+                <SelectItem value="library">{t('library')}</SelectItem>
+                <SelectItem value="sadhanas">{t('sadhanas')}</SelectItem>
+                <SelectItem value="community">{t('community')}</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-sm text-muted-foreground">
-              Choose which page to show when you open the app
-            </p>
           </div>
         </div>
       </CardContent>

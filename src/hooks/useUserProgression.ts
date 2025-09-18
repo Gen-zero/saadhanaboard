@@ -130,6 +130,21 @@ export const useUserProgression = () => {
     return false;
   };
 
+  const addSpiritualPoints = (amount: number) => {
+    setProgression(prev => {
+      const updated = {
+        ...prev,
+        spiritualPoints: prev.spiritualPoints + amount
+      };
+      
+      if (user) {
+        localStorage.setItem(`user_progression_${user?.id || 'guest'}`, JSON.stringify(updated));
+      }
+      
+      return updated;
+    });
+  };
+
   const completeSadhana = (sadhanaId: string, durationDays: number) => {
     setProgression(prev => {
       const experienceGained = durationDays * 10; // 10 XP per day
@@ -201,6 +216,7 @@ export const useUserProgression = () => {
     progression,
     addExperience,
     spendSpiritualPoints,
+    addSpiritualPoints,
     completeSadhana,
     unlockStoreSadhana,
     getProgressToNextLevel,

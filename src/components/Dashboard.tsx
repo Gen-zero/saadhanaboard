@@ -1,13 +1,12 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AlarmClock, CheckSquare, BookOpen, Lightbulb, Calendar, PieChart, RotateCw } from 'lucide-react';
+import { AlarmClock, CheckSquare, BookOpen, Lightbulb, Calendar, PieChart, RotateCw, TrendingUp, Target, Award } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 import { useDailySadhanaRefresh } from '@/hooks/useDailySadhanaRefresh';
-
+import ProfileCard from './ProfileCard';
 
 interface Task {
   id: number;
@@ -48,6 +47,8 @@ const Dashboard = () => {
   const [goalProgress, setGoalProgress] = useState(0);
   const [totalDays, setTotalDays] = useState(40);
   const [currentDay, setCurrentDay] = useState(15);
+  const [streak, setStreak] = useState(7); // Current streak
+  const [level, setLevel] = useState(3); // User level
 
   // Function to load tasks from localStorage
   const loadTasks = () => {
@@ -138,9 +139,6 @@ const Dashboard = () => {
     
     window.addEventListener('sadhana-tasks-refreshed', handleTasksRefreshed);
     
-    return () => {
-      window.removeEventListener('sadhana-tasks-refreshed', handleTasksRefreshed);
-    };
     // Get or set daily intention
     const today = new Date();
     const savedIntention = localStorage.getItem('dailyIntention');
@@ -188,6 +186,10 @@ const Dashboard = () => {
       
       setGoalProgress(Math.floor((15 / 40) * 100));
     }
+    
+    return () => {
+      window.removeEventListener('sadhana-tasks-refreshed', handleTasksRefreshed);
+    };
   }, []);
 
   // Manual refresh function for sadhana tasks
@@ -280,16 +282,53 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight">Welcome Back</h1>
-        <p className="text-muted-foreground">
-          Continue your spiritual journey with purpose and intention.
-        </p>
+    <div className="space-y-6 animate-fade-in relative z-10">
+      {/* Profile Card */}
+      <ProfileCard />
+      
+      {/* Enhanced Welcome Section with Cosmic Effects */}
+      <div className="relative overflow-hidden rounded-xl backdrop-blur-md bg-gradient-to-br from-purple-500/10 via-fuchsia-500/5 to-purple-500/10 border border-purple-500/20 p-6">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500 rounded-full filter blur-[80px] opacity-20"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-fuchsia-500 rounded-full filter blur-[80px] opacity-20"></div>
+        
+        <div className="relative z-10 flex flex-col gap-2">
+          <h1 className="text-4xl font-bold tracking-tight">
+            Welcome Back, Seeker
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl">
+            Continue your spiritual journey with purpose and intention. Your cosmic path awaits.
+          </p>
+          
+          {/* Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 border border-purple-500/20">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-purple-500" />
+                <span className="text-sm font-medium">Current Streak</span>
+              </div>
+              <div className="text-2xl font-bold mt-1">{streak} days</div>
+            </div>
+            
+            <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 border border-purple-500/20">
+              <div className="flex items-center gap-2">
+                <Award className="h-5 w-5 text-fuchsia-500" />
+                <span className="text-sm font-medium">Spiritual Level</span>
+              </div>
+              <div className="text-2xl font-bold mt-1">Level {level}</div>
+            </div>
+            
+            <div className="bg-background/50 backdrop-blur-sm rounded-lg p-4 border border-purple-500/20">
+              <div className="flex items-center gap-2">
+                <Target className="h-5 w-5 text-indigo-500" />
+                <span className="text-sm font-medium">Goal Progress</span>
+              </div>
+              <div className="text-2xl font-bold mt-1">{Math.floor((currentDay / totalDays) * 100)}%</div>
+            </div>
+          </div>
+        </div>
       </div>
 
-
-
+      {/* Enhanced Task Section */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-xl font-medium flex items-center gap-2">
@@ -366,7 +405,9 @@ const Dashboard = () => {
         </CardContent>
       </Card>
 
+      {/* Enhanced Progress and Focus Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Today's Progress Card */}
         <Card>
           <CardHeader>
             <CardTitle className="text-xl font-medium flex items-center gap-2">
@@ -413,10 +454,20 @@ const Dashboard = () => {
                   Congratulations! All tasks complete
                 </span>
               )}
+              
+              {/* Progress Bar */}
+              <div className="w-full mt-4">
+                <div className="flex justify-between text-xs mb-1">
+                  <span>Progress</span>
+                  <span>{dailyProgress}%</span>
+                </div>
+                <Progress value={dailyProgress} className="h-2" />
+              </div>
             </div>
           </CardContent>
         </Card>
         
+        {/* Spiritual Focus Card */}
         <Card>
           <CardHeader>
             <CardTitle className="text-xl font-medium flex items-center gap-2">

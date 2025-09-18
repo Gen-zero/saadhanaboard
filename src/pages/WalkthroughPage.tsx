@@ -4,103 +4,100 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { 
-  BookHeart, 
-  CheckSquare, 
-  Settings, 
   Sparkles, 
-  ArrowRight, 
-  ArrowLeft, 
+  BookOpen, 
+  Target, 
+  Calendar,
+  Heart,
+  Users,
   Play,
-  X
+  X,
+  ArrowLeft,
+  ArrowRight,
+  CheckSquare
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSettings } from '@/hooks/useSettings';
 
-interface WalkthroughStep {
-  icon: React.ComponentType<any>;
-  title: string;
-  description: string;
-  features: string[];
-  color: string;
-}
-
-const WALKTHROUGH_STEPS: WalkthroughStep[] = [
+// Define walkthrough steps
+const WALKTHROUGH_STEPS = [
   {
-    icon: BookHeart,
-    title: "Spiritual Library",
-    description: "Access a vast collection of spiritual texts and upload your own sacred books",
+    title: "Your Spiritual Dashboard",
+    description: "Track your daily practices, monitor progress, and stay connected with your spiritual goals",
+    icon: BookOpen,
+    color: "from-purple-500 to-fuchsia-500",
     features: [
-      "Browse spiritual texts by tradition",
-      "Upload and organize your own books",
-      "Advanced search and filtering",
-      "Read in interactive viewer"
-    ],
-    color: "from-blue-500 to-purple-500"
+      "Daily practice tracking",
+      "Progress visualization",
+      "Streak maintenance",
+      "Goal monitoring"
+    ]
   },
   {
-    icon: CheckSquare,
-    title: "Saadhana Management",
-    description: "Create, track, and complete your daily spiritual practices",
+    title: "Create Sacred Commitments",
+    description: "Design personalized spiritual practices with divine intentions and sacred commitments",
+    icon: Heart,
+    color: "from-fuchsia-500 to-pink-500",
     features: [
-      "Create custom sadhanas",
-      "Track daily progress",
-      "Set goals and priorities",
-      "Reflect on your journey"
-    ],
-    color: "from-purple-500 to-fuchsia-500"
+      "Custom sadhana creation",
+      "Divine focus selection",
+      "Duration planning",
+      "Sacred paper generation"
+    ]
   },
   {
-    icon: Sparkles,
-    title: "Cosmic Visualization",
-    description: "Experience your sadhanas in beautiful 3D cosmic environments",
+    title: "Community & Growth",
+    description: "Connect with fellow practitioners and track your spiritual evolution",
+    icon: Users,
+    color: "from-indigo-500 to-purple-500",
     features: [
-      "Interactive 3D visualizations",
-      "Sacred geometry patterns",
-      "Cosmic backgrounds",
-      "Immersive meditation experience"
-    ],
-    color: "from-fuchsia-500 to-pink-500"
-  },
-  {
-    icon: Settings,
-    title: "Personalization",
-    description: "Customize your spiritual journey with personal settings",
-    features: [
-      "Appearance customization",
-      "Meditation preferences",
-      "Privacy controls",
-      "Accessibility options"
-    ],
-    color: "from-pink-500 to-red-500"
+      "Spiritual level progression",
+      "Community sharing",
+      "Achievement badges",
+      "Reflection journaling"
+    ]
   }
 ];
 
 const WalkthroughPage = () => {
   const navigate = useNavigate();
+  const { settings } = useSettings();
   const [currentStep, setCurrentStep] = useState(0);
-
+  
   const nextStep = () => {
-    setCurrentStep(prev => Math.min(prev + 1, WALKTHROUGH_STEPS.length - 1));
+    if (currentStep < WALKTHROUGH_STEPS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 0));
-  };
-
-  const handleComplete = () => {
-    navigate('/sadhana');
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
   const handleSkip = () => {
-    navigate('/sadhana');
+    // Mark walkthrough as complete in localStorage
+    localStorage.setItem('walkthroughComplete', 'true');
+    navigate('/dashboard');
   };
+
+  const handleComplete = () => {
+    // Mark walkthrough as complete in localStorage
+    localStorage.setItem('walkthroughComplete', 'true');
+    navigate('/dashboard');
+  };
+
+  // Check if Shiva theme is active
+  const isShivaTheme = settings?.appearance?.colorScheme === 'shiva';
 
   const currentStepData = WALKTHROUGH_STEPS[currentStep];
   const IconComponent = currentStepData.icon;
 
   return (
     <div className="min-h-screen cosmic-nebula-bg flex items-center justify-center p-4">
-      {/* Cosmic particles animation */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      {/* Cosmic particles animation - hidden for Shiva theme */}
+      <div className={`fixed inset-0 overflow-hidden pointer-events-none ${isShivaTheme ? 'hidden' : ''}`}>
         {Array.from({ length: 50 }, (_, i) => (
           <div
             key={i}

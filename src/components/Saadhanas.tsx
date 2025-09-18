@@ -14,6 +14,7 @@ import SadhanaGroup from './SadhanaGroup';
 import AddSadhana from './AddSadhana';
 import ReflectionDialog from './ReflectionDialog';
 import CosmicBackgroundSimple from './sadhana/CosmicBackgroundSimple';
+import { useSettings } from '@/hooks/useSettings';
 
 const CosmicParticle = ({ delay }: { delay: number }) => {
   return (
@@ -47,6 +48,7 @@ const Saadhanas = () => {
     handleSaveReflection
   } = useSaadhanas();
 
+  const { settings } = useSettings();
   const [cosmicParticles, setCosmicParticles] = useState<number[]>([]);
   
   useEffect(() => {
@@ -56,6 +58,9 @@ const Saadhanas = () => {
   }, []);
 
   const totalSaadhanas = Object.values(groupedSaadhanas).reduce((sum, arr) => sum + arr.length, 0);
+
+  // Check if Shiva theme is active
+  const isShivaTheme = settings?.appearance?.colorScheme === 'shiva';
 
   // Wrapper function to handle the return type expected by AddSadhana
   const handleAddSadhanaWrapper = (newSadhana: Omit<Sadhana, 'id' | 'reflection'>): boolean => {
@@ -81,11 +86,11 @@ const Saadhanas = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in cosmic-nebula-bg relative">
+    <div className="space-y-6 animate-fade-in cosmic-nebula-bg relative bg-transparent">
       <CosmicBackgroundSimple />
       
-      {/* Cosmic particles */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {/* Cosmic particles - hidden for Shiva theme */}
+      <div className={`fixed inset-0 pointer-events-none overflow-hidden ${isShivaTheme ? 'hidden' : ''}`}>
         {cosmicParticles.map((_, index) => (
           <CosmicParticle key={index} delay={index * 0.1} />
         ))}

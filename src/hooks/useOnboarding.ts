@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/lib/auth-context';
 import { toast } from '@/hooks/use-toast';
+import api from '@/services/api';
 
 export interface OnboardingData {
   name: string;
@@ -9,6 +9,11 @@ export interface OnboardingData {
   timeOfBirth: string;
   placeOfBirth: string;
   favoriteDeity: string;
+  gotra?: string;
+  varna?: string;
+  sampradaya?: string;
+  location?: string;
+  // Removed welcomeQuizCompleted field
 }
 
 export const useOnboarding = () => {
@@ -17,11 +22,16 @@ export const useOnboarding = () => {
   const { user } = useAuth();
   
   const [onboardingData, setOnboardingData] = useState<OnboardingData>({
-    name: user?.user_metadata?.display_name || '',
+    name: user?.display_name || '',
     dateOfBirth: '',
     timeOfBirth: '',
     placeOfBirth: '',
-    favoriteDeity: ''
+    favoriteDeity: '',
+    gotra: '',
+    varna: '',
+    sampradaya: '',
+    location: ''
+    // Removed welcomeQuizCompleted field
   });
 
   const updateData = (field: keyof OnboardingData, value: string) => {
@@ -52,30 +62,31 @@ export const useOnboarding = () => {
     try {
       setIsLoading(true);
 
-      // Update the user's profile with onboarding data
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          display_name: onboardingData.name,
-          date_of_birth: onboardingData.dateOfBirth || null,
-          time_of_birth: onboardingData.timeOfBirth || null,
-          place_of_birth: onboardingData.placeOfBirth || null,
-          favorite_deity: onboardingData.favoriteDeity || null,
-          onboarding_completed: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
+      // Update profile with onboarding data
+      const profileData = {
+        display_name: onboardingData.name,
+        date_of_birth: onboardingData.dateOfBirth,
+        time_of_birth: onboardingData.timeOfBirth,
+        place_of_birth: onboardingData.placeOfBirth,
+        favorite_deity: onboardingData.favoriteDeity,
+        gotra: onboardingData.gotra,
+        varna: onboardingData.varna,
+        sampradaya: onboardingData.sampradaya,
+        location: onboardingData.location,
+        onboarding_completed: true
+        // Removed welcome_quiz_completed field
+      };
 
-      if (profileError) throw profileError;
+      await api.updateProfile(profileData);
 
       toast({
-        title: "Welcome to Saadhana Board!",
-        description: "Your spiritual journey begins now.",
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
       });
 
       return { error: null, showWalkthrough };
     } catch (error: any) {
-      console.error('Onboarding completion error:', error);
+      console.error('Complete onboarding error:', error);
       toast({
         title: "Error",
         description: "Failed to complete onboarding. Please try again.",
@@ -94,15 +105,10 @@ export const useOnboarding = () => {
       setIsLoading(true);
 
       // Mark onboarding as completed without additional data
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          onboarding_completed: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', user.id);
-
-      if (profileError) throw profileError;
+      await api.updateProfile({
+        onboarding_completed: true
+        // Removed welcome_quiz_completed field
+      });
 
       toast({
         title: "Onboarding Skipped",
@@ -127,14 +133,8 @@ export const useOnboarding = () => {
     if (!user?.id) return false;
 
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('onboarding_completed')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-      return data?.onboarding_completed || false;
+      const data = await api.getProfile();
+      return data.profile?.onboarding_completed || false;
     } catch (error) {
       console.error('Error checking onboarding status:', error);
       return false;
@@ -142,15 +142,14 @@ export const useOnboarding = () => {
   };
 
   return {
+    isLoading,
+    currentStep,
     onboardingData,
     updateData,
-    currentStep,
-    setCurrentStep,
     nextStep,
     prevStep,
     completeOnboarding,
     skipOnboarding,
-    checkOnboardingStatus,
-    isLoading
+    checkOnboardingStatus
   };
 };

@@ -1,23 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+import { Calendar, User, MapPin, Users, BookOpen, Sword, Flower2, Zap, Mountain } from 'lucide-react';
 import { useOnboarding } from '@/hooks/useOnboarding';
-import { User, Calendar, Clock, MapPin, Heart, ArrowRight, ArrowLeft, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
+// Define the deities, varnas, and sampradayas directly in the component
 const DEITIES = [
-  { value: 'shiva', label: 'Lord Shiva', emoji: '🔱' },
   { value: 'vishnu', label: 'Lord Vishnu', emoji: '🌀' },
   { value: 'krishna', label: 'Lord Krishna', emoji: '🪶' },
   { value: 'rama', label: 'Lord Rama', emoji: '🏹' },
   { value: 'ganesha', label: 'Lord Ganesha', emoji: '🐘' },
-  { value: 'hanuman', label: 'Lord Hanuman', emoji: '🙏' },
   { value: 'durga', label: 'Goddess Durga', emoji: '🦁' },
   { value: 'lakshmi', label: 'Goddess Lakshmi', emoji: '🪷' },
   { value: 'saraswati', label: 'Goddess Saraswati', emoji: '🎵' },
@@ -25,6 +21,23 @@ const DEITIES = [
   { value: 'parvati', label: 'Goddess Parvati', emoji: '🏔️' },
   { value: 'brahma', label: 'Lord Brahma', emoji: '🌸' },
   { value: 'other', label: 'Other', emoji: '✨' }
+];
+
+const VARNAS = [
+  { value: 'brahmana', label: 'Brahmana 🙏' },
+  { value: 'kshatriya', label: 'Kshatriya ⚔️' },
+  { value: 'vaishya', label: 'Vaishya व्यापार' },
+  { value: 'shudra', label: 'Shudra 🛠️' },
+  { value: 'outcaste', label: 'Outcaste' }
+];
+
+const SAMPRADAYAS = [
+  { value: 'shakta', label: 'Shakta' },
+  { value: 'shaiva', label: 'Shaiva' },
+  { value: 'smarta', label: 'Smarta' },
+  { value: 'vaishnava', label: 'Vaishnava' },
+  { value: 'buddhist', label: 'Buddhist / Zen' },
+  { value: 'jain', label: 'Jain' }
 ];
 
 const StepIndicator = ({ currentStep, totalSteps }: { currentStep: number; totalSteps: number }) => (
@@ -56,6 +69,8 @@ const OnboardingPage = () => {
   } = useOnboarding();
 
   const [localErrors, setLocalErrors] = useState<Record<string, string>>({});
+  const [isDikshit, setIsDikshit] = useState(false);
+  const [otherDeity, setOtherDeity] = useState('');
 
   const validateStep = (step: number): boolean => {
     const errors: Record<string, string> = {};
@@ -77,6 +92,18 @@ const OnboardingPage = () => {
         break;
       case 3:
         // Deity selection is optional
+        break;
+      case 4:
+        // Profile information step
+        if (!onboardingData.gotra?.trim()) {
+          errors.gotra = 'Gotra is required';
+        }
+        if (!onboardingData.varna) {
+          errors.varna = 'Varna selection is required';
+        }
+        if (isDikshit && !onboardingData.sampradaya) {
+          errors.sampradaya = 'Sampradaya selection is required for Dikshit';
+        }
         break;
     }
     
@@ -176,15 +203,15 @@ const OnboardingPage = () => {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 mb-4">
                 <Calendar className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-400 to-fuchsia-600 mb-2">
-                Your birth details
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-400 to-blue-600 mb-2">
+                Birth Details (Optional)
               </h2>
               <p className="text-muted-foreground">
-                This helps us create personalized spiritual insights (optional)
+                These details help personalize your spiritual experience
               </p>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="dateOfBirth" className="text-base font-medium">
                   Date of Birth
@@ -194,9 +221,9 @@ const OnboardingPage = () => {
                   <Input
                     id="dateOfBirth"
                     type="date"
-                    value={onboardingData.dateOfBirth}
+                    value={onboardingData.dateOfBirth || ''}
                     onChange={(e) => updateData('dateOfBirth', e.target.value)}
-                    className="pl-10 bg-background/50 border-purple-500/20 focus:border-purple-500/50"
+                    className="pl-10 bg-background/50 border-blue-500/20 focus:border-blue-500/50"
                   />
                 </div>
                 {localErrors.dateOfBirth && (
@@ -206,37 +233,37 @@ const OnboardingPage = () => {
 
               <div>
                 <Label htmlFor="timeOfBirth" className="text-base font-medium">
-                  Time of Birth
+                  Time of Birth (24hr)
                 </Label>
                 <div className="relative mt-2">
-                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="timeOfBirth"
                     type="time"
-                    value={onboardingData.timeOfBirth}
+                    value={onboardingData.timeOfBirth || ''}
                     onChange={(e) => updateData('timeOfBirth', e.target.value)}
-                    className="pl-10 bg-background/50 border-purple-500/20 focus:border-purple-500/50"
+                    className="pl-10 bg-background/50 border-blue-500/20 focus:border-blue-500/50"
                   />
                 </div>
                 {localErrors.timeOfBirth && (
                   <p className="text-red-400 text-sm mt-1">{localErrors.timeOfBirth}</p>
                 )}
               </div>
+            </div>
 
-              <div>
-                <Label htmlFor="placeOfBirth" className="text-base font-medium">
-                  Place of Birth
-                </Label>
-                <div className="relative mt-2">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="placeOfBirth"
-                    placeholder="City, Country"
-                    value={onboardingData.placeOfBirth}
-                    onChange={(e) => updateData('placeOfBirth', e.target.value)}
-                    className="pl-10 bg-background/50 border-purple-500/20 focus:border-purple-500/50"
-                  />
-                </div>
+            <div>
+              <Label htmlFor="birthPlace" className="text-base font-medium">
+                Place of Birth
+              </Label>
+              <div className="relative mt-2">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="birthPlace"
+                  placeholder="City, State/Country"
+                  value={onboardingData.placeOfBirth || ''}
+                  onChange={(e) => updateData('placeOfBirth', e.target.value)}
+                  className="pl-10 bg-background/50 border-blue-500/20 focus:border-blue-500/50"
+                />
               </div>
             </div>
           </motion.div>
@@ -253,41 +280,215 @@ const OnboardingPage = () => {
             className="space-y-6"
           >
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-fuchsia-500 to-pink-500 mb-4">
-                <Heart className="w-8 h-8 text-white" />
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 mb-4">
+                <Users className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-500 via-pink-400 to-purple-600 mb-2">
-                Choose your divine guide
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-orange-400 to-amber-600 mb-2">
+                Divine Connection
               </h2>
               <p className="text-muted-foreground">
-                Select a deity that resonates with your spiritual journey
+                Which deity resonates most with your spiritual path?
               </p>
             </div>
 
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Favorite Deity</Label>
-              <Select
-                value={onboardingData.favoriteDeity}
-                onValueChange={(value) => updateData('favoriteDeity', value)}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              {DEITIES.map((deity) => (
+                <div
+                  key={deity.value}
+                  onClick={() => {
+                    setOtherDeity('');
+                    updateData('favoriteDeity', deity.value);
+                  }}
+                  className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                    onboardingData.favoriteDeity === deity.value
+                      ? 'border-amber-500 bg-amber-500/10 scale-105'
+                      : 'border-border hover:border-amber-500/50 hover:bg-amber-500/5'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">{deity.emoji}</div>
+                  <div className="text-sm font-medium text-center">{deity.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-4">
+              <Label htmlFor="otherDeity" className="text-base font-medium">
+                Other Deity or Spiritual Focus
+              </Label>
+              <Input
+                id="otherDeity"
+                placeholder="If your deity isn't listed above..."
+                value={otherDeity}
+                onChange={(e) => {
+                  setOtherDeity(e.target.value);
+                  updateData('favoriteDeity', e.target.value);
+                }}
+                className="mt-2 bg-background/50 border-amber-500/20 focus:border-amber-500/50"
+              />
+            </div>
+          </motion.div>
+        );
+
+      case 4:
+        return (
+          <motion.div
+            key="step4"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6"
+          >
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 mb-4">
+                <BookOpen className="w-8 h-8 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 via-emerald-400 to-green-600 mb-2">
+                Profile Information
+              </h2>
+              <p className="text-muted-foreground">
+                Share some details about your spiritual background
+              </p>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="gotra" className="text-base font-medium">
+                  Gotra *
+                </Label>
+                <Input
+                  id="gotra"
+                  placeholder="Enter your gotra"
+                  value={onboardingData.gotra || ''}
+                  onChange={(e) => updateData('gotra', e.target.value)}
+                  className="mt-2 bg-background/50 border-green-500/20 focus:border-green-500/50"
+                />
+                {localErrors.gotra && (
+                  <p className="text-red-400 text-sm mt-1">{localErrors.gotra}</p>
+                )}
+              </div>
+
+              <div>
+                <Label htmlFor="varna" className="text-base font-medium">
+                  Varna *
+                </Label>
+                <Select value={onboardingData.varna || ''} onValueChange={(value) => updateData('varna', value)}>
+                  <SelectTrigger className="mt-2 bg-background/50 border-green-500/20 focus:border-green-500/50">
+                    <SelectValue placeholder="Select your varna" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VARNAS.map((varna) => (
+                      <SelectItem key={varna.value} value={varna.value}>
+                        {varna.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {localErrors.varna && (
+                  <p className="text-red-400 text-sm mt-1">{localErrors.varna}</p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="isDikshit"
+                  checked={isDikshit}
+                  onChange={(e) => setIsDikshit(e.target.checked)}
+                  className="h-4 w-4 text-green-500 border-green-500/20 rounded focus:ring-green-500"
+                />
+                <Label htmlFor="isDikshit" className="text-base">
+                  I am Dikshit (formally initiated)
+                </Label>
+              </div>
+
+              {isDikshit && (
+                <div>
+                  <Label htmlFor="sampradaya" className="text-base font-medium">
+                    Sampradaya *
+                  </Label>
+                  <Select value={onboardingData.sampradaya || ''} onValueChange={(value) => updateData('sampradaya', value)}>
+                    <SelectTrigger className="mt-2 bg-background/50 border-green-500/20 focus:border-green-500/50">
+                      <SelectValue placeholder="Select your sampradaya" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SAMPRADAYAS.map((sampradaya) => (
+                        <SelectItem key={sampradaya.value} value={sampradaya.value}>
+                          {sampradaya.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {localErrors.sampradaya && (
+                    <p className="text-red-400 text-sm mt-1">{localErrors.sampradaya}</p>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <Label htmlFor="location" className="text-base font-medium">
+                  Location
+                </Label>
+                <div className="relative mt-2">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="location"
+                    placeholder="City, State/Country"
+                    value={onboardingData.location || ''}
+                    onChange={(e) => updateData('location', e.target.value)}
+                    className="pl-10 bg-background/50 border-green-500/20 focus:border-green-500/50"
+                  />
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        );
+
+      case 5:
+        return (
+          <motion.div
+            key="step5"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 }}
+            transition={{ duration: 0.3 }}
+            className="space-y-6 text-center"
+          >
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-fuchsia-500 mb-4 mx-auto">
+              <Flower2 className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600 mb-2">
+              Ready to Begin Your Journey?
+            </h2>
+            <p className="text-muted-foreground mb-8">
+              You're all set to start your spiritual practice with SaadhanaBoard. 
+              Would you like a quick walkthrough of the features, or dive right in?
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                onClick={handleCompleteWithWalkthrough}
+                className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 px-8 py-6 text-lg"
               >
-                <SelectTrigger className="w-full bg-background/50 border-purple-500/20 focus:border-purple-500/50 text-lg">
-                  <SelectValue placeholder="Choose your deity..." />
-                </SelectTrigger>
-                <SelectContent className="max-h-80">
-                  {DEITIES.map((deity) => (
-                    <SelectItem 
-                      key={deity.value} 
-                      value={deity.value}
-                      className="cursor-pointer hover:bg-purple-500/10"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-xl">{deity.emoji}</span>
-                        <span>{deity.label}</span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                Show Me Around
+              </Button>
+              <Button
+                onClick={handleComplete}
+                variant="outline"
+                className="border-purple-500/30 hover:bg-purple-500/10 px-8 py-6 text-lg"
+              >
+                Start Practicing
+              </Button>
+            </div>
+            
+            <div className="pt-8">
+              <Button
+                onClick={handleSkip}
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Skip for now
+              </Button>
             </div>
           </motion.div>
         );
@@ -297,103 +498,44 @@ const OnboardingPage = () => {
     }
   };
 
-  const progress = (currentStep / 3) * 100;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen cosmic-nebula-bg flex items-center justify-center p-4">
-      {/* Cosmic particles animation */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 50 }, (_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-white rounded-full opacity-60 cosmic-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 4}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      <Card className="w-full max-w-lg bg-background/80 backdrop-blur-sm border border-purple-500/20 shadow-2xl">
-        <CardHeader className="text-center">
-          <div className="flex items-center justify-center mb-4">
-            <img 
-              src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
-              alt="Saadhana Board Logo" 
-              className="h-12 w-12" 
-            />
-            <Sparkles className="ml-2 h-6 w-6 text-purple-500 animate-pulse" />
-          </div>
-          <CardTitle className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
-            Saadhana Yantra
-          </CardTitle>
-          <StepIndicator currentStep={currentStep} totalSteps={3} />
-          <Progress value={progress} className="w-full h-2 mb-4" />
-        </CardHeader>
-
-        <CardContent className="space-y-6">
-          <AnimatePresence mode="wait">
+    <div className="min-h-screen flex items-center justify-center p-4">
+      <div className="w-full max-w-2xl">
+        <div className="backdrop-blur-sm bg-background/70 rounded-2xl border border-purple-500/20 p-8 shadow-2xl">
+          <StepIndicator currentStep={currentStep} totalSteps={5} />
+          
+          <div className="mb-8">
             {renderStep()}
-          </AnimatePresence>
-
-          <div className="flex justify-between pt-6">
-            {currentStep > 1 ? (
-              <Button
-                variant="outline"
-                onClick={prevStep}
-                className="border-purple-500/30 hover:border-purple-500/50"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Previous
-              </Button>
-            ) : (
-              <div></div>
-            )}
-
-            <div className="flex gap-3">
-              <Button
-                variant="ghost"
-                onClick={handleSkip}
-                disabled={isLoading}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                Skip for now
-              </Button>
-              
-              {currentStep < 3 ? (
-                <Button
-                  onClick={handleNext}
-                  className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600"
-                >
-                  Continue
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              ) : (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleComplete}
-                    disabled={isLoading}
-                    variant="outline"
-                    className="border-purple-500/30 hover:border-purple-500/50"
-                  >
-                    {isLoading ? 'Completing...' : 'Start Journey'}
-                  </Button>
-                  <Button
-                    onClick={handleCompleteWithWalkthrough}
-                    disabled={isLoading}
-                    className="bg-gradient-to-r from-fuchsia-500 to-pink-500 hover:from-fuchsia-600 hover:to-pink-600"
-                  >
-                    {isLoading ? 'Loading...' : 'Take Tour'}
-                    <Sparkles className="w-4 h-4 ml-2" />
-                  </Button>
-                </div>
-              )}
-            </div>
           </div>
-        </CardContent>
-      </Card>
+          
+          {currentStep < 5 && (
+            <div className="flex justify-between pt-6 border-t border-border">
+              <Button
+                onClick={prevStep}
+                variant="outline"
+                disabled={currentStep === 1}
+                className="border-purple-500/30 hover:bg-purple-500/10"
+              >
+                Back
+              </Button>
+              <Button
+                onClick={currentStep === 4 ? handleComplete : handleNext}
+                className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600"
+              >
+                {currentStep === 4 ? 'Complete Setup' : 'Next'}
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

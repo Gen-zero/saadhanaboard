@@ -1,4 +1,3 @@
-
 -- Create a table for user-uploaded spiritual books
 CREATE TABLE public.spiritual_books (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -6,7 +5,9 @@ CREATE TABLE public.spiritual_books (
   title TEXT NOT NULL,
   author TEXT NOT NULL,
   traditions TEXT[] NOT NULL DEFAULT '{}',
-  content TEXT NOT NULL,
+  content TEXT, -- This will be optional now
+  storage_url TEXT, -- New field for file storage URL
+  is_storage_file BOOLEAN DEFAULT false, -- New field to indicate if it's a stored file
   description TEXT,
   year INTEGER,
   language TEXT DEFAULT 'english',
@@ -16,9 +17,25 @@ CREATE TABLE public.spiritual_books (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
+-- Add the new columns to existing table if they don't exist
+ALTER TABLE public.spiritual_books 
+ADD COLUMN IF NOT EXISTS storage_url TEXT,
+ADD COLUMN IF NOT EXISTS is_storage_file BOOLEAN DEFAULT false;
+
+-- Add settings column to profiles table
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS settings JSONB;
+
+-- Add new profile columns
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS gotra TEXT,
+ADD COLUMN IF NOT EXISTS varna TEXT,
+ADD COLUMN IF NOT EXISTS sampradaya TEXT;
+
 -- Create a storage bucket for book covers and files
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('spiritual-books', 'spiritual-books', true);
+VALUES ('spiritual-books', 'spiritual-books', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- Enable Row Level Security (RLS) on the spiritual_books table
 ALTER TABLE public.spiritual_books ENABLE ROW LEVEL SECURITY;

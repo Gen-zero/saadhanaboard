@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserPlus, User, Key, Mail, Loader2 } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/lib/auth-context";
 import {
   Form,
   FormControl,
@@ -13,25 +12,27 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
+import { Input } from "@/components/ui/input";
+import { useAuth } from "@/lib/auth-context";
+import { UserPlus, User, Mail, Key, Loader2 } from "lucide-react";
+import { useSettings } from "@/hooks/useSettings";
 
 const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
+  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
+  message: "Passwords don't match",
   path: ["confirmPassword"],
 });
 
 const SignupPage = () => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const { signup } = useAuth();
+  const { settings } = useSettings();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,33 +44,27 @@ const SignupPage = () => {
     },
   });
 
+  // Check if Shiva theme is active
+  const isShivaTheme = settings?.appearance?.colorScheme === 'shiva';
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsLoading(true);
+    setError(null);
+    
     try {
-      setIsLoading(true);
-      const { error } = await signup(values.email, values.password, values.name);
-      if (error) {
-        toast({
-          title: "Registration failed",
-          description: error.message || "There was a problem creating your account",
-          variant: "destructive",
-        });
-        return;
-      }
-      // Navigate to onboarding after successful signup
-      navigate("/onboarding");
-    } catch (error) {
-      toast({
-        title: "Registration failed",
-        description: "An unexpected error occurred. Please try again.",
-        variant: "destructive",
-      });
+      await signup(values.name, values.email, values.password);
+      // Redirect to dashboard instead of welcome quiz
+      navigate("/dashboard");
+    } catch (err: any) {
+      console.error("Signup error:", err);
+      setError(err.message || "Failed to create account. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center cosmic-nebula-bg p-4">
+    <div className={`min-h-screen flex flex-col items-center justify-center p-4 ${isShivaTheme ? '' : 'cosmic-nebula-bg'}`}>
       <div className="w-full max-w-md space-y-6 animate-fade-in">
         <div className="flex flex-col items-center text-center mb-8">
           <img 
@@ -90,6 +85,12 @@ const SignupPage = () => {
             <UserPlus className="h-5 w-5 text-purple-500" />
             Create Account
           </h2>
+
+          {error && (
+            <div className="mb-4 p-3 bg-destructive/20 text-destructive text-sm rounded-md">
+              {error}
+            </div>
+          )}
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

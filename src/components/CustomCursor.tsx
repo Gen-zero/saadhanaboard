@@ -1,11 +1,11 @@
-
 import { useState, useEffect } from "react";
 
-const CURSOR_SIZE = 24;
+const CURSOR_SIZE = 30;
 
 const CustomCursor = () => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [visible, setVisible] = useState(false);
+  const [isClicking, setIsClicking] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -14,13 +14,26 @@ const CustomCursor = () => {
       setPos({ x: e.clientX, y: e.clientY });
       setVisible(true);
     };
+    
+    const onMouseDown = () => {
+      setIsClicking(true);
+    };
+    
+    const onMouseUp = () => {
+      setIsClicking(false);
+    };
+    
     const onMouseLeave = () => setVisible(false);
 
     document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mousedown", onMouseDown);
+    document.addEventListener("mouseup", onMouseUp);
     document.addEventListener("mouseleave", onMouseLeave);
 
     return () => {
       document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mousedown", onMouseDown);
+      document.removeEventListener("mouseup", onMouseUp);
       document.removeEventListener("mouseleave", onMouseLeave);
     };
   }, []);
@@ -39,16 +52,36 @@ const CustomCursor = () => {
         transform: "translate(-50%, -50%)",
       }}
     >
-      {/* Divine cursor: glowing white/gold center, subtle aura */}
+      {/* Spiritual fire-themed cursor with cremation ground symbolism */}
       <div className="relative w-full h-full flex items-center justify-center">
-        {/* Glowing center */}
-        <div className="absolute w-6 h-6 rounded-full bg-gradient-to-br from-yellow-300 via-white to-yellow-500 shadow-[0_0_32px_8px_rgba(244,215,101,0.4)] animate-[pulse_1.5s_ease-in-out_infinite] border-2 border-yellow-100"></div>
-        {/* Slight inner white dot for maximum focus */}
-        <div className="w-2.5 h-2.5 rounded-full bg-white shadow-[0_0_18px_6px_rgba(255,255,255,0.5)] border border-yellow-200"></div>
+        {/* Outer fire glow ring - deep red */}
+        <div className={`absolute inset-0 rounded-full border-2 border-red-900/40 transition-all duration-200 ${isClicking ? 'scale-75' : 'scale-100'}`}></div>
+        
+        {/* Middle animated fire ring - orange to red with pulse animation */}
+        <div className={`absolute inset-0 rounded-full border border-orange-700/50 fire-pulse transition-all duration-200 ${isClicking ? 'scale-90' : 'scale-100'}`}></div>
+        
+        {/* Main cursor core with sacred fire glow - gold to deep red */}
+        <div className={`absolute w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 via-orange-600 to-red-900 shadow-[0_0_32px_8px_rgba(245,158,11,0.6)] fire-pulse border-2 border-amber-200 transition-all duration-200 ${isClicking ? 'scale-90' : 'scale-100'}`}></div>
+        
+        {/* Inner white dot for focus - representing the soul/spirit */}
+        <div className={`w-3 h-3 rounded-full bg-amber-100 shadow-[0_0_18px_6px_rgba(251,191,36,0.7)] border border-amber-300 transition-all duration-200 ${isClicking ? 'scale-75' : 'scale-100'}`}></div>
+        
+        {/* Subtle ash/smoke particles for cremation ground theme */}
+        {[0, 1, 2, 3].map((i) => (
+          <div 
+            key={i}
+            className="absolute w-1 h-1 rounded-full bg-gray-400 opacity-60 ash-float"
+            style={{
+              top: `${50 + 30 * Math.sin((i * Math.PI) / 2)}%`,
+              left: `${50 + 30 * Math.cos((i * Math.PI) / 2)}%`,
+              transform: 'translate(-50%, -50%)',
+              animation: `ash-float 2s infinite ${i * 0.5}s`
+            }}
+          ></div>
+        ))}
       </div>
     </div>
   );
 };
 
 export default CustomCursor;
-

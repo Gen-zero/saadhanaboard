@@ -1,5 +1,4 @@
-
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Card,
   CardContent,
@@ -8,13 +7,35 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { BookOpen, Calendar, Clock, BarChartHorizontal } from 'lucide-react';
+import { BookOpen, Calendar, Clock, BarChartHorizontal, Save, User as UserIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useProfileData, type HistoricalSadhana } from '@/hooks/useProfileData';
+import { useAuth } from '@/lib/auth-context';
+import api from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
+import { SettingsType } from './SettingsTypes';
 
-const ProfileSettings = () => {
+interface ProfileSettingsProps {
+  settings: SettingsType;
+  updateSettings: (path: (string | number)[], value: any) => void;
+}
+
+const ProfileSettings = ({ settings, updateSettings }: ProfileSettingsProps) => {
   const { profile, history, stats, currentPractice, addToHistory, updateProfile } = useProfileData();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedProfile, setEditedProfile] = useState({
+    display_name: profile.name,
+    bio: '',
+    location: '',
+    experience_level: 'beginner',
+    favorite_deity: '',
+  });
 
   // Listen for sadhana completion/break events
   useEffect(() => {
@@ -35,6 +56,28 @@ const ProfileSettings = () => {
     };
   }, [addToHistory]);
 
+  // Load profile data from backend when component mounts
+  useEffect(() => {
+    const loadProfileData = async () => {
+      try {
+        if (user?.id) {
+          const data = await api.getProfile();
+          setEditedProfile({
+            display_name: data.profile.display_name || profile.name,
+            bio: data.profile.bio || '',
+            location: data.profile.location || '',
+            experience_level: data.profile.experience_level || 'beginner',
+            favorite_deity: data.profile.favorite_deity || '',
+          });
+        }
+      } catch (error) {
+        console.error('Error loading profile data:', error);
+      }
+    };
+
+    loadProfileData();
+  }, [user, profile.name]);
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -50,6 +93,34 @@ const ProfileSettings = () => {
     });
   };
 
+  const handleSaveProfile = async () => {
+    try {
+      await api.updateProfile({
+        display_name: editedProfile.display_name,
+        bio: editedProfile.bio,
+        location: editedProfile.location,
+        experience_level: editedProfile.experience_level,
+        favorite_deity: editedProfile.favorite_deity,
+      });
+
+      // Update local profile data
+      updateProfile({ name: editedProfile.display_name });
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+      
+      setIsEditing(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -57,30 +128,106 @@ const ProfileSettings = () => {
           <Avatar className="h-24 w-24">
             <AvatarImage src={profile.avatar} />
             <AvatarFallback className="bg-primary/10 text-primary text-3xl">
-              {profile.name
-                .split(' ')
-                .map((n) => n[0])
-                .join('')}
+              <UserIcon className="h-12 w-12" />
             </AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <CardTitle className="text-3xl">{profile.name}</CardTitle>
-            <CardDescription className="mt-2 flex items-center gap-1.5 text-base">
-              <Calendar className="h-4 w-4" />
-              <span>Joined {getJoinedDate()}</span>
-            </CardDescription>
-            <p className="mt-2 text-muted-foreground">{profile.email}</p>
-            <Button variant="outline" className="mt-4" onClick={() => {
-              const newName = prompt('Enter your name:', profile.name);
-              if (newName && newName.trim()) {
-                updateProfile({ name: newName.trim() });
-              }
-            }}>
-              Edit Profile
-            </Button>
+            {isEditing ? (
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="display_name">Name</Label>
+                  <Input
+                    id="display_name"
+                    value={editedProfile.display_name}
+                    onChange={(e) => setEditedProfile({...editedProfile, display_name: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    value={profile.email}
+                    disabled
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveProfile} className="flex items-center gap-2">
+                    <Save className="h-4 w-4" />
+                    Save Changes
+                  </Button>
+                  <Button variant="outline" onClick={() => setIsEditing(false)}>
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <CardTitle className="text-3xl">{profile.name}</CardTitle>
+                <CardDescription className="mt-2 flex items-center gap-1.5 text-base">
+                  <Calendar className="h-4 w-4" />
+                  <span>Joined {getJoinedDate()}</span>
+                </CardDescription>
+                <p className="mt-2 text-muted-foreground">{profile.email}</p>
+                <Button variant="outline" className="mt-4" onClick={() => setIsEditing(true)}>
+                  Edit Profile
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </CardHeader>
+      
+      {isEditing && (
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea
+                id="bio"
+                value={editedProfile.bio}
+                onChange={(e) => setEditedProfile({...editedProfile, bio: e.target.value})}
+                placeholder="Tell us about your spiritual journey..."
+                rows={4}
+              />
+            </div>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="location">Location</Label>
+                <Input
+                  id="location"
+                  value={editedProfile.location}
+                  onChange={(e) => setEditedProfile({...editedProfile, location: e.target.value})}
+                  placeholder="Where are you from?"
+                />
+              </div>
+              <div>
+                <Label htmlFor="experience_level">Experience Level</Label>
+                <select
+                  id="experience_level"
+                  className="w-full p-2 rounded-md border border-input bg-background"
+                  value={editedProfile.experience_level}
+                  onChange={(e) => setEditedProfile({...editedProfile, experience_level: e.target.value})}
+                >
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                  <option value="master">Master</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="favorite_deity">Favorite Deity</Label>
+                <Input
+                  id="favorite_deity"
+                  value={editedProfile.favorite_deity}
+                  onChange={(e) => setEditedProfile({...editedProfile, favorite_deity: e.target.value})}
+                  placeholder="Which deity do you connect with most?"
+                />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      )}
+      
       <CardContent className="space-y-8 pt-6">
         {currentPractice ? (
           <div>

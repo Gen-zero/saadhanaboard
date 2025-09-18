@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -23,6 +22,17 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
   settings,
   updateSettings,
 }) => {
+  // Guard against undefined settings or settings still loading
+  if (!settings || !settings.appearance) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -37,9 +47,9 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
           <div className="space-y-2">
             <Label>Color Scheme</Label>
             <RadioGroup
-              value={settings.appearance.colorScheme}
+              value={settings.appearance?.colorScheme || 'default'}
               onValueChange={(value) => updateSettings(['appearance', 'colorScheme'], value)}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-2"
+              className="grid grid-cols-2 sm:grid-cols-5 gap-2"
             >
               <div>
                 <RadioGroupItem value="default" id="scheme-default" className="sr-only" />
@@ -58,7 +68,7 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
                   className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                 >
                   <div className="rounded-full w-8 h-8 bg-gradient-to-r from-amber-700 to-green-700"></div>
-                  <span className="mt-2">Earth</span>
+                  <span className="mt-2">Krishna</span>
                 </Label>
               </div>
               <div>
@@ -68,7 +78,7 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
                   className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                 >
                   <div className="rounded-full w-8 h-8 bg-gradient-to-r from-blue-600 to-teal-500"></div>
-                  <span className="mt-2">Water</span>
+                  <span className="mt-2">Vishnu</span>
                 </Label>
               </div>
               <div>
@@ -78,7 +88,47 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
                   className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                 >
                   <div className="rounded-full w-8 h-8 bg-gradient-to-r from-red-600 to-yellow-500"></div>
-                  <span className="mt-2">Fire</span>
+                  <span className="mt-2">Maa Durga</span>
+                </Label>
+              </div>
+              <div>
+                <RadioGroupItem value="shiva" id="scheme-shiva" className="sr-only" />
+                <Label
+                  htmlFor="scheme-shiva"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                >
+                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
+                  <span className="mt-2">Shiva</span>
+                </Label>
+              </div>
+              <div>
+                <RadioGroupItem value="bhairava" id="scheme-bhairava" className="sr-only" />
+                <Label
+                  htmlFor="scheme-bhairava"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                >
+                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-red-900 to-red-700"></div>
+                  <span className="mt-2">Bhairava</span>
+                </Label>
+              </div>
+              <div>
+                <RadioGroupItem value="serenity" id="scheme-serenity" className="sr-only" />
+                <Label
+                  htmlFor="scheme-serenity"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                >
+                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-blue-300 to-teal-300"></div>
+                  <span className="mt-2">Serenity</span>
+                </Label>
+              </div>
+              <div>
+                <RadioGroupItem value="ganesha" id="scheme-ganesha" className="sr-only" />
+                <Label
+                  htmlFor="scheme-ganesha"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                >
+                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-purple-600 to-amber-500"></div>
+                  <span className="mt-2">Ganesha</span>
                 </Label>
               </div>
             </RadioGroup>
@@ -91,7 +141,7 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
             <div className="flex items-center space-x-2">
               <span className="text-sm">A</span>
               <Slider
-                value={[settings.appearance.fontSize]}
+                value={[settings.appearance?.fontSize || 16]}
                 min={12}
                 max={24}
                 step={1}
@@ -101,7 +151,7 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
               <span className="text-lg">A</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Current font size: {settings.appearance.fontSize}px
+              Current font size: {settings.appearance?.fontSize || 16}px
             </p>
           </div>
 
@@ -116,7 +166,7 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
                 </p>
               </div>
               <Switch
-                checked={settings.appearance.animationsEnabled}
+                checked={settings.appearance?.animationsEnabled ?? true}
                 onCheckedChange={(checked) =>
                   updateSettings(['appearance', 'animationsEnabled'], checked)
                 }
@@ -135,7 +185,7 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
                 </p>
               </div>
               <Switch
-                checked={settings.appearance.highContrastMode}
+                checked={settings.appearance?.highContrastMode ?? false}
                 onCheckedChange={(checked) =>
                   updateSettings(['appearance', 'highContrastMode'], checked)
                 }

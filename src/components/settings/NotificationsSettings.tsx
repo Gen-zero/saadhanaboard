@@ -21,6 +21,19 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
   settings,
   updateSettings,
 }) => {
+  // Guard against undefined settings or settings still loading
+  if (!settings || !settings.notifications || !settings.reminders) {
+    return (
+      <div className="space-y-6">
+        <Card>
+          <CardContent className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500"></div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <Card>
@@ -38,7 +51,7 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
                 </p>
               </div>
               <Switch
-                checked={settings.notifications.enabled}
+                checked={settings.notifications?.enabled ?? true}
                 onCheckedChange={(checked) =>
                   updateSettings(['notifications', 'enabled'], checked)
                 }
@@ -55,8 +68,8 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
                 </p>
               </div>
               <Switch
-                disabled={!settings.notifications.enabled}
-                checked={settings.notifications.ritualReminders}
+                disabled={!settings.notifications?.enabled}
+                checked={settings.notifications?.ritualReminders ?? true}
                 onCheckedChange={(checked) =>
                   updateSettings(['notifications', 'ritualReminders'], checked)
                 }
@@ -73,8 +86,8 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
                 </p>
               </div>
               <Switch
-                disabled={!settings.notifications.enabled}
-                checked={settings.notifications.goalProgress}
+                disabled={!settings.notifications?.enabled}
+                checked={settings.notifications?.goalProgress ?? true}
                 onCheckedChange={(checked) =>
                   updateSettings(['notifications', 'goalProgress'], checked)
                 }
@@ -91,8 +104,8 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
                 </p>
               </div>
               <Switch
-                disabled={!settings.notifications.enabled}
-                checked={settings.notifications.motivationalMessages}
+                disabled={!settings.notifications?.enabled}
+                checked={settings.notifications?.motivationalMessages ?? true}
                 onCheckedChange={(checked) =>
                   updateSettings(
                     ['notifications', 'motivationalMessages'],
@@ -119,9 +132,9 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
             <Input
               type="time"
               id="morning-reminder"
-              value={settings.reminders.morning}
+              value={settings.reminders?.morning || '06:00'}
               onChange={(e) => updateSettings(['reminders', 'morning'], e.target.value)}
-              disabled={!settings.notifications.enabled}
+              disabled={!settings.notifications?.enabled}
             />
           </div>
           <div className="space-y-2">
@@ -129,9 +142,9 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
             <Input
               type="time"
               id="midday-reminder"
-              value={settings.reminders.midday}
+              value={settings.reminders?.midday || '12:00'}
               onChange={(e) => updateSettings(['reminders', 'midday'], e.target.value)}
-              disabled={!settings.notifications.enabled}
+              disabled={!settings.notifications?.enabled}
             />
           </div>
           <div className="space-y-2">
@@ -139,9 +152,9 @@ const NotificationsSettings: React.FC<NotificationsSettingsProps> = ({
             <Input
               type="time"
               id="evening-reminder"
-              value={settings.reminders.evening}
+              value={settings.reminders?.evening || '18:00'}
               onChange={(e) => updateSettings(['reminders', 'evening'], e.target.value)}
-              disabled={!settings.notifications.enabled}
+              disabled={!settings.notifications?.enabled}
             />
           </div>
         </CardContent>

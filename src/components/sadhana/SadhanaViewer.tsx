@@ -1,18 +1,47 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import SceneContainer from './SceneContainer';
 import ViewerControls from './ViewerControls';
 import ViewerFooter from './ViewerFooter';
 import CosmicBackground from './CosmicBackground';
+import { SadhanaData } from '@/hooks/useSadhanaData';
+import { Dispatch, SetStateAction } from 'react';
 
 interface SadhanaViewerProps {
-  paperContent: string;
+  sadhanaData: SadhanaData | null;
+  setView3D: Dispatch<SetStateAction<boolean>>;
 }
 
-const SadhanaViewer = ({ paperContent }: SadhanaViewerProps) => {
+const SadhanaViewer = ({ sadhanaData, setView3D }: SadhanaViewerProps) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [audioPlaying, setAudioPlaying] = useState(false);
+  
+  // Format paper content from sadhana data
+  const formatPaperContent = (data: SadhanaData | null): string => {
+    if (!data) return '';
+    
+    return `
+Purpose:
+${data.purpose}
+
+Goal:
+${data.goal}
+
+Divine Focus:
+${data.deity}
+
+Duration:
+${data.durationDays} days
+
+Message:
+"${data.message}"
+
+My Offerings:
+${data.offerings.map((o, i) => `${i+1}. ${o}`).join('\n')}
+    `;
+  };
+  
+  const paperContent = formatPaperContent(sadhanaData);
   
   useEffect(() => {
     // Create ambient sound
@@ -53,6 +82,7 @@ const SadhanaViewer = ({ paperContent }: SadhanaViewerProps) => {
         audioPlaying={audioPlaying} 
         toggleAudio={toggleAudio} 
         handlePrint={handlePrint} 
+        setView3D={setView3D}
       />
       
       <Canvas 
