@@ -9,6 +9,8 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 import ThemePanel from "@/components/ThemePanel";
+// Mahakali animated background component — mount for experimentation
+import MahakaliAnimatedBackground from "@/components/MahakaliAnimatedBackground";
 
 // Dynamic yantra that responds to user interaction - cremation ground theme
 const InteractiveYantra = () => {
@@ -336,67 +338,14 @@ const ExperimentPage = () => {
 
   return (
     <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-900 via-red-950 to-black text-white overflow-hidden relative">
-      {/* Cremation Ground Background with Skulls and Bones */}
-      <div className="fixed inset-0 z-0 overflow-hidden">
-        {[...Array(50)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute text-red-500/20"
-            initial={{ opacity: 0 }}
-            animate={{ 
-              opacity: [0.1, 0.3, 0.1],
-              y: [0, Math.random() * 20 - 10],
-            }}
-            transition={{
-              duration: Math.random() * 5 + 5,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              fontSize: `${Math.random() * 20 + 10}px`,
-            }}
-          >
-            {['☠', '🦴', '⚱'][Math.floor(Math.random() * 3)]}
-          </motion.div>
-        ))}
-      </div>
-      
-      {/* Animated fire particles for cremation ground effect */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={`fire-${i}`}
-            className="absolute text-orange-500/30"
-            initial={{ 
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              opacity: 0
-            }}
-            animate={{
-              y: [null, Math.random() * window.innerHeight - 100],
-              x: [null, Math.random() * window.innerWidth - 50, Math.random() * window.innerWidth + 50],
-              opacity: [0, 1, 0],
-              scale: [0.5, 1.5, 0.5],
-            }}
-            transition={{
-              duration: Math.random() * 8 + 8,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-              ease: "easeOut"
-            }}
-            style={{
-              fontSize: `${Math.random() * 20 + 10}px`,
-            }}
-          >
-            🔥
-          </motion.div>
-        ))}
-      </div>
+      {/* Wrapper for background layers - prepared for MahakaliAnimatedBackground integration */}
+      <div className="fixed inset-0 z-0">
+  {/* Mount MahakaliAnimatedBackground for visual testing. Toggle props while tuning. */}
+  <MahakaliAnimatedBackground className="fixed inset-0 z-0" enableBloom={true} enableParticles={true} intensity={1} />
+        {/* Removed legacy CSS gradient and emoji-based background layers — Three.js now provides the background visuals */}
+        {/* FloatingElements retained only if desired for extra 2D overlays; currently suppressed to avoid visual duplication */}
 
-      {/* Floating Elements */}
-      <FloatingElements />
+  </div>
 
       {/* Custom header for landing page - cremation ground theme */}
       <header className="border-b border-red-800/30 backdrop-blur-md bg-background/10 sticky top-0 z-50">
@@ -430,64 +379,7 @@ const ExperimentPage = () => {
           className="text-center py-20 md:py-40 relative overflow-hidden"
           style={{ y: heroY }}
         >
-          {/* Animated Mandala Background with enhanced fire effects */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-10">
-            <div className="relative w-full h-full max-w-4xl">
-              {[...Array(16)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute inset-0 border border-red-700/40 rounded-full"
-                  style={{
-                    transform: `rotate(${i * 22.5}deg)`,
-                  }}
-                  animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.2, 0.5, 0.2],
-                    rotate: [i * 22.5, i * 22.5 + 10, i * 22.5],
-                  }}
-                  transition={{
-                    duration: 10,
-                    repeat: Infinity,
-                    delay: i * 0.2,
-                    ease: "easeInOut"
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-          
-          {/* Floating fire particles in hero section */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(15)].map((_, i) => (
-              <motion.div
-                key={`hero-fire-${i}`}
-                className="absolute text-orange-500/40"
-                initial={{ 
-                  x: Math.random() * window.innerWidth,
-                  y: Math.random() * window.innerHeight,
-                  opacity: 0
-                }}
-                animate={{
-                  y: [null, Math.random() * window.innerHeight - 100],
-                  x: [null, Math.random() * window.innerWidth - 50, Math.random() * window.innerWidth + 50],
-                  opacity: [0, 1, 0],
-                  scale: [0.5, 1.5, 0.5],
-                }}
-                transition={{
-                  duration: Math.random() * 6 + 6,
-                  repeat: Infinity,
-                  delay: Math.random() * 3,
-                  ease: "easeOut"
-                }}
-                style={{
-                  fontSize: `${Math.random() * 15 + 10}px`,
-                }}
-              >
-                🔥
-              </motion.div>
-            ))}
-          </div>
-          
+          {/* Visual background is provided by the MahakaliAnimatedBackground Three.js scene */}
           <div className="relative z-10 max-w-6xl mx-auto px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}

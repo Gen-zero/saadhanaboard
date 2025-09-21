@@ -13,6 +13,9 @@ import { Slider } from '@/components/ui/slider';
 import { Palette } from 'lucide-react';
 import { SettingsType } from './SettingsTypes';
 
+// Import the Skull and Bone GIF for Mahakali theme
+import SkullBoneGif from '@/../icons/Skull and Bone Turnaround.gif';
+
 interface AppearanceSettingsProps {
   settings: SettingsType;
   updateSettings: (path: (string | number)[], value: any) => void;
@@ -129,6 +132,16 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
                 >
                   <div className="rounded-full w-8 h-8 bg-gradient-to-r from-purple-600 to-amber-500"></div>
                   <span className="mt-2">Ganesha</span>
+                </Label>
+              </div>
+              <div>
+                <RadioGroupItem value="mahakali" id="scheme-mahakali" className="sr-only" />
+                <Label
+                  htmlFor="scheme-mahakali"
+                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                >
+                  <img src={SkullBoneGif} alt="Mahakali" className="rounded-full w-14 h-14" />
+                  <span className="mt-2">Mahakali</span>
                 </Label>
               </div>
             </RadioGroup>

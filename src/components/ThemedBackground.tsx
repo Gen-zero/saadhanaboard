@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import MahakaliAnimatedBackground from '@/components/MahakaliAnimatedBackground';
 
 // Function to draw the Om symbol for the Default theme
 const drawOmSymbol = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, alpha: number) => {
@@ -898,13 +899,15 @@ const drawMandalaPattern = (ctx: CanvasRenderingContext2D, theme: string, width:
 };
 
 interface ThemedBackgroundProps {
-  theme: 'default' | 'earth' | 'water' | 'fire' | 'shiva' | 'bhairava' | 'serenity' | 'ganesha';
+  theme: 'default' | 'earth' | 'water' | 'fire' | 'shiva' | 'bhairava' | 'serenity' | 'ganesha' | 'mahakali';
 }
 
 const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   useEffect(() => {
+    // If mahakali theme is active, skip initializing the 2D canvas animation (Three.js will handle rendering)
+    if (theme === 'mahakali') return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     
@@ -1810,6 +1813,13 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
     };
   }, [theme]);
   
+  // If mahakali theme is active, render the Three.js mahakali background instead of the canvas
+  if (theme === 'mahakali') {
+    return (
+      <MahakaliAnimatedBackground className="fixed inset-0 z-0" enableBloom={true} enableParticles={true} intensity={1} />
+    );
+  }
+
   return (
     <canvas 
       ref={canvasRef} 

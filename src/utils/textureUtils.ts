@@ -1,95 +1,203 @@
-
 import * as THREE from 'three';
 
-/**
- * Creates a fallback parchment texture when the external one fails to load
- */
-export const createFallbackTexture = (): THREE.Texture => {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 1024;
-  const context = canvas.getContext('2d');
-  
-  if (context) {
-    // Create parchment-like background with ivory color
-    const gradient = context.createRadialGradient(
-      canvas.width / 2, canvas.height / 2, 0,
-      canvas.width / 2, canvas.height / 2, canvas.width / 2
-    );
-    gradient.addColorStop(0, '#FFFFF0'); // Ivory
-    gradient.addColorStop(0.8, '#FFF8DC'); // Lighter Ivory
-    gradient.addColorStop(1, '#F8F4E3'); // Slightly darker Ivory
-    
-    context.fillStyle = gradient;
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Add some noise for texture
-    for (let i = 0; i < 50000; i++) {
-      const x = Math.random() * canvas.width;
-      const y = Math.random() * canvas.height;
-      const opacity = Math.random() * 0.1;
-      
-      context.fillStyle = `rgba(54, 69, 79, ${opacity})`; // Charcoal with opacity
-      context.fillRect(x, y, 1, 1);
-    }
-    
-    // Add some aging effects with crimson and gold touches
-    for (let i = 0; i < 20; i++) {
-      const x = Math.random() * canvas.width;
-      const y = Math.random() * canvas.height;
-      const width = Math.random() * 100 + 50;
-      const height = Math.random() * 5 + 2;
-      const colorChoice = Math.random();
-      const opacity = Math.random() * 0.05;
-      
-      if (colorChoice < 0.7) {
-        context.fillStyle = `rgba(220, 20, 60, ${opacity})`; // Crimson with opacity
-      } else {
-        context.fillStyle = `rgba(255, 215, 0, ${opacity})`; // Gold with opacity
-      }
-      context.fillRect(x, y, width, height);
-    }
-    
-    // Add subtle gold frame
-    const frameWidth = 30;
-    context.strokeStyle = 'rgba(255, 215, 0, 0.3)'; // Gold with opacity
-    context.lineWidth = frameWidth;
-    context.strokeRect(
-      frameWidth / 2, 
-      frameWidth / 2, 
-      canvas.width - frameWidth, 
-      canvas.height - frameWidth
-    );
+// Module-level cache as requested
+const textureCache: Map<string, THREE.Texture> = new Map();
+
+/** Basic small fallback texture when loads fail */
+export function createFallbackTexture(color: string = '#7f7f7f'): THREE.Texture {
+  const size = 2;
+  const data = new Uint8Array(size * size * 4);
+  const c = new THREE.Color(color);
+  for (let i = 0; i < size * size; i++) {
+    data[i * 4 + 0] = Math.floor(c.r * 255);
+    data[i * 4 + 1] = Math.floor(c.g * 255);
+    data[i * 4 + 2] = Math.floor(c.b * 255);
+    data[i * 4 + 3] = 255;
   }
-  
-  const texture = new THREE.CanvasTexture(canvas);
-  return texture;
-};
+  const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+  tex.needsUpdate = true;
+  tex.generateMipmaps = false;
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.minFilter = THREE.LinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+}
+
+/** Create a procedural glow texture via canvas */
+export function createGlowTexture(baseColor: string = '#ff6b6b', size = 128): THREE.Texture {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  gradient.addColorStop(0, baseColor);
+  gradient.addColorStop(0.6, baseColor + '88');
+  gradient.addColorStop(1, baseColor + '00');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.needsUpdate = true;
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  tex.minFilter = THREE.LinearMipMapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  return tex;
+}
+
+/** Preprocess a texture for yantra usage per the requested fields */
+export function preprocessYantraImage(tex: THREE.Texture): THREE.Texture {
+  // As requested in the verification comments
+  // Note: colorSpace vs encoding differences across three versions; use the field suggested
+  // Set both if available for compatibility
+  try {
+    // three r152+ uses colorSpace
+    (tex as any).colorSpace = (THREE as any).SRGBColorSpace ?? undefined;
+  } catch (e) {
+    // ignore
+  }
+  // Backward compatible: assign to any to avoid TS property mismatch across versions
+  (tex as any).encoding = (THREE as any).sRGBEncoding ?? (THREE as any).SRGBColorSpace ?? (tex as any).encoding;
+  tex.flipY = false;
+  tex.generateMipmaps = true;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+  // anisotropy needs a renderer to query; set a reasonable default if not available
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const renderer: any = (globalThis as any).__THREE_RENDERER__;
+    const max = renderer?.capabilities?.getMaxAnisotropy?.() ?? 8;
+    tex.anisotropy = Math.min(16, max);
+  } catch (e) {
+    tex.anisotropy = Math.min(16, (tex as any).anisotropy || 1);
+  }
+  tex.needsUpdate = true;
+  return tex;
+}
+
+/** Validate that a texture loaded correctly */
+export function validateTextureLoading(tex?: THREE.Texture): boolean {
+  if (!tex) return false;
+  const img: any = (tex as any).image;
+  if (!img) return false;
+  const w = img.width ?? img.videoWidth ?? 0;
+  const h = img.height ?? img.videoHeight ?? 0;
+  return isFinite(w) && isFinite(h) && w > 1 && h > 1;
+}
+
+/** Dispose helper */
+export function disposeTexture(tex?: THREE.Texture) {
+  if (tex) {
+    try {
+      tex.dispose?.();
+    } catch (e) {
+      // ignore
+    }
+  }
+}
+
+/** Load an HTMLImageElement with CORS handling */
+function loadImageElement(url: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = (ev) => reject(new Error('Image failed to load: ' + url));
+    img.src = url;
+  });
+}
+
+/** Load a centered square cropped texture client-side */
+export async function loadCroppedTexture(url: string, size = 1024): Promise<THREE.Texture> {
+  const img = await loadImageElement(url);
+  const minSide = Math.min(img.width, img.height);
+  const sx = Math.floor((img.width - minSide) / 2);
+  const sy = Math.floor((img.height - minSide) / 2);
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  // draw centered square scaled to size
+  ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+  const tex = new THREE.CanvasTexture(canvas);
+  preprocessYantraImage(tex);
+  return tex;
+}
+
+/** Wrap THREE.TextureLoader.loadAsync if available, otherwise fallback */
+async function loadTextureAsync(url: string): Promise<THREE.Texture> {
+  const loader = new THREE.TextureLoader();
+  // three's loader has loadAsync in modern versions
+  // @ts-ignore
+  if (typeof (loader as any).loadAsync === 'function') {
+    // @ts-ignore
+    return (loader as any).loadAsync(url);
+  }
+  // fallback to manual Promise
+  return new Promise((resolve, reject) => {
+    loader.load(url, (t) => resolve(t), undefined, (err) => reject(err));
+  });
+}
+
+/** Load yantra texture with cache, loadAsync, preprocess, and fallback */
+export async function loadYantraTexture(path: string): Promise<THREE.Texture> {
+  const key = path;
+  if (textureCache.has(key)) return textureCache.get(key)!;
+  try {
+    const tex = await loadTextureAsync(path);
+    preprocessYantraImage(tex);
+    if (!validateTextureLoading(tex)) throw new Error('validation failed');
+    textureCache.set(key, tex);
+    return tex;
+  } catch (e) {
+    console.warn('loadYantraTexture failed for', path, e);
+    const fb = createFallbackTexture('#222222');
+    textureCache.set(key, fb);
+    return fb;
+  }
+}
+
+/** Specific loader for Mahakali yantra (uses cropped texture) */
+export async function createMahakaliYantraTexture(): Promise<THREE.Texture> {
+  const path = '/icons/mahakali-yantra.png';
+  // use the cropped loader for performance and consistency
+  const tex = await loadCroppedTexture(path, 1024).catch(() => loadYantraTexture(path));
+  textureCache.set(path, tex);
+  return tex;
+}
+
+// export cache for debugging
+export { textureCache };
 
 /**
- * Creates a displacement map for the parchment
+ * Backwards-compatible parchment fallback and displacement creators left out
+ * to keep this file focused on yantra texture utilities. Use createFallbackTexture
+ * above for fallback UI.
  */
-export const createDisplacementMap = (): THREE.Texture => {
+
+/**
+ * Create a procedural grayscale displacement map using a canvas.
+ * Returns a THREE.Texture suitable for use as a displacementMap.
+ */
+export function createDisplacementMap(size = 256, intensity = 1): THREE.Texture {
   const canvas = document.createElement('canvas');
-  canvas.width = 512;
-  canvas.height = 512;
-  const context = canvas.getContext('2d');
-  
-  if (context) {
-    context.fillStyle = '#888888';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    
-    // Add some random noise for displacement
-    for (let i = 0; i < 10000; i++) {
-      const x = Math.random() * canvas.width;
-      const y = Math.random() * canvas.height;
-      const grayValue = Math.floor(Math.random() * 40 + 100);
-      context.fillStyle = `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
-      context.fillRect(x, y, 3, 3);
-    }
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+
+  const imageData = ctx.createImageData(size, size);
+  // Simple noise-based displacement
+  for (let i = 0; i < size * size; i++) {
+    // value between 0..255, use a softened random noise for gentle displacement
+    const v = Math.floor((Math.random() * 0.5 + 0.25) * 255 * intensity);
+    imageData.data[i * 4 + 0] = v;
+    imageData.data[i * 4 + 1] = v;
+    imageData.data[i * 4 + 2] = v;
+    imageData.data[i * 4 + 3] = 255;
   }
-  
-  const displacementTexture = new THREE.CanvasTexture(canvas);
-  displacementTexture.wrapS = displacementTexture.wrapT = THREE.RepeatWrapping;
-  return displacementTexture;
-};
+  ctx.putImageData(imageData, 0, 0);
+
+  const tex = new THREE.CanvasTexture(canvas);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.minFilter = THREE.LinearMipMapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = true;
+  tex.needsUpdate = true;
+  return tex;
+}

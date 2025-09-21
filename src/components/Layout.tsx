@@ -1,37 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-  Home,
-  CheckSquare,
-  User,
-  Settings,
-  Menu,
-  X,
-  ChevronRight,
-  BookHeart,
-  LogOut,
-  LogIn,
-  Zap,
-  Sword,
-  Waves,
-  Flame,
-  Moon,
-  Sun,
-  Mountain,
-  Leaf,
-  Sparkles,
-  LayoutDashboard,
-  ShoppingCart,
-  Plus
-} from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { useSettings } from '@/hooks/useSettings';
-import { useDivineSounds } from '@/hooks/useDivineSounds';
-import { useUserProgression } from '@/hooks/useUserProgression';
-import EnhancedDeityIcon from './EnhancedDeityIcon';
 import { useTranslation } from 'react-i18next';
+import EnhancedDeityIcon from './EnhancedDeityIcon';
+import { Leaf, Zap, User, ChevronRight, LogOut, LogIn } from 'lucide-react';
+import { 
+  BookHeart, 
+  CheckSquare, 
+  ShoppingCart, 
+  Settings,
+  Sparkles
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+// Import the Skull and Bone GIF for Mahakali theme
+import SkullBoneGif from '@/../icons/Skull and Bone Turnaround.gif';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -42,14 +26,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mantraIndex, setMantraIndex] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const { progression } = useUserProgression();
-  const { toast } = useToast();
+  const { user, signOut } = useAuth();
   const { settings, isLoading } = useSettings();
-  const { playButtonClick, playNotification } = useDivineSounds();
   const { t } = useTranslation();
 
-  // Hindu mantras for ambient display
+  // Hindu mantras for ambient display (local array instead of import)
   const hinduMantras = [
     "ॐ गं गणपतये नमः",
     "ॐ नमः शिवाय",
@@ -121,6 +102,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       name: "Lord Bhairava",
       element: "Fire"
     },
+    mahakali: {
+      icon: <img src={SkullBoneGif} alt="Mahakali" className="h-28 w-28" />,
+      name: "Maa Mahakali",
+      element: "Fire"
+    }
   };
 
   // Updated navigation items - removed Dashboard and using translations
@@ -139,23 +125,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return false;
   };
 
+  // Simplified handlers without audio functions
   const handleLogout = () => {
-    playButtonClick();
-    logout();
-    toast({
-      title: "Logged out",
-      description: "You've been successfully logged out."
-    });
+    signOut();
     navigate('/login');
   };
 
   const handleLoginNavigation = () => {
-    playButtonClick();
     navigate('/login');
   };
 
   const handleBuySP = () => {
-    playButtonClick();
     navigate('/store');
   };
 
@@ -236,14 +216,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 alt="Saadhana Board Logo"
                 className="h-16 w-16 cursor-pointer transition-transform duration-300 hover:scale-110"
                 onClick={() => {
-                  playButtonClick();
                   navigate('/');
                 }}
               />
               <h1 
                 className="text-2xl font-semibold text-sidebar-foreground cursor-pointer transition-all duration-300 hover:text-purple-300"
                 onClick={() => {
-                  playButtonClick();
                   navigate('/');
                 }}
               >
@@ -256,7 +234,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex flex-col items-center justify-center p-4 space-y-2">
             <div className="flex items-center justify-center transition-transform duration-500 hover:scale-105 cursor-pointer"
               onClick={() => {
-                playButtonClick();
                 navigate('/settings');
               }}
             >
@@ -281,7 +258,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     ? 'bg-purple-500/20 text-foreground border border-purple-500/20 scale-[1.02] shadow-md'
                     : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground border border-transparent hover:border-purple-500/20 hover:scale-[1.01]'
                 } p-3 group`}
-                onClick={() => playButtonClick()}
+                onClick={() => {}}
               >
                 <item.icon 
                   size={24} 
@@ -311,7 +288,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         ? 'bg-purple-500/20 text-foreground border border-purple-500/20 scale-[1.02] shadow-md'
                         : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground border border-transparent hover:border-purple-500/20 hover:scale-[1.01]'
                     } p-3 justify-start group`}
-                    onClick={() => playButtonClick()}
+                    onClick={() => {}}
                   >
                     <User 
                       size={16} 
@@ -362,7 +339,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   Buy SP
                 </span>
                 <span className="ml-auto text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full">
-                  {progression?.spiritualPoints || 0}
+                  0
                 </span>
               </Button>
             </div>
@@ -385,7 +362,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         : 'bg-sidebar-accent text-sidebar-foreground/70 hover:bg-purple-500/10'
                     }`}
                     onClick={() => {
-                      playButtonClick();
                       // Update theme setting
                       if (settings) {
                         // This would need to be implemented in the settings update function

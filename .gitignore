@@ -1,4 +1,12 @@
-# Logs
+# Ignore intermediate/duplicate yantra assets
+/Mahakali_yantra.jpeg
+/icons/Mahakali yantra.png
+
+# Node / build
+node_modules/
+dist/
+/.vite
+/.turbo# Logs
 logs
 *.log
 npm-debug.log*

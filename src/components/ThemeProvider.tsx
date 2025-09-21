@@ -62,6 +62,9 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ settings, children }) => 
       if (appearance.colorScheme !== 'default') {
         if (appearance.colorScheme === 'shiva') {
           document.body.classList.add('shiva-theme');
+        } else if (appearance.colorScheme === 'mahakali') {
+          // Add Mahakali body class for CSS-based adjustments (colors, fonts)
+          document.body.classList.add('theme-mahakali');
         } else {
           document.body.classList.add(`color-scheme-${appearance.colorScheme}`);
         }

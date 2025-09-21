@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useSettings } from '@/hooks/useSettings';
 import { Sparkles, Flame, Skull, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+
+// Import the Skull and Bone GIF for Mahakali theme
+import SkullBoneGif from '@/../icons/Skull and Bone Turnaround.gif';
 
 interface ThemeOption {
   id: string;
@@ -17,6 +21,8 @@ const ThemePanel = () => {
   const [currentTheme, setCurrentTheme] = useState('default');
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const { settings, updateSettings } = useSettings();
+  const [globalMode, setGlobalMode] = useState(false); // toggle between landing vs global theme
   
   // Define theme options
   const themeOptions: ThemeOption[] = [
@@ -33,7 +39,7 @@ const ThemePanel = () => {
       id: 'mahakali',
       name: 'Mahakali Theme',
       description: '🔥 Cremation ground landing page',
-      icon: <Flame className="h-4 w-4" />,
+      icon: <img src={SkullBoneGif} alt="Mahakali" className="h-10 w-10" />,
       color: 'from-red-700 to-black',
       isLandingPage: true,
       path: '/MahakaliLandingpage'
@@ -84,12 +90,17 @@ const ThemePanel = () => {
 
   const handleThemeChange = (themeId: string) => {
     const selectedTheme = themeOptions.find(theme => theme.id === themeId);
-    
-    if (selectedTheme && selectedTheme.isLandingPage && selectedTheme.path) {
+    if (globalMode) {
+      // Apply as global theme in settings using the path-based API
+      if (updateSettings) {
+        updateSettings(['appearance', 'colorScheme'], themeId);
+      }
+      setCurrentTheme(themeId);
+    } else if (selectedTheme && selectedTheme.isLandingPage && selectedTheme.path) {
       // Navigate to the landing page for this theme
       navigate(selectedTheme.path);
     } else {
-      // Apply the theme normally
+      // Apply the theme locally (component level)
       setCurrentTheme(themeId);
     }
     
@@ -124,6 +135,18 @@ const ThemePanel = () => {
     }
   };
 
+  // Get icon for the main theme button
+  const getMainButtonIcon = () => {
+    switch (currentTheme) {
+      case 'mahakali':
+        return <img src={SkullBoneGif} alt="Mahakali" className={`h-10 w-10 ${getIconColor()}`} />;
+      case 'mystery':
+        return <Skull className={`h-4 w-4 ${getIconColor()}`} />;
+      default:
+        return <Sparkles className={`h-4 w-4 ${getIconColor()}`} />;
+    }
+  };
+
   return (
     <div className="relative z-[60]">
       <Button
@@ -131,13 +154,7 @@ const ThemePanel = () => {
         className={getButtonClass()}
         onClick={() => setIsOpen(!isOpen)}
       >
-        {currentTheme === 'mahakali' ? (
-          <Flame className={`h-4 w-4 ${getIconColor()}`} />
-        ) : currentTheme === 'mystery' ? (
-          <Skull className={`h-4 w-4 ${getIconColor()}`} />
-        ) : (
-          <Sparkles className={`h-4 w-4 ${getIconColor()}`} />
-        )}
+        {getMainButtonIcon()}
         <span className="text-sm">Themes</span>
         <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </Button>
@@ -145,8 +162,18 @@ const ThemePanel = () => {
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 w-64 bg-background/90 backdrop-blur-xl rounded-xl border border-purple-500/20 shadow-2xl z-[60]">
           <div className="p-2">
-            <div className="px-3 py-2 text-xs font-semibold text-foreground/70 uppercase tracking-wider">
-              Select Theme
+            <div className="flex items-center justify-between px-3 py-2">
+              <div className="text-xs font-semibold text-foreground/70 uppercase tracking-wider">Select Theme</div>
+              <div className="text-xs text-muted-foreground">
+                <button
+                  type="button"
+                  onClick={() => setGlobalMode(!globalMode)}
+                  className="px-2 py-1 rounded bg-background/10 text-xs border border-muted-foreground"
+                  aria-pressed={globalMode}
+                >
+                  {globalMode ? 'Global Theme' : 'Landing Page'}
+                </button>
+              </div>
             </div>
             <div className="space-y-1">
               {themeOptions.map((theme) => (

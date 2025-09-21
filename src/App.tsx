@@ -191,8 +191,8 @@ const App = () => {
   
   // Determine the theme for background animation
   const backgroundTheme = settings?.appearance?.colorScheme && 
-    ['default', 'earth', 'water', 'fire', 'shiva', 'bhairava', 'serenity', 'ganesha'].includes(settings.appearance.colorScheme) 
-    ? settings.appearance.colorScheme as 'default' | 'earth' | 'water' | 'fire' | 'shiva' | 'bhairava' | 'serenity' | 'ganesha'
+    ['default', 'earth', 'water', 'fire', 'shiva', 'bhairava', 'serenity', 'ganesha', 'mahakali'].includes(settings.appearance.colorScheme) 
+    ? settings.appearance.colorScheme as 'default' | 'earth' | 'water' | 'fire' | 'shiva' | 'bhairava' | 'serenity' | 'ganesha' | 'mahakali'
     : 'default';
   
   return (
