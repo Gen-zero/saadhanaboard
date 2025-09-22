@@ -29,16 +29,10 @@ const FileUpload = ({ onFileProcessed }: FileUploadProps) => {
   const processPDFFile = async (file: File): Promise<string> => {
     return new Promise(async (resolve, reject) => {
       try {
-        const arrayBuffer = await file.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        
-        // Dynamic import to handle pdf-parse
-        const pdfParse = await import('pdf-parse');
-        const data = await (pdfParse as any).default(uint8Array);
-        
-        resolve(data.text);
+        // PDF files are stored directly without text extraction
+        resolve("");
       } catch (error) {
-        reject(new Error("Failed to parse PDF file. The file may be corrupted or password-protected."));
+        reject(new Error("Failed to process PDF file."));
       }
     });
   };
