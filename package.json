@@ -4,14 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-  "dev": "vite",
-  "assets:move": "node scripts/move-assets.js",
-  "build": "npm run assets:move && tsc -b && vite build",
-  "postinstall": "npm run assets:move",
-  "lint": "eslint .",
-  "preview": "vite preview",
-  "backend:dev": "cd backend && npm run dev",
-  "backend:install": "cd backend && npm install"
+    "dev": "vite",
+    "assets:move": "node scripts/move-assets.js",
+    "build": "npm run assets:move && tsc -b && vite build",
+    "postinstall": "npm run assets:move",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "backend:dev": "cd backend && npm run dev",
+    "backend:install": "cd backend && npm install"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -44,6 +44,7 @@
     "@radix-ui/react-tooltip": "^1.1.4",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
+    "@react-three/postprocessing": "^2.19.1",
     "@tanstack/react-query": "^5.56.2",
     "@tsparticles/engine": "^3.9.1",
     "@tsparticles/react": "^3.0.0",
@@ -64,6 +65,7 @@
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "nodemon": "^3.1.10",
+    "postprocessing": "^6.37.8",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
@@ -77,8 +79,6 @@
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.161.0",
-  "@react-three/postprocessing": "^2.15.0",
-  "postprocessing": "^6.32.0",
     "vaul": "^0.9.3",
     "zod": "^3.25.76"
   },

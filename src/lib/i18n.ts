@@ -43,7 +43,7 @@ const englishTranslations = {
     // Settings page
     "settings_menu": "Settings Menu",
     "navigate_settings": "Navigate through different settings sections",
-    "customize_experience": "Customize your SaadhanaBoard experience",
+    "customize_experience": "Customize your SadhanaBoard experience",
     "saving": "Saving...",
     "settings_saved_success": "Your settings have been successfully saved.",
     "save_failed": "Save Failed",
@@ -109,7 +109,7 @@ const hindiTranslations = {
     // Settings page
     "settings_menu": "सेटिंग्स मेनू",
     "navigate_settings": "विभिन्न सेटिंग्स अनुभागों के माध्यम से नेविगेट करें",
-    "customize_experience": "अपने SaadhanaBoard अनुभव को अनुकूलित करें",
+    "customize_experience": "अपने SadhanaBoard अनुभव को अनुकूलित करें",
     "saving": "सहेजा जा रहा है...",
     "settings_saved_success": "आपकी सेटिंग्स सफलतापूर्वक सहेजी गई हैं।",
     "save_failed": "सहेजने में विफल",

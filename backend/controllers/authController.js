@@ -22,6 +22,26 @@ class AuthController {
     }
   }
 
+  // Join waiting list
+  static async joinWaitlist(req, res) {
+    try {
+      const { name, email, reason } = req.body;
+
+      if (!name || !email) {
+        return res.status(400).json({ error: 'Name and email are required' });
+      }
+
+      const waitlistEntry = await AuthService.joinWaitlist(name, email, reason);
+
+      res.status(201).json({
+        message: 'Successfully joined the waiting list! We will contact you soon.',
+        waitlistEntry
+      });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+
   // User login
   static async login(req, res) {
     try {

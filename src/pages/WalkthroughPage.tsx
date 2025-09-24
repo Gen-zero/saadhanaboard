@@ -124,7 +124,7 @@ const WalkthroughPage = () => {
           
           <div className="flex items-center justify-center mb-4">
             <img 
-              src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
+              src="/lovable-uploads/sadhanaboard_logo.png" 
               alt="Saadhana Board Logo" 
               className="h-12 w-12" 
             />

@@ -43,7 +43,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     "ॐ तत्सत्वितुर्वरेण्यं",
     "ॐ शांतिः शांतिः शांतिः",
     "ॐ नमो नारायणाय",
-    "ॐ नमः शिवाय शंभवे च विष्णवे देवाय च ध्रुवाय च"
+    "ॐ नमः शिवाय शंभवे च विष्णवे देवाय च ध्रुवाय च",
+    "ॐ ह्रीं दुर्गायै नमः",
+    "ॐ ऐं सरस्वत्यै नमः",
+    "ॐ ह्रीं श्रीं क्लीं त्रिभुवन महालक्ष्म्यै अस्मि",
+    "ॐ गुरुर्ब्रह्मा गुरुर्विष्णुः गुरुर्देवो महेश्वरः",
+    "ॐ सह नाववतु सह नौ भुनक्तु",
+    "ॐ पूर्णमदः पूर्णमिदं पूर्णात्पूर्णमुदच्यते",
+    "ॐ असतो मा सद्गमय तमसो मा ज्योतिर्गमय",
+    "ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम्",
+    "ॐ वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ",
+    "ॐ मणिपद्मे हूं",
+    "ॐ अहं ब्रह्मास्मि",
+    "ॐ तत्त्वमसि",
+    "ॐ सर्वं खल्विदं ब्रह्म",
+    "ॐ ईशावास्यमिदं सर्वम्",
+    "ॐ यतो वा इमानि भूतानि जायन्ते",
+    "ॐ हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे",
+    "ॐ राम राम राम राम राम राम रामेति",
+    "ॐ जय गणेश जय गणेश जय गणेश देवा",
+    "ॐ भद्रं कर्णेभिः शृणुयाम देवाः"
   ];
 
   // Cycle through mantras
@@ -212,7 +231,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center justify-between p-4 border-b border-purple-500/10 pt-10">
             <div className="flex items-center gap-2">
               <img
-                src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png"
+                src="/lovable-uploads/sadhanaboard_logo.png"
                 alt="Saadhana Board Logo"
                 className="h-16 w-16 cursor-pointer transition-transform duration-300 hover:scale-110"
                 onClick={() => {
@@ -225,7 +244,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   navigate('/');
                 }}
               >
-                Saadhana Board
+                SadhanaBoard
               </h1>
             </div>
           </div>
@@ -342,36 +361,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   0
                 </span>
               </Button>
-            </div>
-            
-            {/* Theme selector */}
-            <div className="mt-4 pt-4 border-t border-purple-500/10">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-sidebar-foreground/70">Theme</span>
-                <span className="text-xs text-sidebar-foreground/50 capitalize">
-                  {settings?.appearance?.colorScheme || 'default'}
-                </span>
-              </div>
-              <div className="flex gap-1">
-                {['default', 'earth', 'water', 'fire', 'shiva'].map((theme) => (
-                  <button
-                    key={theme}
-                    className={`flex-1 h-8 rounded-md text-xs transition-all duration-200 ${
-                      settings?.appearance?.colorScheme === theme
-                        ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                        : 'bg-sidebar-accent text-sidebar-foreground/70 hover:bg-purple-500/10'
-                    }`}
-                    onClick={() => {
-                      // Update theme setting
-                      if (settings) {
-                        // This would need to be implemented in the settings update function
-                      }
-                    }}
-                  >
-                    {theme.charAt(0).toUpperCase() + theme.slice(1)}
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
         </div>

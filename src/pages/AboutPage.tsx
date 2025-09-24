@@ -49,7 +49,7 @@ const AboutPage = () => {
         {/* Hero Section */}
         <div className="text-center py-12 backdrop-blur-sm bg-background/70 rounded-lg border border-purple-500/20">
           <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600 mb-4">
-            About SaadhanaBoard
+            About SadhanaBoard
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             A sacred space for spiritual practitioners to track their journey, connect with the divine, 
@@ -68,7 +68,7 @@ const AboutPage = () => {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                SaadhanaBoard was created with a sacred purpose: to support spiritual practitioners 
+                SadhanaBoard was created with a sacred purpose: to support spiritual practitioners 
                 in their journey toward self-realization and divine connection.
               </p>
               <p className="text-muted-foreground mb-4">
@@ -157,7 +157,7 @@ const AboutPage = () => {
         <div className="backdrop-blur-sm bg-background/70 p-8 rounded-lg border border-purple-500/20 text-center">
           <h2 className="text-2xl font-bold mb-4">Join Our Spiritual Community</h2>
           <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-            Begin your journey with SaadhanaBoard today and experience the transformative power of 
+            Begin your journey with SadhanaBoard today and experience the transformative power of 
             consistent spiritual practice
           </p>
           <Button size="lg" onClick={() => navigate("/signup")} className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600">

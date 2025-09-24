@@ -109,6 +109,31 @@ class AuthService {
       throw new Error(`Failed to get user: ${error.message}`);
     }
   }
+
+  // Join waiting list
+  static async joinWaitlist(name, email, reason) {
+    try {
+      // Check if email already exists in waitlist
+      const existingEntry = await db.query(
+        'SELECT id FROM waitlist WHERE email = $1',
+        [email]
+      );
+
+      if (existingEntry.rows.length > 0) {
+        throw new Error('This email is already on the waiting list');
+      }
+
+      // Add to waitlist
+      const result = await db.query(
+        'INSERT INTO waitlist (name, email, reason, created_at) VALUES ($1, $2, $3, NOW()) RETURNING id, name, email, reason, created_at',
+        [name, email, reason || null]
+      );
+
+      return result.rows[0];
+    } catch (error) {
+      throw new Error(`Failed to join waiting list: ${error.message}`);
+    }
+  }
 }
 
 module.exports = AuthService;

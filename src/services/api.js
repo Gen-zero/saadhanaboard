@@ -42,6 +42,41 @@ class ApiService {
     }
   }
 
+  // Convenience methods for different HTTP verbs
+  async get(endpoint, options = {}) {
+    return this.request(endpoint, { method: 'GET', ...options });
+  }
+
+  async post(endpoint, data = null, options = {}) {
+    const config = {
+      method: 'POST',
+      ...options,
+    };
+    
+    if (data) {
+      config.body = JSON.stringify(data);
+    }
+    
+    return this.request(endpoint, config);
+  }
+
+  async put(endpoint, data = null, options = {}) {
+    const config = {
+      method: 'PUT',
+      ...options,
+    };
+    
+    if (data) {
+      config.body = JSON.stringify(data);
+    }
+    
+    return this.request(endpoint, config);
+  }
+
+  async delete(endpoint, options = {}) {
+    return this.request(endpoint, { method: 'DELETE', ...options });
+  }
+
   // Auth methods
   async register(email, password, displayName) {
     const data = await this.request('/auth/register', {
@@ -197,4 +232,7 @@ class ApiService {
   }
 }
 
-export default new ApiService();
+const apiService = new ApiService();
+
+export { apiService as api };
+export default apiService;

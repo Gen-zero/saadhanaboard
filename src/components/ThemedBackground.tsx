@@ -2,15 +2,74 @@ import { useEffect, useRef } from 'react';
 import MahakaliAnimatedBackground from '@/components/MahakaliAnimatedBackground';
 
 // Function to draw the Om symbol for the Default theme
-const drawOmSymbol = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, alpha: number) => {
+const drawOmSymbol = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, alpha: number, isGold: boolean = false) => {
   ctx.save();
   ctx.translate(x, y);
   ctx.globalAlpha = alpha;
-  ctx.fillStyle = '#bb86fc'; // Purple color
-  ctx.font = `bold ${size}px Arial`;
+  
+  if (isGold) {
+    // Create a golden gradient for accent Om symbols
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.8);
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); // Bright white center
+    gradient.addColorStop(0.3, 'rgba(255, 223, 0, 1)'); // Bright gold
+    gradient.addColorStop(0.6, 'rgba(255, 215, 0, 0.95)'); // Gold
+    gradient.addColorStop(1, 'rgba(218, 165, 32, 0.8)'); // Goldenrod edge
+    ctx.fillStyle = gradient;
+    
+    // Add intense golden glow effect
+    ctx.shadowColor = 'rgba(255, 215, 0, 1)';
+    ctx.shadowBlur = size * 0.8;
+    
+    // Make it bolder by increasing font weight and size
+    ctx.font = `900 ${size * 1.3}px Arial, sans-serif`; // Increased size by 30% and made ultra-bold
+  } else {
+    ctx.fillStyle = '#bb86fc'; // Purple color
+    ctx.font = `bold ${size}px Arial`;
+  }
+  
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('ॐ', 0, 0);
+  
+  if (isGold) {
+    // Add secondary glow layer for more intensity
+    ctx.shadowColor = 'rgba(255, 255, 0, 0.8)';
+    ctx.shadowBlur = size * 0.4;
+    ctx.fillText('ॐ', 0, 0);
+  }
+  
+  ctx.restore();
+};
+
+// Function to draw golden accent mantras
+const drawGoldMantra = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, alpha: number, mantra: string) => {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.globalAlpha = alpha;
+  
+  // Create a radial golden gradient for more intense glow
+  const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 3);
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)'); // Bright white center
+  gradient.addColorStop(0.2, 'rgba(255, 223, 0, 1)'); // Bright gold
+  gradient.addColorStop(0.5, 'rgba(255, 215, 0, 0.95)'); // Gold
+  gradient.addColorStop(1, 'rgba(218, 165, 32, 0.8)'); // Goldenrod
+  ctx.fillStyle = gradient;
+  
+  // Add intense golden glow
+  ctx.shadowColor = 'rgba(255, 215, 0, 1)';
+  ctx.shadowBlur = size * 1.2;
+  
+  // Make font bolder and larger
+  ctx.font = `900 ${size * 1.4}px Arial, sans-serif`; // Increased size by 40% and made ultra-bold
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(mantra, 0, 0);
+  
+  // Add secondary glow layer
+  ctx.shadowColor = 'rgba(255, 255, 0, 0.9)';
+  ctx.shadowBlur = size * 0.6;
+  ctx.fillText(mantra, 0, 0);
+  
   ctx.restore();
 };
 
@@ -937,7 +996,7 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
       switch (theme) {
         case 'default':
           particleCount = 150;
-          spiritualElementCount = 8;
+          spiritualElementCount = 12; // Increased to include more gold elements
           for (let i = 0; i < particleCount; i++) {
             particles.push({
               x: Math.random() * canvas.width,
@@ -972,18 +1031,26 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
             });
           }
           
+          // Define mantras for golden accent elements
+          const sacredMantras = ['ॐ', 'ॐ नमः शिवाय', 'सत्यम्', 'शान्ति', 'आनन्द', 'प्रेम'];
+          
           for (let i = 0; i < spiritualElementCount; i++) {
+            const isGoldAccent = Math.random() > 0.65; // 35% chance for gold accent
+            const elementType = Math.random() > 0.6 ? 'mantra' : (Math.random() > 0.5 ? 'om' : 'sriyantra');
+            
             spiritualElements.push({
               x: Math.random() * canvas.width,
               y: Math.random() * canvas.height,
               size: Math.random() * 20 + 10,
-              speedX: (Math.random() * 0.5 - 0.25) * 0.5,
-              speedY: (Math.random() * 0.5 - 0.25) * 0.5,
-              type: Math.random() > 0.5 ? 'om' : 'sriyantra',
+              speedX: (Math.random() * 0.5 - 0.25) * (isGoldAccent ? 0.3 : 0.5), // 40% slower for gold
+              speedY: (Math.random() * 0.5 - 0.25) * (isGoldAccent ? 0.3 : 0.5), // 40% slower for gold
+              type: elementType,
               rotation: Math.random() * Math.PI * 2,
-              rotationSpeed: (Math.random() * 0.02 - 0.01),
+              rotationSpeed: (Math.random() * 0.02 - 0.01) * (isGoldAccent ? 0.5 : 1), // 50% slower rotation for gold
               alpha: Math.random() * 0.3 + 0.1,
               pulseDirection: Math.random() > 0.5 ? 1 : -1,
+              isGold: isGoldAccent,
+              mantraText: sacredMantras[Math.floor(Math.random() * sacredMantras.length)],
               update: function() {
                 this.x += this.speedX;
                 this.y += this.speedY;
@@ -992,7 +1059,7 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
                 if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
                 if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
                 
-                this.alpha += 0.005 * this.pulseDirection;
+                this.alpha += 0.005 * this.pulseDirection * (this.isGold ? 0.7 : 1); // Slower pulse for gold
                 if (this.alpha <= 0.1 || this.alpha >= 0.4) {
                   this.pulseDirection *= -1;
                 }
@@ -1002,7 +1069,23 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
                 
                 switch (this.type) {
                   case 'om':
-                    drawOmSymbol(ctx, this.x, this.y, this.size, this.alpha);
+                    drawOmSymbol(ctx, this.x, this.y, this.size, this.alpha, this.isGold);
+                    break;
+                  case 'mantra':
+                    if (this.isGold) {
+                      drawGoldMantra(ctx, this.x, this.y, this.size * 0.6, this.alpha, this.mantraText);
+                    } else {
+                      // Draw regular mantra
+                      ctx.save();
+                      ctx.translate(this.x, this.y);
+                      ctx.globalAlpha = this.alpha;
+                      ctx.fillStyle = '#bb86fc';
+                      ctx.font = `bold ${this.size * 0.6}px Arial`;
+                      ctx.textAlign = 'center';
+                      ctx.textBaseline = 'middle';
+                      ctx.fillText(this.mantraText, 0, 0);
+                      ctx.restore();
+                    }
                     break;
                   case 'sriyantra':
                     drawSriYantra(ctx, this.x, this.y, this.size, this.rotation, this.alpha);
@@ -1015,7 +1098,7 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
           
         case 'earth':
           particleCount = 120;
-          spiritualElementCount = 6;
+          spiritualElementCount = 8; // Increased for gold mantras
           for (let i = 0; i < particleCount; i++) {
             particles.push({
               x: Math.random() * canvas.width,
@@ -1046,17 +1129,26 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
             });
           }
           
+          // Earth-themed mantras
+          const earthMantras = ['ॐ', 'पृथ्वी', 'भूमि', 'माता', 'प्रकृति'];
+          
           for (let i = 0; i < spiritualElementCount; i++) {
+            const isMantra = Math.random() > 0.6; // 40% chance for mantras
+            const isGoldAccent = Math.random() > 0.7; // 30% chance for gold
+            
             spiritualElements.push({
               x: Math.random() * canvas.width,
               y: Math.random() * canvas.height,
               size: Math.random() * 30 + 20,
-              speedX: (Math.random() * 0.3 - 0.15),
-              speedY: (Math.random() * 0.3 - 0.15),
+              speedX: (Math.random() * 0.3 - 0.15) * (isGoldAccent ? 0.4 : 1), // 60% slower for gold
+              speedY: (Math.random() * 0.3 - 0.15) * (isGoldAccent ? 0.4 : 1), // 60% slower for gold
               rotation: Math.random() * Math.PI * 2,
-              rotationSpeed: (Math.random() * 0.01 - 0.005),
+              rotationSpeed: (Math.random() * 0.01 - 0.005) * (isGoldAccent ? 0.3 : 1), // 70% slower rotation
               alpha: Math.random() * 0.4 + 0.2,
               pulseDirection: Math.random() > 0.5 ? 1 : -1,
+              type: isMantra ? 'mantra' : 'lotus',
+              isGold: isGoldAccent,
+              mantraText: earthMantras[Math.floor(Math.random() * earthMantras.length)],
               update: function() {
                 this.x += this.speedX;
                 this.y += this.speedY;
@@ -1074,7 +1166,25 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
               },
               draw: function() {
                 if (!ctx) return;
-                drawLotus(ctx, this.x, this.y, this.size, this.rotation, this.alpha);
+                
+                if (this.type === 'mantra') {
+                  if (this.isGold) {
+                    drawGoldMantra(ctx, this.x, this.y, this.size * 0.4, this.alpha, this.mantraText);
+                  } else {
+                    // Draw earth-themed mantra
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = '#8b5a2b'; // Earth brown
+                    ctx.font = `bold ${this.size * 0.4}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(this.mantraText, 0, 0);
+                    ctx.restore();
+                  }
+                } else {
+                  drawLotus(ctx, this.x, this.y, this.size, this.rotation, this.alpha);
+                }
               }
             });
           }
@@ -1082,7 +1192,7 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
           
         case 'water':
           particleCount = 100;
-          spiritualElementCount = 8;
+          spiritualElementCount = 10;
           for (let i = 0; i < particleCount; i++) {
             particles.push({
               x: Math.random() * canvas.width,
@@ -1113,15 +1223,24 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
             });
           }
           
+          // Water-themed mantras
+          const waterMantras = ['ॐ', 'वायु', 'जल', 'अमृतम्', 'प्राण'];
+          
           for (let i = 0; i < spiritualElementCount; i++) {
+            const isMantra = Math.random() > 0.5; // 50% chance for mantras
+            const isGoldAccent = Math.random() > 0.75; // 25% chance for gold
+            
             spiritualElements.push({
               x: Math.random() * canvas.width,
               y: canvas.height + 50, // Start from bottom
               size: Math.random() * 15 + 10,
-              speedX: (Math.random() * 0.5 - 0.25),
-              speedY: -(Math.random() * 1 + 0.5), // Move upward
+              speedX: (Math.random() * 0.5 - 0.25) * (isGoldAccent ? 0.5 : 1), // 50% slower horizontal for gold
+              speedY: -(Math.random() * 1 + 0.5) * (isGoldAccent ? 0.6 : 1), // 40% slower upward for gold
               alpha: Math.random() * 0.6 + 0.2,
               pulseDirection: Math.random() > 0.5 ? 1 : -1,
+              type: isMantra ? 'mantra' : 'diya',
+              isGold: isGoldAccent,
+              mantraText: waterMantras[Math.floor(Math.random() * waterMantras.length)],
               update: function() {
                 this.x += this.speedX;
                 this.y += this.speedY;
@@ -1139,7 +1258,25 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
               },
               draw: function() {
                 if (!ctx) return;
-                drawDiya(ctx, this.x, this.y, this.size, this.alpha);
+                
+                if (this.type === 'mantra') {
+                  if (this.isGold) {
+                    drawGoldMantra(ctx, this.x, this.y, this.size * 0.6, this.alpha, this.mantraText);
+                  } else {
+                    // Draw water-themed mantra
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.globalAlpha = this.alpha;
+                    ctx.fillStyle = '#4d9de0'; // Blue color
+                    ctx.font = `bold ${this.size * 0.6}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(this.mantraText, 0, 0);
+                    ctx.restore();
+                  }
+                } else {
+                  drawDiya(ctx, this.x, this.y, this.size, this.alpha);
+                }
               }
             });
           }

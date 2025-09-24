@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth-context";
 import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
+import WaitlistPage from "./pages/WaitlistPage";
 import DashboardPage from "./pages/DashboardPage";
 import SadhanaPage from "./pages/SadhanaPage";
 import SaadhanasPage from "./pages/SaadhanasPage";
@@ -51,8 +51,25 @@ const hinduMantras = [
   "ॐ शांतिः शांतिः शांतिः",
   "ॐ नमो नारायणाय",
   "ॐ नमः शिवाय शंभवे च विष्णवे देवाय च ध्रुवाय च",
-  "ॐ गं गणपतये नमः सर्वदुःखप्रशमनाय",
-  "ॐ नमो भगवते वासुदेवाय जनार्दनाय"
+  "ॐ ह्रीं दुर्गायै नमः",
+  "ॐ ऐं सरस्वत्यै नमः",
+  "ॐ ह्रीं श्रीं क्लीं त्रिभुवन महालक्ष्म्यै अस्मि",
+  "ॐ गुरुर्ब्रह्मा गुरुर्विष्णुः गुरुर्देवो महेश्वरः",
+  "ॐ सह नाववतु सह नौ भुनक्तु",
+  "ॐ पूर्णमदः पूर्णमिदं पूर्णात्पूर्णमुदच्यते",
+  "ॐ असतो मा सद्गमय तमसो मा ज्योतिर्गमय",
+  "ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम्",
+  "ॐ वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ",
+  "ॐ मणिपद्मे हूं",
+  "ॐ अहं ब्रह्मास्मि",
+  "ॐ तत्त्वमसि",
+  "ॐ सर्वं खल्विदं ब्रह्म",
+  "ॐ ईशावास्यमिदं सर्वम्",
+  "ॐ यतो वा इमानि भूतानि जायन्ते",
+  "ॐ हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे",
+  "ॐ राम राम राम राम राम राम रामेति",
+  "ॐ जय गणेश जय गणेश जय गणेश देवा",
+  "ॐ भद्रं कर्णेभिः शृणुयाम देवाः"
 ];
 
 // Protected route component that checks for authentication
@@ -152,7 +169,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/signup" element={<SignupPage />} />
+      <Route path="/signup" element={<WaitlistPage />} />
+      <Route path="/waitlist" element={<WaitlistPage />} />
       <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
       <Route path="/walkthrough" element={<ProtectedRoute><WalkthroughPage /></ProtectedRoute>} />
       <Route path="/your-atma-yantra" element={<ProtectedRoute><SpiritualDemoPage /></ProtectedRoute>} />
@@ -218,7 +236,7 @@ const App = () => {
             ))}
             
             {/* Floating yantra patterns */}
-            {[...Array(8)].map((_, index) => (
+            {[...Array(4)].map((_, index) => (
               <div 
                 key={index}
                 className="floating-yantra"

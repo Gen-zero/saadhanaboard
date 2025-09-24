@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, Trophy, Calendar, Users, Sparkles, MoonStar, Flame, Target, Heart, Mountain, Star, TrendingUp, Play, Volume2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
-import ThemePanel from "@/components/ThemePanel";
 // Removed Layout import to create a distinct landing page experience
 
 const HomePage = () => {
@@ -84,7 +83,7 @@ const HomePage = () => {
     {
       name: "Priya Sharma",
       role: "Yoga Teacher",
-      content: "SaadhanaBoard has transformed my daily practice. The tracking features keep me accountable and the progress insights are truly inspiring.",
+      content: "SadhanaBoard has transformed my daily practice. The tracking features keep me accountable and the progress insights are truly inspiring.",
       avatar: "PS"
     },
     {
@@ -121,15 +120,16 @@ const HomePage = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-fuchsia-500 flex items-center justify-center">
-                <Sparkles className="h-6 w-6 text-white" />
-              </div>
+              <img
+                src="/lovable-uploads/sadhanaboard_logo.png"
+                alt="SadhanaBoard Logo"
+                className="h-10 w-10 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110"
+              />
               <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-fuchsia-500">
-                SaadhanaBoard
+                SadhanaBoard
               </span>
             </Link>
             <div className="flex items-center space-x-4">
-              <ThemePanel />
               <Button asChild variant="ghost" className="text-foreground/80 hover:text-foreground hover:bg-background/20">
                 <Link to="/login">Login</Link>
               </Button>
@@ -142,59 +142,8 @@ const HomePage = () => {
       </header>
 
       <div className="space-y-16 animate-fade-in">
-        {/* Hero Section */}
-        <section className="text-center py-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-background/20 to-background/30 backdrop-blur-sm"></div>
-          <div className="relative z-10 max-w-4xl mx-auto px-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-300 mb-6 border border-purple-500/20">
-              <Sparkles className="h-4 w-4" />
-              <span className="text-sm font-medium">Divine Transformation Awaits</span>
-            </div>
-            <h1 className="text-4xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-fuchsia-300 to-purple-500">
-              Your Spiritual Journey
-              <br />
-              <span className="block mt-2">Begins Here</span>
-            </h1>
-            <p className="text-xl text-muted-foreground/90 mb-10 max-w-3xl mx-auto">
-              Embark on a transformative spiritual path with our comprehensive sadhana tracking platform. 
-              Cultivate discipline, track progress, and connect with a community of dedicated practitioners.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-purple-500/90 to-fuchsia-500/90 hover:from-purple-500 hover:to-fuchsia-500 text-lg px-8 py-6 backdrop-blur-sm"
-                asChild
-              >
-                <Link to="/signup">
-                  Begin Your Journey
-                </Link>
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="border-purple-500/40 text-lg px-8 py-6 hover:bg-purple-500/10 backdrop-blur-sm"
-                asChild
-              >
-                <Link to="/login">
-                  Continue Practice
-                </Link>
-              </Button>
-            </div>
-            
-            {/* Stats Section */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-              {stats.map((stat, index) => {
-                const Icon = stat.icon;
-                return (
-                  <div key={index} className="backdrop-blur-md bg-background/20 p-4 rounded-lg border border-purple-500/10">
-                    <Icon className="h-8 w-8 text-purple-400 mx-auto mb-2" />
-                    <div className="text-2xl font-bold text-purple-300">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.label}</div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+        {/* Hero Section - Empty */}
+        <section className="py-20">
         </section>
 
         {/* Features Section - Marketing focused */}
@@ -282,7 +231,7 @@ const HomePage = () => {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">What Practitioners Say</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Join thousands of practitioners who have deepened their spiritual journey with SaadhanaBoard
+              Join thousands of practitioners who have deepened their spiritual journey with SadhanaBoard
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -435,11 +384,13 @@ const HomePage = () => {
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-fuchsia-500 flex items-center justify-center">
-                  <Sparkles className="h-4 w-4 text-white" />
-                </div>
+                <img
+                  src="/lovable-uploads/sadhanaboard_logo.png"
+                  alt="SadhanaBoard Logo"
+                  className="h-8 w-8 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110"
+                />
                 <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-fuchsia-500">
-                  SaadhanaBoard
+                  SadhanaBoard
                 </span>
               </div>
               <div className="flex space-x-6 text-sm text-muted-foreground/80">
@@ -455,14 +406,11 @@ const HomePage = () => {
               </div>
             </div>
             <div className="mt-6 text-center text-xs text-muted-foreground/70">
-              © {new Date().getFullYear()} SaadhanaBoard. All rights reserved. A sacred space for spiritual practitioners.
+              © {new Date().getFullYear()} SadhanaBoard. All rights reserved. A sacred space for spiritual practitioners.
             </div>
           </div>
         </footer>
       </div>
-      
-      {/* Theme Panel */}
-      <ThemePanel />
     </div>
   );
 };

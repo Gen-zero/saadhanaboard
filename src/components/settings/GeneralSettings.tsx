@@ -96,26 +96,6 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = ({
 
           <Separator />
 
-          {/* Theme */}
-          <div className="space-y-2">
-            <Label htmlFor="theme">{t('theme')}</Label>
-            <Select 
-              value={settings.theme || 'light'} 
-              onValueChange={(value) => updateSettings(['theme'], value)}
-            >
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t('select_theme')} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">{t('light')}</SelectItem>
-                <SelectItem value="dark">{t('dark')}</SelectItem>
-                <SelectItem value="system">{t('system')}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Separator />
-
           {/* Language - Limited to English and Hindi */}
           <div className="space-y-2">
             <Label htmlFor="language">{t('language')}</Label>

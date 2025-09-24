@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/lib/auth-context";
-import { LogIn, User, Key, Loader2 } from "lucide-react";
+import { LogIn, User, Key, Loader2, ArrowLeft } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
 
 const formSchema = z.object({
@@ -56,11 +56,25 @@ const LoginPage = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col items-center justify-center p-4 ${isShivaTheme ? '' : 'cosmic-nebula-bg'}`}>
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
+    <div className={`min-h-screen flex flex-col ${isShivaTheme ? '' : 'cosmic-nebula-bg'}`}>
+      {/* Fixed Back Button - Top Left Corner */}
+      <div className="fixed top-4 left-4 z-50">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate('/landingpage')}
+          className="flex items-center text-muted-foreground hover:text-foreground bg-background/80 backdrop-blur-sm border border-purple-500/20"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Homepage
+        </Button>
+      </div>
+
+      {/* Main Content - Centered */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md animate-fade-in">
         <div className="flex flex-col items-center text-center mb-8">
           <img 
-            src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
+            src="/lovable-uploads/sadhanaboard_logo.png" 
             alt="Saadhana Board Logo" 
             className="h-20 w-20 mb-4" 
           />
@@ -138,7 +152,7 @@ const LoginPage = () => {
             <p>
               Don't have an account?{" "}
               <Link to="/signup" className="text-purple-500 hover:text-purple-700 hover:underline">
-                Sign up
+                Join waitlist
               </Link>
             </p>
           </div>
@@ -146,6 +160,7 @@ const LoginPage = () => {
 
         <div className="text-center text-xs text-muted-foreground">
           <p>Create an account to begin your spiritual journey</p>
+        </div>
         </div>
       </div>
     </div>

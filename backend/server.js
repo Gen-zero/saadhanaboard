@@ -31,7 +31,7 @@ app.use('/api/sadhanas', sadhanaRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', message: 'SaadhanaBoard backend is running' });
+  res.json({ status: 'OK', message: 'SadhanaBoard backend is running' });
 });
 
 // Error handling middleware

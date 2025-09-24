@@ -95,6 +95,20 @@ CREATE INDEX IF NOT EXISTS idx_profiles_id ON profiles(id);
 CREATE INDEX IF NOT EXISTS idx_sadhanas_user_id ON sadhanas(user_id);
 CREATE INDEX IF NOT EXISTS idx_sadhana_progress_user_id ON sadhana_progress(user_id);
 CREATE INDEX IF NOT EXISTS idx_spiritual_books_user_id ON spiritual_books(user_id);
+
+-- Create waitlist table
+CREATE TABLE IF NOT EXISTS waitlist (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT UNIQUE NOT NULL,
+  reason TEXT,
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_waitlist_email ON waitlist(email);
+CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist(status);
 `;
 
 async function initDatabase() {
@@ -120,6 +134,25 @@ async function initDatabase() {
       // Removed welcome_quiz_completed column addition
     } catch (error) {
       console.log('Profile columns already exist or error adding them:', error.message);
+    }
+    
+    // Create waitlist table if it doesn't exist
+    try {
+      await db.query(`
+        CREATE TABLE IF NOT EXISTS waitlist (
+          id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          name TEXT NOT NULL,
+          email TEXT UNIQUE NOT NULL,
+          reason TEXT,
+          status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        )
+      `);
+      await db.query('CREATE INDEX IF NOT EXISTS idx_waitlist_email ON waitlist(email)');
+      await db.query('CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist(status)');
+    } catch (error) {
+      console.log('Waitlist table already exists or error creating it:', error.message);
     }
     
     console.log('Database schema initialized successfully!');
