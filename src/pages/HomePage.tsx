@@ -115,44 +115,102 @@ const HomePage = () => {
 
   return (
     <>
-      {/* Sticky Navigation Bar with Saadhana Paper Texture */}
+      {/* Sticky Navigation Bar - Glassy Spiritual Theme */}
       <div 
-        className="sticky top-4 z-50 mx-4"
+        className="sticky top-0 left-0 right-0 z-[999999] px-4 pt-4"
         style={{
           pointerEvents: 'auto'
         }}
       >
         <nav 
-          className="bg-[url('/textures/parchment.jpg')] bg-cover bg-center border border-amber-500/30 rounded-lg shadow-2xl backdrop-blur-sm"
+          className="relative overflow-hidden rounded-2xl transition-all duration-500 hover:shadow-2xl group"
           style={{
-            backgroundImage: 'url(/textures/parchment.jpg)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundColor: 'rgba(255, 248, 220, 0.9)', // Fallback parchment color
-            backdropFilter: 'blur(8px)',
-            boxShadow: 'inset 0 0 20px rgba(255, 215, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3)'
+            background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.08), rgba(75, 0, 130, 0.12), rgba(148, 0, 211, 0.08))',
+            backdropFilter: 'blur(20px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+            border: '1px solid rgba(255, 215, 0, 0.25)',
+            boxShadow: '0 8px 32px rgba(139, 69, 19, 0.1), 0 0 0 1px rgba(255, 215, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
           }}
         >
-          {/* Decorative border overlay */}
-          <div className="absolute inset-0 border-[8px] border-[rgba(255,215,0,0.4)] rounded-lg pointer-events-none"></div>
+          {/* Subtle gradient overlay */}
+          <div 
+            className="absolute inset-0 opacity-30 group-hover:opacity-50 transition-opacity duration-500"
+            style={{
+              background: 'linear-gradient(45deg, rgba(255, 215, 0, 0.05), transparent, rgba(138, 43, 226, 0.05))'
+            }}
+          />
           
-          <div className="flex items-center justify-between px-6 py-4 relative z-10">
-            <Link to="/" className="flex items-center space-x-2">
-              <img
-                src="/lovable-uploads/sadhanaboard_logo.png"
-                alt="SadhanaBoard Logo"
-                className="h-10 w-10 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110 border-2 border-amber-600/30"
-              />
-              <span className="text-xl font-bold text-amber-900 font-serif drop-shadow-sm">
-                SadhanaBoard
-              </span>
+          {/* Floating spiritual particles in navbar */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-2 left-16 w-1 h-1 bg-yellow-400/60 rounded-full animate-pulse" />
+            <div className="absolute top-4 right-20 w-1.5 h-1.5 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
+            <div className="absolute bottom-3 left-32 w-1 h-1 bg-fuchsia-400/50 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+          </div>
+          
+          <div className="relative flex items-center justify-between px-6 py-4">
+            <Link to="/" className="flex items-center space-x-3">
+              <div className="relative">
+                <img
+                  src="/lovable-uploads/sadhanaboard_logo.png"
+                  alt="SadhanaBoard Logo"
+                  className="h-12 w-12 rounded-full cursor-pointer scale-110 shadow-lg shadow-purple-500/30"
+                  style={{
+                    filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.3))'
+                  }}
+                />
+                {/* Constant glowing ring around logo */}
+                <div 
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: 'conic-gradient(from 0deg, rgba(255, 215, 0, 0.3), rgba(138, 43, 226, 0.3), rgba(255, 215, 0, 0.3))',
+                    padding: '2px'
+                  }}
+                >
+                  <div className="w-full h-full rounded-full bg-background/20" />
+                </div>
+              </div>
+              
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-purple-300 to-fuchsia-300">
+                  SadhanaBoard
+                </span>
+                <span className="text-xs text-yellow-400/70 font-medium tracking-wider">
+                  ✨ Your Digital Yantra
+                </span>
+              </div>
             </Link>
+            
             <div className="flex items-center space-x-4">
-              <Button asChild variant="ghost" className="text-amber-800 hover:text-amber-900 hover:bg-amber-200/30 border border-amber-600/20">
-                <Link to="/login">Login</Link>
+              <Button 
+                asChild 
+                variant="ghost" 
+                className="relative text-foreground/80 hover:text-foreground hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-purple-400/40 transition-all duration-300 group/btn overflow-hidden"
+              >
+                <Link to="/login">
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                  <span className="relative z-10">Login</span>
+                </Link>
               </Button>
-              <Button asChild className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white border border-amber-700/50 shadow-lg">
-                <Link to="/signup">Sign Up</Link>
+              
+              <Button 
+                asChild 
+                className="relative bg-gradient-to-r from-purple-500/80 via-fuchsia-500/80 to-purple-500/80 hover:from-purple-400 hover:via-fuchsia-400 hover:to-purple-400 backdrop-blur-sm border border-purple-400/30 hover:border-yellow-400/50 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 group/cta overflow-hidden"
+              >
+                <Link to="/signup">
+                  {/* Animated gradient background */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-purple-400/20 to-fuchsia-400/20 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500"
+                  />
+                  {/* Floating sparkles */}
+                  <div className="absolute top-1 right-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping opacity-0 group-hover/cta:opacity-100" />
+                  <div className="absolute bottom-1 left-3 w-0.5 h-0.5 bg-white rounded-full animate-pulse opacity-0 group-hover/cta:opacity-100" style={{ animationDelay: '0.5s' }} />
+                  
+                  <span className="relative z-10 flex items-center">
+                    Sign Up
+                    <Sparkles className="ml-2 h-4 w-4 group-hover/cta:animate-spin" style={{ animationDuration: '2s' }} />
+                  </span>
+                </Link>
               </Button>
             </div>
           </div>
@@ -160,166 +218,199 @@ const HomePage = () => {
       </div>
 
       <div className="min-h-screen bg-transparent">
-        <div className="space-y-16 animate-fade-in pt-8">
+        <div className="space-y-16 animate-fade-in">
           {/* Hero Section with Sadhana Paper */}
-          <section className="py-20 container mx-auto px-4">
+          <section className="py-4 container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              {/* Left Side - Sadhana Paper */}
-              <div className="relative">
-                <div className="bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950/20 dark:to-orange-950/20 p-8 rounded-lg shadow-2xl border border-amber-200/50 dark:border-amber-800/30 transform rotate-1 hover:rotate-0 transition-transform duration-500">
-                  <div className="text-center mb-6">
-                    <h3 className="text-2xl font-bold text-amber-800 dark:text-amber-200 mb-2">🌸 Navratri 2025 Sadhana 🌸</h3>
-                    <p className="text-amber-700 dark:text-amber-300 text-sm">September 22 - October 1, 2025</p>
-                  </div>
-                  
-                  <div className="space-y-4 text-amber-900 dark:text-amber-100">
-                    <div className="border-b border-amber-300/50 pb-2">
-                      <h4 className="font-semibold text-lg">🕉️ Daily Practice</h4>
-                      <ul className="mt-2 space-y-1 text-sm">
-                        <li>• Morning: Durga Chalisa (21 minutes)</li>
-                        <li>• Evening: Aarti & Meditation (15 minutes)</li>
-                        <li>• Night: Gratitude Journal (5 minutes)</li>
-                      </ul>
-                    </div>
-                    
-                    <div className="border-b border-amber-300/50 pb-2">
-                      <h4 className="font-semibold text-lg">🌺 Nine Divine Aspects</h4>
-                      <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
-                        <div className="text-center p-2 bg-red-100/50 dark:bg-red-900/20 rounded">
-                          <div className="font-medium">Day 1-3</div>
-                          <div>Durga</div>
-                          <div className="text-red-600 dark:text-red-400">Strength</div>
-                        </div>
-                        <div className="text-center p-2 bg-green-100/50 dark:bg-green-900/20 rounded">
-                          <div className="font-medium">Day 4-6</div>
-                          <div>Lakshmi</div>
-                          <div className="text-green-600 dark:text-green-400">Abundance</div>
-                        </div>
-                        <div className="text-center p-2 bg-blue-100/50 dark:bg-blue-900/20 rounded">
-                          <div className="font-medium">Day 7-9</div>
-                          <div>Saraswati</div>
-                          <div className="text-blue-600 dark:text-blue-400">Wisdom</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <h4 className="font-semibold text-lg">🎯 Intention (Sankalpa)</h4>
-                      <p className="text-sm italic mt-1">"May I cultivate inner strength, abundance of spirit, and divine wisdom to serve my highest purpose."</p>
-                    </div>
-                    
-                    <div className="mt-6 pt-4 border-t border-amber-300/50">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-amber-600 dark:text-amber-400">✨ Track daily progress</span>
-                        <span className="text-amber-600 dark:text-amber-400">Created with SadhanaBoard</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Decorative elements around the paper */}
-                <div className="absolute -top-4 -left-4 w-8 h-8 text-amber-400 animate-pulse">
-                  <Sparkles className="w-full h-full" />
-                </div>
-                <div className="absolute -bottom-4 -right-4 w-6 h-6 text-orange-400 animate-bounce">
-                  <Heart className="w-full h-full" />
-                </div>
-              </div>
-              
-              {/* Right Side - Spiritual Content */}
+              {/* Left Side - Spiritual Content */}
               <div className="space-y-8">
                 <div className="text-center lg:text-left">
                   <h1 className="text-5xl lg:text-6xl font-bold mb-6">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
-                      Sacred
+                      ✨ Your Saadhana
                     </span>
                     <br />
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 via-purple-400 to-fuchsia-600">
-                      Practice
-                    </span>
-                    <br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-fuchsia-500 to-purple-500">
-                      Tracker
+                      Awaits.
                     </span>
                   </h1>
                   
                   <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                    Transform your spiritual journey with personalized sadhana practices. 
-                    Create, track, and evolve your daily rituals with divine guidance.
+                    A private circle is opening. Join the seekers walking the first path into SaadhanaBoard — a digital yantra for practice, discipline, and inner growth.
                   </p>
+                  
+                  {/* Glowing Path with Markers */}
+                  <div className="relative mb-8 py-6">
+                    {/* Glowing line/path */}
+                    <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500/20 via-fuchsia-400/60 to-purple-500/20 transform -translate-y-1/2" />
+                    <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-purple-500/10 via-fuchsia-400/30 to-purple-500/10 transform -translate-y-1/2 blur-sm" />
+                    
+                    {/* Luminous markers */}
+                    <div className="flex justify-between items-center relative z-10">
+                      <div className="flex flex-col items-center text-center max-w-[120px]">
+                        <div className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-400 mb-2 shadow-lg animate-pulse" style={{ boxShadow: '0 0 20px rgba(168, 85, 247, 0.5)' }} />
+                        <div className="text-sm font-medium text-purple-300">🌸 Waitlist Opens</div>
+                        <div className="text-xs text-muted-foreground">(Now)</div>
+                      </div>
+                      
+                      <div className="flex flex-col items-center text-center max-w-[120px]">
+                        <div className="w-4 h-4 rounded-full bg-gradient-to-r from-fuchsia-400 to-purple-400 mb-2 shadow-lg" style={{ boxShadow: '0 0 15px rgba(217, 70, 239, 0.4)' }} />
+                        <div className="text-sm font-medium text-fuchsia-300">🌅 Early Circle Forms</div>
+                        <div className="text-xs text-muted-foreground">(2 Weeks)</div>
+                      </div>
+                      
+                      <div className="flex flex-col items-center text-center max-w-[120px]">
+                        <div className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-400 to-indigo-400 mb-2 shadow-lg" style={{ boxShadow: '0 0 15px rgba(139, 92, 246, 0.4)' }} />
+                        <div className="text-sm font-medium text-indigo-300">🔮 Doors Open</div>
+                        <div className="text-xs text-muted-foreground">(Private Beta)</div>
+                      </div>
+                    </div>
+                  </div>
                   
                   <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
                     <Button 
                       size="lg" 
-                      className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-lg px-8 py-6"
+                      className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-400 hover:to-fuchsia-400 text-lg px-8 py-6 shadow-lg hover:shadow-2xl transition-all duration-300"
+                      style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.3)' }}
                       asChild
                     >
                       <Link to="/signup">
-                        Start Your Journey
-                        <Sparkles className="ml-2 h-5 w-5" />
+                        🌟 Enter the Path
                       </Link>
                     </Button>
                     
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="border-purple-500/40 text-lg px-8 py-6 hover:bg-purple-500/10"
+                      className="border-purple-500/40 text-lg px-8 py-6 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
+                      style={{ boxShadow: '0 0 15px rgba(168, 85, 247, 0.1)' }}
                       asChild
                     >
                       <Link to="/library">
-                        Explore Practices
-                        <BookOpen className="ml-2 h-5 w-5" />
+                        🌙 Learn More
                       </Link>
                     </Button>
                   </div>
                 </div>
                 
-                {/* Spiritual Stats */}
+                {/* Early Access Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
                   <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 hover:border-purple-500/30 transition-all duration-300">
                     <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-purple-400">10,000+</div>
-                      <div className="text-sm text-muted-foreground">Active Practitioners</div>
+                      <div className="text-2xl font-bold text-purple-400">Limited</div>
+                      <div className="text-sm text-muted-foreground">Beta Access</div>
                     </CardContent>
                   </Card>
                   
                   <Card className="backdrop-blur-md bg-background/20 border-fuchsia-500/10 hover:border-fuchsia-500/30 transition-all duration-300">
                     <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-fuchsia-400">500+</div>
-                      <div className="text-sm text-muted-foreground">Sacred Practices</div>
+                      <div className="text-2xl font-bold text-fuchsia-400">Early</div>
+                      <div className="text-sm text-muted-foreground">Adopters</div>
                     </CardContent>
                   </Card>
                   
                   <Card className="backdrop-blur-md bg-background/20 border-blue-500/10 hover:border-blue-500/30 transition-all duration-300">
                     <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-blue-400">98%</div>
-                      <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
+                      <div className="text-2xl font-bold text-blue-400">Priority</div>
+                      <div className="text-sm text-muted-foreground">Support</div>
                     </CardContent>
                   </Card>
                   
                   <Card className="backdrop-blur-md bg-background/20 border-green-500/10 hover:border-green-500/30 transition-all duration-300">
                     <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-green-400">24/7</div>
-                      <div className="text-sm text-muted-foreground">Divine Support</div>
+                      <div className="text-2xl font-bold text-green-400">Exclusive</div>
+                      <div className="text-sm text-muted-foreground">Features</div>
                     </CardContent>
                   </Card>
                 </div>
-                
-                {/* Featured Quote */}
-                <div className="relative">
-                  <Card className="backdrop-blur-md bg-gradient-to-br from-purple-500/10 via-fuchsia-500/10 to-purple-500/10 border-purple-500/20">
-                    <CardContent className="p-6">
-                      <div className="text-lg italic text-center text-muted-foreground mb-4">
-                        "The mind is everything. What you think you become."
+              </div>
+              
+              {/* Right Side - Sadhana Paper (Exact Replica) */}
+              <div className="relative">
+                <div className="relative max-w-md mx-auto">
+                  {/* Paper Container - Exact replica styling */}
+                  <div 
+                    className="relative p-8 rounded-2xl shadow-2xl border-2"
+                    style={{
+                      background: 'linear-gradient(145deg, #fdfcf0 0%, #f7f3e8 50%, #f0ead2 100%)',
+                      borderColor: '#d4af37',
+                      fontFamily: 'Georgia, serif'
+                    }}
+                  >
+                    {/* Ornate corners */}
+                    <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-amber-600 rounded-tl-lg" />
+                    <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-amber-600 rounded-tr-lg" />
+                    <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-amber-600 rounded-bl-lg" />
+                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-amber-600 rounded-br-lg" />
+                    
+                    {/* Header */}
+                    <div className="text-center mb-6">
+                      <h3 className="text-2xl font-bold text-amber-800 mb-2" style={{ fontFamily: 'Georgia, serif' }}>🕉️ Sadhana Paper</h3>
+                      <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent mx-auto" />
+                    </div>
+
+                    {/* Content - Following exact original format */}
+                    <div className="space-y-3" style={{ fontFamily: 'Georgia, serif', color: '#8b4513' }}>
+                      <div>
+                        <div className="font-semibold text-amber-800 mb-1">Purpose:</div>
+                        <div className="text-sm leading-relaxed pl-2">
+                          To honor Divine Mother Durga during the sacred nine nights of Navratri and invoke her blessings for strength, wisdom, and spiritual growth.
+                        </div>
                       </div>
-                      <div className="text-center text-sm text-purple-400 font-medium">
-                        — Buddha
+                      
+                      <div>
+                        <div className="font-semibold text-amber-800 mb-1">Goal:</div>
+                        <div className="text-sm leading-relaxed pl-2">
+                          Complete daily worship, fasting, and meditation practices for spiritual purification and divine connection.
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                  <div className="absolute -top-2 left-4 text-purple-400">
-                    <Star className="w-6 h-6" />
+                      
+                      <div>
+                        <div className="font-semibold text-amber-800 mb-1">Divine Focus:</div>
+                        <div className="text-sm leading-relaxed pl-2">
+                          Maa Durga and her nine divine forms (Navadurga)
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="font-semibold text-amber-800 mb-1">Duration:</div>
+                        <div className="text-sm leading-relaxed pl-2">
+                          9 days
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="font-semibold text-amber-800 mb-1">Message:</div>
+                        <div className="text-sm italic leading-relaxed pl-2">
+                          "May the Divine Mother's grace illuminate my path and transform my being with her infinite love and protection."
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div className="font-semibold text-amber-800 mb-1">My Offerings:</div>
+                        <div className="text-sm space-y-1 pl-2">
+                          <div>1. Daily Durga Chalisa recitation</div>
+                          <div>2. Morning meditation (30 minutes)</div>
+                          <div>3. Evening aarti and prayers</div>
+                          <div>4. Sattvic fasting during day</div>
+                          <div>5. Reading Devi Mahatmya</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Subtle texture overlay */}
+                    <div 
+                      className="absolute inset-0 rounded-2xl pointer-events-none opacity-20"
+                      style={{
+                        backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(184, 134, 11, 0.1) 0%, transparent 50%)'
+                      }}
+                    />
                   </div>
+                  
+                  {/* Floating spiritual elements */}
+                  <div className="absolute -top-3 -right-3 text-2xl animate-pulse opacity-70">🌸</div>
+                  <div className="absolute -bottom-3 -left-3 text-xl animate-pulse opacity-70">🪔</div>
+                  <div className="absolute top-1/2 -left-6 text-lg animate-bounce opacity-50">✨</div>
                 </div>
               </div>
             </div>
@@ -563,11 +654,26 @@ const HomePage = () => {
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                <img
-                  src="/lovable-uploads/sadhanaboard_logo.png"
-                  alt="SadhanaBoard Logo"
-                  className="h-8 w-8 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110 border-2 border-purple-500/30"
-                />
+                <div className="relative">
+                  <img
+                    src="/lovable-uploads/sadhanaboard_logo.png"
+                    alt="SadhanaBoard Logo"
+                    className="h-8 w-8 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110 relative z-10"
+                    style={{
+                      filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.3))'
+                    }}
+                  />
+                  {/* Constant glowing ring around logo */}
+                  <div 
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: 'conic-gradient(from 0deg, rgba(255, 215, 0, 0.3), rgba(138, 43, 226, 0.3), rgba(255, 215, 0, 0.3))',
+                      padding: '2px'
+                    }}
+                  >
+                    <div className="w-full h-full rounded-full bg-background/20" />
+                  </div>
+                </div>
                 <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-fuchsia-500">
                   SadhanaBoard
                 </span>

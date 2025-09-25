@@ -129,11 +129,26 @@ const WaitlistPage = () => {
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-lg animate-fade-in">
           <div className="flex flex-col items-center text-center mb-6">
-            <img 
-              src="/lovable-uploads/sadhanaboard_logo.png" 
-              alt="SadhanaBoard Logo" 
-              className="h-16 w-16 mb-3 border-2 border-purple-500/30 rounded-full" 
-            />
+            <div className="relative mb-3">
+              <img 
+                src="/lovable-uploads/sadhanaboard_logo.png" 
+                alt="SadhanaBoard Logo" 
+                className="h-16 w-16 rounded-full relative z-10" 
+                style={{
+                  filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.3))'
+                }}
+              />
+              {/* Constant glowing ring around logo */}
+              <div 
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: 'conic-gradient(from 0deg, rgba(255, 215, 0, 0.3), rgba(138, 43, 226, 0.3), rgba(255, 215, 0, 0.3))',
+                  padding: '2px'
+                }}
+              >
+                <div className="w-full h-full rounded-full bg-background/20" />
+              </div>
+            </div>
             <h1 className="text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
               Join the Waitlist
             </h1>
