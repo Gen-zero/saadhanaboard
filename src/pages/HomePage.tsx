@@ -1,8 +1,299 @@
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { BookOpen, Trophy, Calendar, Users, Sparkles, MoonStar, Flame, Target, Heart, Mountain, Star, TrendingUp, Play, Volume2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
-// Removed Layout import to create a distinct landing page experience
+import { motion, AnimatePresence } from 'framer-motion';
+
+// Spiritual Library Showcase Component
+const SpiritualLibraryShowcase = () => {
+  const [activeTab, setActiveTab] = useState('sadhanas');
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [hoveredSadhana, setHoveredSadhana] = useState(null);
+
+  // Sample data for showcase
+  const sampleSadhanas = [
+    {
+      id: 1,
+      title: "21-Day Mindful Awakening",
+      description: "Begin your meditation journey",
+      duration: "21 days",
+      difficulty: "Beginner",
+      icon: "🧘‍♂️",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      id: 2,
+      title: "Om Namah Shivaya",
+      description: "Sacred mantra practice",
+      duration: "108 days",
+      difficulty: "Intermediate",
+      icon: "🕉️",
+      color: "from-orange-500 to-amber-500"
+    },
+    {
+      id: 3,
+      title: "Krishna Bhakti",
+      description: "Divine love through devotion",
+      duration: "49 days",
+      difficulty: "Beginner",
+      icon: "💝",
+      color: "from-pink-500 to-rose-500"
+    }
+  ];
+
+  const sampleBooks = [
+    {
+      id: 1,
+      title: "Bhagavad Gita",
+      author: "Vyasa",
+      tradition: "Hinduism",
+      excerpt: "You are what you believe yourself to be...",
+      pages: "18 Chapters"
+    },
+    {
+      id: 2,
+      title: "Tao Te Ching",
+      author: "Laozi",
+      tradition: "Taoism",
+      excerpt: "The Tao that can be told is not the eternal Tao...",
+      pages: "81 Verses"
+    },
+    {
+      id: 3,
+      title: "Yoga Sutras",
+      author: "Patanjali",
+      tradition: "Yoga",
+      excerpt: "Yoga is the cessation of fluctuations of the mind...",
+      pages: "196 Sutras"
+    }
+  ];
+
+  return (
+    <Card className="bg-background/95 backdrop-blur-sm border border-amber-500/30 shadow-xl overflow-hidden">
+      <CardHeader className="text-center pb-3">
+        <div className="flex items-center justify-center mb-3">
+          <div className="text-2xl mr-2">📚</div>
+          <CardTitle className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-500 to-amber-700">
+            A Living Spiritual Library, Always Within Reach
+          </CardTitle>
+        </div>
+        <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Discover a sacred space where everything you need for your practice lives together — sadhanas to guide you, 
+          texts to inspire you. No more searching, no more scattered rituals — just a single home for your journey.
+        </p>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        {/* Interactive Tabs */}
+        <div className="flex justify-center space-x-1 bg-muted/50 p-1 rounded-lg max-w-sm mx-auto">
+          {[
+            { id: 'sadhanas', label: 'Sacred Practices', icon: '🧘‍♂️' },
+            { id: 'texts', label: 'Holy Texts', icon: '📖' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-300 text-xs ${
+                activeTab === tab.id
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md transform scale-105'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+              }`}
+            >
+              <span className="text-sm">{tab.icon}</span>
+              <span className="font-medium">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Content Area */}
+        <div className="min-h-[250px]">
+          <AnimatePresence mode="wait">
+            {activeTab === 'sadhanas' && (
+              <motion.div
+                key="sadhanas"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-4"
+              >
+                {sampleSadhanas.map((sadhana, index) => (
+                  <motion.div
+                    key={sadhana.id}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onMouseEnter={() => setHoveredSadhana(sadhana.id)}
+                    onMouseLeave={() => setHoveredSadhana(null)}
+                    className="group relative overflow-hidden rounded-lg border border-amber-200/50 bg-gradient-to-br from-background/80 to-background/40 p-4 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br ${sadhana.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                    
+                    <div className="relative z-10">
+                      <div className="text-2xl mb-3 transform group-hover:scale-110 transition-transform duration-300">
+                        {sadhana.icon}
+                      </div>
+                      
+                      <h3 className="font-bold text-base mb-2 text-foreground group-hover:text-amber-700 transition-colors">
+                        {sadhana.title}
+                      </h3>
+                      
+                      <p className="text-muted-foreground text-xs mb-3 leading-relaxed">
+                        {sadhana.description}
+                      </p>
+                      
+                      <div className="flex justify-between items-center text-xs gap-2">
+                        <Badge variant="secondary" className="bg-amber-100/50 text-amber-800 border-amber-200/50 text-[10px] px-2 py-0.5">
+                          {sadhana.duration}
+                        </Badge>
+                        <Badge variant="outline" className="border-amber-300/50 text-amber-700 text-[10px] px-2 py-0.5">
+                          {sadhana.difficulty}
+                        </Badge>
+                      </div>
+                      
+                      {hoveredSadhana === sadhana.id && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          className="absolute inset-0 bg-gradient-to-br from-amber-500/90 to-orange-500/90 backdrop-blur-sm rounded-lg flex items-center justify-center"
+                        >
+                          <div className="text-white text-center">
+                            <Play className="w-6 h-6 mx-auto mb-1" />
+                            <p className="font-semibold text-sm">Start Practice</p>
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+                
+                {/* Browse More Sadhanas Button */}
+                <div className="mt-6 w-full flex justify-center">
+                  <Button 
+                    variant="outline" 
+                    size="default" 
+                    className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 text-sm px-6 py-3 font-medium"
+                    asChild
+                  >
+                    <Link to="/sadhanas">
+                      Browse More Sadhanas
+                    </Link>
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'texts' && (
+              <motion.div
+                key="texts"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-4"
+              >
+                {sampleBooks.map((book, index) => (
+                  <motion.div
+                    key={book.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    onClick={() => setSelectedBook(selectedBook === book.id ? null : book.id)}
+                    className="group cursor-pointer"
+                  >
+                    <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/50 rounded-lg p-4 border border-amber-200/50 hover:border-amber-300/70 transition-all duration-300 hover:shadow-lg">
+                      <div className="flex items-start space-x-3">
+                        <div className="w-8 h-12 bg-gradient-to-b from-amber-600 to-orange-600 rounded shadow-md flex items-center justify-center text-white text-sm font-bold transform group-hover:scale-105 transition-transform">
+                          📖
+                        </div>
+                        
+                        <div className="flex-1">
+                          <h3 className="font-bold text-sm text-amber-800 dark:text-amber-200 mb-1">
+                            {book.title}
+                          </h3>
+                          <p className="text-xs text-amber-600 dark:text-amber-300 mb-1">
+                            by {book.author}
+                          </p>
+                          <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-700 dark:text-amber-300 px-2 py-0.5">
+                            {book.tradition}
+                          </Badge>
+                        </div>
+                      </div>
+                      
+                      <AnimatePresence>
+                        {selectedBook === book.id && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="mt-3 pt-3 border-t border-amber-200/50"
+                          >
+                            <p className="text-xs text-muted-foreground italic mb-2 leading-relaxed">
+                              "{book.excerpt}"
+                            </p>
+                            <div className="flex justify-between items-center">
+                              <span className="text-[10px] text-amber-600">{book.pages}</span>
+                              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-xs px-3 py-1 h-6">
+                                <BookOpen className="w-3 h-3 mr-1" />
+                                Read Now
+                              </Button>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </motion.div>
+                ))}
+                
+                {/* Browse More Texts Button */}
+                <div className="mt-6 w-full flex justify-center">
+                  <Button 
+                    variant="outline" 
+                    size="default" 
+                    className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 text-sm px-6 py-3 font-medium"
+                    asChild
+                  >
+                    <Link to="/library">
+                      Browse More Texts
+                    </Link>
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Call to Action */}
+        <div className="text-center pt-6 border-t border-amber-200/50">
+          <div className="max-w-xl mx-auto">
+            <h4 className="text-lg font-semibold text-amber-800 dark:text-amber-200 mb-2">
+              Ready to Begin Your Sacred Journey?
+            </h4>
+            <p className="text-muted-foreground mb-4 text-sm">
+              Join thousands of seekers who have found their spiritual home in our integrated practice platform.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-6 text-sm" asChild>
+                <Link to="/signup">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Start Your Practice
+                </Link>
+              </Button>
+              <Button variant="outline" className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 px-6 text-sm" asChild>
+                <Link to="/library">
+                  Explore Library
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const HomePage = () => {
   const features = [
@@ -117,13 +408,13 @@ const HomePage = () => {
     <>
       {/* Sticky Navigation Bar - Glassy Spiritual Theme */}
       <div 
-        className="sticky top-0 left-0 right-0 z-[999999] px-4 pt-4"
+        className="sticky top-0 left-0 right-0 z-[999999] px-2 sm:px-4 pt-2 sm:pt-4"
         style={{
           pointerEvents: 'auto'
         }}
       >
         <nav 
-          className="relative overflow-hidden rounded-2xl transition-all duration-500 hover:shadow-2xl group"
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl transition-all duration-500 hover:shadow-2xl group"
           style={{
             background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.08), rgba(75, 0, 130, 0.12), rgba(148, 0, 211, 0.08))',
             backdropFilter: 'blur(20px) saturate(180%)',
@@ -140,20 +431,20 @@ const HomePage = () => {
             }}
           />
           
-          {/* Floating spiritual particles in navbar */}
+          {/* Floating spiritual particles in navbar - Responsive positioning */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-2 left-16 w-1 h-1 bg-yellow-400/60 rounded-full animate-pulse" />
-            <div className="absolute top-4 right-20 w-1.5 h-1.5 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
-            <div className="absolute bottom-3 left-32 w-1 h-1 bg-fuchsia-400/50 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+            <div className="absolute top-1 sm:top-2 left-8 sm:left-16 w-0.5 sm:w-1 h-0.5 sm:h-1 bg-yellow-400/60 rounded-full animate-pulse" />
+            <div className="absolute top-2 sm:top-4 right-8 sm:right-20 w-1 sm:w-1.5 h-1 sm:h-1.5 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
+            <div className="absolute bottom-1 sm:bottom-3 left-16 sm:left-32 w-0.5 sm:w-1 h-0.5 sm:h-1 bg-fuchsia-400/50 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
           </div>
           
-          <div className="relative flex items-center justify-between px-6 py-4">
-            <Link to="/" className="flex items-center space-x-3">
+          <div className="relative flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4">
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
               <div className="relative">
                 <img
                   src="/lovable-uploads/sadhanaboard_logo.png"
                   alt="SadhanaBoard Logo"
-                  className="h-12 w-12 rounded-full cursor-pointer scale-110 shadow-lg shadow-purple-500/30"
+                  className="h-8 w-8 sm:h-12 sm:w-12 rounded-full cursor-pointer scale-110 shadow-lg shadow-purple-500/30"
                   style={{
                     filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.3))'
                   }}
@@ -171,20 +462,21 @@ const HomePage = () => {
               </div>
               
               <div className="flex flex-col">
-                <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-purple-300 to-fuchsia-300">
+                <span className="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-purple-300 to-fuchsia-300">
                   SadhanaBoard
                 </span>
-                <span className="text-xs text-yellow-400/70 font-medium tracking-wider">
+                <span className="text-[10px] sm:text-xs text-yellow-400/70 font-medium tracking-wider hidden xs:block">
                   ✨ Your Digital Yantra
                 </span>
               </div>
             </Link>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <Button 
                 asChild 
                 variant="ghost" 
-                className="relative text-foreground/80 hover:text-foreground hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-purple-400/40 transition-all duration-300 group/btn overflow-hidden"
+                size="sm"
+                className="relative text-foreground/80 hover:text-foreground hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-purple-400/40 transition-all duration-300 group/btn overflow-hidden px-3 sm:px-4 py-2 text-sm"
               >
                 <Link to="/login">
                   {/* Shimmer effect */}
@@ -195,20 +487,22 @@ const HomePage = () => {
               
               <Button 
                 asChild 
-                className="relative bg-gradient-to-r from-purple-500/80 via-fuchsia-500/80 to-purple-500/80 hover:from-purple-400 hover:via-fuchsia-400 hover:to-purple-400 backdrop-blur-sm border border-purple-400/30 hover:border-yellow-400/50 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 group/cta overflow-hidden"
+                size="sm"
+                className="relative bg-gradient-to-r from-purple-500/80 via-fuchsia-500/80 to-purple-500/80 hover:from-purple-400 hover:via-fuchsia-400 hover:to-purple-400 backdrop-blur-sm border border-purple-400/30 hover:border-yellow-400/50 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 group/cta overflow-hidden px-3 sm:px-4 py-2 text-sm"
               >
                 <Link to="/signup">
                   {/* Animated gradient background */}
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-purple-400/20 to-fuchsia-400/20 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500"
                   />
-                  {/* Floating sparkles */}
-                  <div className="absolute top-1 right-2 w-1 h-1 bg-yellow-300 rounded-full animate-ping opacity-0 group-hover/cta:opacity-100" />
-                  <div className="absolute bottom-1 left-3 w-0.5 h-0.5 bg-white rounded-full animate-pulse opacity-0 group-hover/cta:opacity-100" style={{ animationDelay: '0.5s' }} />
+                  {/* Floating sparkles - Smaller on mobile */}
+                  <div className="absolute top-0.5 sm:top-1 right-1 sm:right-2 w-0.5 sm:w-1 h-0.5 sm:h-1 bg-yellow-300 rounded-full animate-ping opacity-0 group-hover/cta:opacity-100" />
+                  <div className="absolute bottom-0.5 sm:bottom-1 left-1 sm:left-3 w-0.5 h-0.5 bg-white rounded-full animate-pulse opacity-0 group-hover/cta:opacity-100" style={{ animationDelay: '0.5s' }} />
                   
                   <span className="relative z-10 flex items-center">
-                    Sign Up
-                    <Sparkles className="ml-2 h-4 w-4 group-hover/cta:animate-spin" style={{ animationDuration: '2s' }} />
+                    <span className="hidden xs:inline">Sign Up</span>
+                    <span className="xs:hidden">Join</span>
+                    <Sparkles className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 group-hover/cta:animate-spin" style={{ animationDuration: '2s' }} />
                   </span>
                 </Link>
               </Button>
@@ -218,177 +512,281 @@ const HomePage = () => {
       </div>
 
       <div className="min-h-screen bg-transparent">
-        <div className="space-y-16 animate-fade-in">
+        <div className="space-y-16 animate-fade-in min-h-screen flex flex-col">
           {/* Hero Section with Sadhana Paper */}
-          <section className="py-4 container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <section className="flex-1 flex items-center justify-center px-2 sm:px-4 mt-6 sm:mt-10">
+            <div className="container mx-auto">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
               {/* Left Side - Spiritual Content */}
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 <div className="text-center lg:text-left">
-                  <h1 className="text-5xl lg:text-6xl font-bold mb-6">
+                  <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
-                      ✨ Your Saadhana
+                      ✨ The First Digital Platform
                     </span>
                     <br />
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 via-purple-400 to-fuchsia-600">
-                      Awaits.
+                      for Your Daily Saadhana
                     </span>
                   </h1>
                   
-                  <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                    A private circle is opening. Join the seekers walking the first path into SaadhanaBoard — a digital yantra for practice, discipline, and inner growth.
+                  <p className="text-lg sm:text-xl text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
+                    Design, track, and deepen your spiritual practice in one sacred space.
                   </p>
                   
-                  {/* Glowing Path with Markers */}
-                  <div className="relative mb-8 py-6">
-                    {/* Glowing line/path */}
-                    <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-500/20 via-fuchsia-400/60 to-purple-500/20 transform -translate-y-1/2" />
-                    <div className="absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-purple-500/10 via-fuchsia-400/30 to-purple-500/10 transform -translate-y-1/2 blur-sm" />
-                    
-                    {/* Luminous markers */}
-                    <div className="flex justify-between items-center relative z-10">
-                      <div className="flex flex-col items-center text-center max-w-[120px]">
-                        <div className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-400 to-fuchsia-400 mb-2 shadow-lg animate-pulse" style={{ boxShadow: '0 0 20px rgba(168, 85, 247, 0.5)' }} />
-                        <div className="text-sm font-medium text-purple-300">🌸 Waitlist Opens</div>
-                        <div className="text-xs text-muted-foreground">(Now)</div>
-                      </div>
-                      
-                      <div className="flex flex-col items-center text-center max-w-[120px]">
-                        <div className="w-4 h-4 rounded-full bg-gradient-to-r from-fuchsia-400 to-purple-400 mb-2 shadow-lg" style={{ boxShadow: '0 0 15px rgba(217, 70, 239, 0.4)' }} />
-                        <div className="text-sm font-medium text-fuchsia-300">🌅 Early Circle Forms</div>
-                        <div className="text-xs text-muted-foreground">(2 Weeks)</div>
-                      </div>
-                      
-                      <div className="flex flex-col items-center text-center max-w-[120px]">
-                        <div className="w-4 h-4 rounded-full bg-gradient-to-r from-purple-400 to-indigo-400 mb-2 shadow-lg" style={{ boxShadow: '0 0 15px rgba(139, 92, 246, 0.4)' }} />
-                        <div className="text-sm font-medium text-indigo-300">🔮 Doors Open</div>
-                        <div className="text-xs text-muted-foreground">(Private Beta)</div>
-                      </div>
-                    </div>
-                  </div>
+                  <p className="text-base sm:text-lg text-muted-foreground/90 mb-6 sm:mb-8 leading-relaxed">
+                    Join the private waitlist and be among the first to experience discipline, guidance, and growth through SaadhanaBoard.
+                  </p>
                   
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-4 sm:mb-6">
                     <Button 
                       size="lg" 
-                      className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-400 hover:to-fuchsia-400 text-lg px-8 py-6 shadow-lg hover:shadow-2xl transition-all duration-300"
+                      className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-400 hover:to-fuchsia-400 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 shadow-lg hover:shadow-2xl transition-all duration-300"
                       style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.3)' }}
                       asChild
                     >
                       <Link to="/signup">
-                        🌟 Enter the Path
+                        🌟 Join the Waitlist
                       </Link>
                     </Button>
                     
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="border-purple-500/40 text-lg px-8 py-6 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
+                      className="border-purple-500/40 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
                       style={{ boxShadow: '0 0 15px rgba(168, 85, 247, 0.1)' }}
                       asChild
                     >
                       <Link to="/library">
-                        🌙 Learn More
+                        🌙 See How It Works
                       </Link>
                     </Button>
                   </div>
-                </div>
-                
-                {/* Early Access Stats */}
-                <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
-                  <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 hover:border-purple-500/30 transition-all duration-300">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-purple-400">Limited</div>
-                      <div className="text-sm text-muted-foreground">Beta Access</div>
-                    </CardContent>
-                  </Card>
                   
-                  <Card className="backdrop-blur-md bg-background/20 border-fuchsia-500/10 hover:border-fuchsia-500/30 transition-all duration-300">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-fuchsia-400">Early</div>
-                      <div className="text-sm text-muted-foreground">Adopters</div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="backdrop-blur-md bg-background/20 border-blue-500/10 hover:border-blue-500/30 transition-all duration-300">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-blue-400">Priority</div>
-                      <div className="text-sm text-muted-foreground">Support</div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="backdrop-blur-md bg-background/20 border-green-500/10 hover:border-green-500/30 transition-all duration-300">
-                    <CardContent className="p-4 text-center">
-                      <div className="text-2xl font-bold text-green-400">Exclusive</div>
-                      <div className="text-sm text-muted-foreground">Features</div>
-                    </CardContent>
-                  </Card>
+                  {/* Urgency + Exclusivity Line */}
+                  <div className="flex items-center justify-center lg:justify-start gap-2 text-xs sm:text-sm">
+                    <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20 backdrop-blur-sm">
+                      <span className="text-purple-400">🔒</span>
+                      <span className="text-muted-foreground text-center sm:text-left">
+                        Limited seats available. Early seekers get priority access and exclusive features.
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
               
-              {/* Right Side - Sadhana Paper (Exact Replica) */}
+              {/* Right Side - Sadhana Paper (Transparent Golden Metallic) */}
               <div className="relative">
-                <div className="relative max-w-md mx-auto">
-                  {/* Paper Container - Exact replica styling */}
+                <div className="relative max-w-lg mx-auto">
+                  {/* Paper Container - Transparent Golden Metallic styling */}
                   <div 
-                    className="relative p-8 rounded-2xl shadow-2xl border-2"
+                    className="relative p-6 rounded-2xl border-2 backdrop-blur-md"
                     style={{
-                      background: 'linear-gradient(145deg, #fdfcf0 0%, #f7f3e8 50%, #f0ead2 100%)',
-                      borderColor: '#d4af37',
-                      fontFamily: 'Georgia, serif'
+                      background: 'linear-gradient(145deg, rgba(255, 215, 0, 0.08) 0%, rgba(218, 165, 32, 0.12) 30%, rgba(255, 223, 0, 0.06) 70%, rgba(212, 175, 55, 0.10) 100%)',
+                      borderColor: 'rgba(255, 215, 0, 0.4)',
+                      fontFamily: 'Georgia, serif',
+                      boxShadow: `
+                        0 8px 32px rgba(255, 215, 0, 0.15),
+                        0 0 0 1px rgba(255, 215, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                        inset 0 -1px 0 rgba(255, 215, 0, 0.1)
+                      `,
+                      backdropFilter: 'blur(16px) saturate(150%)',
+                      WebkitBackdropFilter: 'blur(16px) saturate(150%)'
                     }}
                   >
-                    {/* Ornate corners */}
-                    <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-amber-600 rounded-tl-lg" />
-                    <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-amber-600 rounded-tr-lg" />
-                    <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-amber-600 rounded-bl-lg" />
-                    <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-amber-600 rounded-br-lg" />
+                    {/* Metallic overlay gradient */}
+                    <div 
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{
+                        background: `
+                          linear-gradient(135deg, 
+                            rgba(255, 255, 255, 0.1) 0%, 
+                            transparent 25%, 
+                            rgba(255, 215, 0, 0.08) 50%, 
+                            transparent 75%, 
+                            rgba(255, 255, 255, 0.05) 100%
+                          )
+                        `,
+                        opacity: 0.7
+                      }}
+                    />
                     
-                    {/* Header */}
-                    <div className="text-center mb-6">
-                      <h3 className="text-2xl font-bold text-amber-800 mb-2" style={{ fontFamily: 'Georgia, serif' }}>🕉️ Sadhana Paper</h3>
-                      <div className="w-20 h-0.5 bg-gradient-to-r from-transparent via-amber-600 to-transparent mx-auto" />
+                    {/* Enhanced ornate corners with golden metallic effect */}
+                    <div 
+                      className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 rounded-tl-lg"
+                      style={{
+                        borderColor: 'rgba(255, 215, 0, 0.8)',
+                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
+                      }}
+                    />
+                    <div 
+                      className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 rounded-tr-lg"
+                      style={{
+                        borderColor: 'rgba(255, 215, 0, 0.8)',
+                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
+                      }}
+                    />
+                    <div 
+                      className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 rounded-bl-lg"
+                      style={{
+                        borderColor: 'rgba(255, 215, 0, 0.8)',
+                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
+                      }}
+                    />
+                    <div 
+                      className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 rounded-br-lg"
+                      style={{
+                        borderColor: 'rgba(255, 215, 0, 0.8)',
+                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
+                      }}
+                    />
+                    
+                    {/* Header with enhanced golden styling */}
+                    <div className="text-center mb-4 relative z-10">
+                      <h3 
+                        className="text-xl font-bold mb-2" 
+                        style={{ 
+                          fontFamily: 'Georgia, serif',
+                          color: 'rgba(255, 215, 0, 0.95)',
+                          textShadow: '0 0 8px rgba(255, 215, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                        }}
+                      >
+                        🕉️ Sadhana Paper
+                      </h3>
+                      <div 
+                        className="w-20 h-0.5 mx-auto"
+                        style={{
+                          background: 'linear-gradient(to right, transparent, rgba(255, 215, 0, 0.8), transparent)',
+                          filter: 'drop-shadow(0 0 2px rgba(255, 215, 0, 0.4))'
+                        }}
+                      />
                     </div>
 
-                    {/* Content - Following exact original format */}
-                    <div className="space-y-3" style={{ fontFamily: 'Georgia, serif', color: '#8b4513' }}>
+                    {/* Content with enhanced golden metallic text */}
+                    <div className="space-y-2 relative z-10" style={{ fontFamily: 'Georgia, serif' }}>
                       <div>
-                        <div className="font-semibold text-amber-800 mb-1">Purpose:</div>
-                        <div className="text-sm leading-relaxed pl-2">
+                        <div 
+                          className="font-semibold mb-1 text-sm"
+                          style={{
+                            color: 'rgba(255, 215, 0, 0.9)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                          }}
+                        >
+                          Purpose:
+                        </div>
+                        <div 
+                          className="text-xs leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
                           To honor Divine Mother Durga during the sacred nine nights of Navratri and invoke her blessings for strength, wisdom, and spiritual growth.
                         </div>
                       </div>
                       
                       <div>
-                        <div className="font-semibold text-amber-800 mb-1">Goal:</div>
-                        <div className="text-sm leading-relaxed pl-2">
+                        <div 
+                          className="font-semibold mb-1 text-sm"
+                          style={{
+                            color: 'rgba(255, 215, 0, 0.9)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                          }}
+                        >
+                          Goal:
+                        </div>
+                        <div 
+                          className="text-xs leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
                           Complete daily worship, fasting, and meditation practices for spiritual purification and divine connection.
                         </div>
                       </div>
                       
                       <div>
-                        <div className="font-semibold text-amber-800 mb-1">Divine Focus:</div>
-                        <div className="text-sm leading-relaxed pl-2">
+                        <div 
+                          className="font-semibold mb-1 text-sm"
+                          style={{
+                            color: 'rgba(255, 215, 0, 0.9)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                          }}
+                        >
+                          Divine Focus:
+                        </div>
+                        <div 
+                          className="text-xs leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
                           Maa Durga and her nine divine forms (Navadurga)
                         </div>
                       </div>
                       
                       <div>
-                        <div className="font-semibold text-amber-800 mb-1">Duration:</div>
-                        <div className="text-sm leading-relaxed pl-2">
+                        <div 
+                          className="font-semibold mb-1 text-sm"
+                          style={{
+                            color: 'rgba(255, 215, 0, 0.9)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                          }}
+                        >
+                          Duration:
+                        </div>
+                        <div 
+                          className="text-xs leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
                           9 days
                         </div>
                       </div>
                       
                       <div>
-                        <div className="font-semibold text-amber-800 mb-1">Message:</div>
-                        <div className="text-sm italic leading-relaxed pl-2">
+                        <div 
+                          className="font-semibold mb-1 text-sm"
+                          style={{
+                            color: 'rgba(255, 215, 0, 0.9)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                          }}
+                        >
+                          Message:
+                        </div>
+                        <div 
+                          className="text-xs italic leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
                           "May the Divine Mother's grace illuminate my path and transform my being with her infinite love and protection."
                         </div>
                       </div>
                       
                       <div>
-                        <div className="font-semibold text-amber-800 mb-1">My Offerings:</div>
-                        <div className="text-sm space-y-1 pl-2">
+                        <div 
+                          className="font-semibold mb-1 text-sm"
+                          style={{
+                            color: 'rgba(255, 215, 0, 0.9)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                          }}
+                        >
+                          My Offerings:
+                        </div>
+                        <div 
+                          className="text-xs space-y-0.5 pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
                           <div>1. Daily Durga Chalisa recitation</div>
                           <div>2. Morning meditation (30 minutes)</div>
                           <div>3. Evening aarti and prayers</div>
@@ -398,21 +796,51 @@ const HomePage = () => {
                       </div>
                     </div>
 
-                    {/* Subtle texture overlay */}
+                    {/* Enhanced metallic texture overlay */}
                     <div 
-                      className="absolute inset-0 rounded-2xl pointer-events-none opacity-20"
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
                       style={{
-                        backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(139, 69, 19, 0.1) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(184, 134, 11, 0.1) 0%, transparent 50%)'
+                        background: `
+                          radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.08) 0%, transparent 40%),
+                          radial-gradient(circle at 80% 70%, rgba(255, 223, 0, 0.06) 0%, transparent 40%),
+                          radial-gradient(circle at 40% 80%, rgba(218, 165, 32, 0.05) 0%, transparent 30%)
+                        `,
+                        opacity: 0.6
                       }}
                     />
                   </div>
                   
-                  {/* Floating spiritual elements */}
-                  <div className="absolute -top-3 -right-3 text-2xl animate-pulse opacity-70">🌸</div>
-                  <div className="absolute -bottom-3 -left-3 text-xl animate-pulse opacity-70">🪔</div>
-                  <div className="absolute top-1/2 -left-6 text-lg animate-bounce opacity-50">✨</div>
+                  {/* Enhanced floating spiritual elements with golden glow */}
+                  <div 
+                    className="absolute -top-3 -right-3 text-2xl animate-pulse"
+                    style={{
+                      filter: 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))',
+                      opacity: 0.8
+                    }}
+                  >
+                    🌸
+                  </div>
+                  <div 
+                    className="absolute -bottom-3 -left-3 text-xl animate-pulse"
+                    style={{
+                      filter: 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))',
+                      opacity: 0.8
+                    }}
+                  >
+                    🪔
+                  </div>
+                  <div 
+                    className="absolute top-1/2 -left-6 text-lg animate-bounce"
+                    style={{
+                      filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.5))',
+                      opacity: 0.7
+                    }}
+                  >
+                    ✨
+                  </div>
                 </div>
               </div>
+            </div>
             </div>
           </section>
 
@@ -494,6 +922,11 @@ const HomePage = () => {
               </Button>
             </div>
           </div>
+          </section>
+
+          {/* Spiritual Library Showcase Section */}
+          <section className="py-16 container mx-auto px-4">
+            <SpiritualLibraryShowcase />
           </section>
 
           {/* Testimonials Section */}

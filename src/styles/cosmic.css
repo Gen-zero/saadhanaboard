@@ -113,6 +113,8 @@ body.shiva-theme::before {
   font-size: 1.2rem;
   color: hsl(var(--primary));
   animation: mantra-float 30s linear infinite;
+  animation-fill-mode: forwards;
+  will-change: transform, opacity;
 }
 
 /* Gold accent mantras */
@@ -126,6 +128,8 @@ body.shiva-theme::before {
                0 0 28px rgba(255, 215, 0, 0.6),
                0 0 36px rgba(255, 215, 0, 0.4); /* Intense multi-layer glow */
   animation: mantra-float-gold 40s linear infinite; /* Slower animation */
+  animation-fill-mode: forwards;
+  will-change: transform, opacity, text-shadow;
 }
 
 @keyframes mantra-float {
@@ -133,14 +137,14 @@ body.shiva-theme::before {
     transform: translateY(100vh) translateX(0);
     opacity: 0;
   }
-  10% {
+  5% {
     opacity: 0.1;
   }
-  90% {
+  95% {
     opacity: 0.1;
   }
   100% {
-    transform: translateY(-100px) translateX(20px);
+    transform: translateY(-10vh) translateX(20px);
     opacity: 0;
   }
 }
@@ -151,30 +155,35 @@ body.shiva-theme::before {
     opacity: 0;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
   }
-  15% {
+  10% {
     opacity: 0.2;
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.8),
                  0 0 25px rgba(255, 215, 0, 0.6);
   }
-  40% {
-    transform: translateY(60vh) translateX(8px) scale(1.2);
+  30% {
+    transform: translateY(70vh) translateX(8px) scale(1.2);
     text-shadow: 0 0 20px rgba(255, 215, 0, 1),
                  0 0 30px rgba(255, 215, 0, 0.8),
                  0 0 40px rgba(255, 215, 0, 0.6);
   }
-  60% {
-    transform: translateY(40vh) translateX(12px) scale(1.15);
+  50% {
+    transform: translateY(50vh) translateX(12px) scale(1.15);
     text-shadow: 0 0 25px rgba(255, 215, 0, 1),
                  0 0 35px rgba(255, 215, 0, 0.9),
                  0 0 45px rgba(255, 215, 0, 0.7);
   }
-  85% {
+  70% {
+    transform: translateY(30vh) translateX(16px) scale(1.1);
+    text-shadow: 0 0 22px rgba(255, 215, 0, 0.9),
+                 0 0 32px rgba(255, 215, 0, 0.7);
+  }
+  90% {
     opacity: 0.18;
     text-shadow: 0 0 18px rgba(255, 215, 0, 0.8),
                  0 0 28px rgba(255, 215, 0, 0.6);
   }
   100% {
-    transform: translateY(-100px) translateX(20px) scale(1);
+    transform: translateY(-10vh) translateX(20px) scale(1);
     opacity: 0;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
   }
@@ -187,6 +196,8 @@ body.shiva-theme::before {
   z-index: 0;
   opacity: 0.05;
   animation: yantra-float 40s linear infinite;
+  animation-fill-mode: forwards;
+  will-change: transform;
 }
 
 /* Gold accent yantra patterns */
@@ -199,6 +210,8 @@ body.shiva-theme::before {
                0 0 18px rgba(255, 215, 0, 0.6),
                0 0 26px rgba(255, 215, 0, 0.4); /* Enhanced glow */
   animation: yantra-float-gold 50s linear infinite; /* Much slower */
+  animation-fill-mode: forwards;
+  will-change: transform, text-shadow;
 }
 
 @keyframes yantra-float {
@@ -206,7 +219,7 @@ body.shiva-theme::before {
     transform: translateY(100vh) rotate(0deg);
   }
   100% {
-    transform: translateY(-100px) rotate(360deg);
+    transform: translateY(-10vh) rotate(360deg);
   }
 }
 
@@ -236,7 +249,17 @@ body.shiva-theme::before {
                  0 0 22px rgba(255, 215, 0, 0.6);
   }
   100% {
-    transform: translateY(-100px) rotate(360deg) scale(1);
+    transform: translateY(-10vh) rotate(360deg) scale(1);
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+  }
+}
+
+/* Shimmer animation for metallic effect */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-15deg);
   }
 }
