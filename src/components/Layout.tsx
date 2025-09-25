@@ -233,7 +233,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <img
                 src="/lovable-uploads/sadhanaboard_logo.png"
                 alt="Saadhana Board Logo"
-                className="h-16 w-16 cursor-pointer transition-transform duration-300 hover:scale-110"
+                className="h-16 w-16 cursor-pointer transition-transform duration-300 hover:scale-110 border-2 border-purple-500/30 rounded-full"
                 onClick={() => {
                   navigate('/');
                 }}

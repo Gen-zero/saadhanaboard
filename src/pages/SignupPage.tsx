@@ -71,7 +71,7 @@ const SignupPage = () => {
           <img 
             src="/lovable-uploads/sadhanaboard_logo.png" 
             alt="Saadhana Board Logo" 
-            className="h-20 w-20 mb-4" 
+            className="h-20 w-20 mb-4 border-2 border-purple-500/30 rounded-full" 
           />
           <h1 className="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
             Saadhana Yantra

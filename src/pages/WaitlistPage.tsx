@@ -132,7 +132,7 @@ const WaitlistPage = () => {
             <img 
               src="/lovable-uploads/sadhanaboard_logo.png" 
               alt="SadhanaBoard Logo" 
-              className="h-16 w-16 mb-3" 
+              className="h-16 w-16 mb-3 border-2 border-purple-500/30 rounded-full" 
             />
             <h1 className="text-2xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
               Join the Waitlist

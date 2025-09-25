@@ -114,40 +114,219 @@ const HomePage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-transparent">
-      {/* Custom header for landing page */}
-      <header className="border-b border-purple-500/10 backdrop-blur-md bg-background/30 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
+    <>
+      {/* Sticky Navigation Bar with Saadhana Paper Texture */}
+      <div 
+        className="sticky top-4 z-50 mx-4"
+        style={{
+          pointerEvents: 'auto'
+        }}
+      >
+        <nav 
+          className="bg-[url('/textures/parchment.jpg')] bg-cover bg-center border border-amber-500/30 rounded-lg shadow-2xl backdrop-blur-sm"
+          style={{
+            backgroundImage: 'url(/textures/parchment.jpg)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundColor: 'rgba(255, 248, 220, 0.9)', // Fallback parchment color
+            backdropFilter: 'blur(8px)',
+            boxShadow: 'inset 0 0 20px rgba(255, 215, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3)'
+          }}
+        >
+          {/* Decorative border overlay */}
+          <div className="absolute inset-0 border-[8px] border-[rgba(255,215,0,0.4)] rounded-lg pointer-events-none"></div>
+          
+          <div className="flex items-center justify-between px-6 py-4 relative z-10">
             <Link to="/" className="flex items-center space-x-2">
               <img
                 src="/lovable-uploads/sadhanaboard_logo.png"
                 alt="SadhanaBoard Logo"
-                className="h-10 w-10 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110"
+                className="h-10 w-10 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110 border-2 border-amber-600/30"
               />
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-fuchsia-500">
+              <span className="text-xl font-bold text-amber-900 font-serif drop-shadow-sm">
                 SadhanaBoard
               </span>
             </Link>
             <div className="flex items-center space-x-4">
-              <Button asChild variant="ghost" className="text-foreground/80 hover:text-foreground hover:bg-background/20">
+              <Button asChild variant="ghost" className="text-amber-800 hover:text-amber-900 hover:bg-amber-200/30 border border-amber-600/20">
                 <Link to="/login">Login</Link>
               </Button>
-              <Button asChild className="bg-gradient-to-r from-purple-500/80 to-fuchsia-500/80 hover:from-purple-500 hover:to-fuchsia-500 backdrop-blur-sm">
+              <Button asChild className="bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white border border-amber-700/50 shadow-lg">
                 <Link to="/signup">Sign Up</Link>
               </Button>
             </div>
           </div>
-        </div>
-      </header>
+        </nav>
+      </div>
 
-      <div className="space-y-16 animate-fade-in">
-        {/* Hero Section - Empty */}
-        <section className="py-20">
-        </section>
+      <div className="min-h-screen bg-transparent">
+        <div className="space-y-16 animate-fade-in pt-8">
+          {/* Hero Section with Sadhana Paper */}
+          <section className="py-20 container mx-auto px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Left Side - Sadhana Paper */}
+              <div className="relative">
+                <div className="bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950/20 dark:to-orange-950/20 p-8 rounded-lg shadow-2xl border border-amber-200/50 dark:border-amber-800/30 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-bold text-amber-800 dark:text-amber-200 mb-2">🌸 Navratri 2025 Sadhana 🌸</h3>
+                    <p className="text-amber-700 dark:text-amber-300 text-sm">September 22 - October 1, 2025</p>
+                  </div>
+                  
+                  <div className="space-y-4 text-amber-900 dark:text-amber-100">
+                    <div className="border-b border-amber-300/50 pb-2">
+                      <h4 className="font-semibold text-lg">🕉️ Daily Practice</h4>
+                      <ul className="mt-2 space-y-1 text-sm">
+                        <li>• Morning: Durga Chalisa (21 minutes)</li>
+                        <li>• Evening: Aarti & Meditation (15 minutes)</li>
+                        <li>• Night: Gratitude Journal (5 minutes)</li>
+                      </ul>
+                    </div>
+                    
+                    <div className="border-b border-amber-300/50 pb-2">
+                      <h4 className="font-semibold text-lg">🌺 Nine Divine Aspects</h4>
+                      <div className="grid grid-cols-3 gap-2 mt-2 text-xs">
+                        <div className="text-center p-2 bg-red-100/50 dark:bg-red-900/20 rounded">
+                          <div className="font-medium">Day 1-3</div>
+                          <div>Durga</div>
+                          <div className="text-red-600 dark:text-red-400">Strength</div>
+                        </div>
+                        <div className="text-center p-2 bg-green-100/50 dark:bg-green-900/20 rounded">
+                          <div className="font-medium">Day 4-6</div>
+                          <div>Lakshmi</div>
+                          <div className="text-green-600 dark:text-green-400">Abundance</div>
+                        </div>
+                        <div className="text-center p-2 bg-blue-100/50 dark:bg-blue-900/20 rounded">
+                          <div className="font-medium">Day 7-9</div>
+                          <div>Saraswati</div>
+                          <div className="text-blue-600 dark:text-blue-400">Wisdom</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-semibold text-lg">🎯 Intention (Sankalpa)</h4>
+                      <p className="text-sm italic mt-1">"May I cultivate inner strength, abundance of spirit, and divine wisdom to serve my highest purpose."</p>
+                    </div>
+                    
+                    <div className="mt-6 pt-4 border-t border-amber-300/50">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="text-amber-600 dark:text-amber-400">✨ Track daily progress</span>
+                        <span className="text-amber-600 dark:text-amber-400">Created with SadhanaBoard</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Decorative elements around the paper */}
+                <div className="absolute -top-4 -left-4 w-8 h-8 text-amber-400 animate-pulse">
+                  <Sparkles className="w-full h-full" />
+                </div>
+                <div className="absolute -bottom-4 -right-4 w-6 h-6 text-orange-400 animate-bounce">
+                  <Heart className="w-full h-full" />
+                </div>
+              </div>
+              
+              {/* Right Side - Spiritual Content */}
+              <div className="space-y-8">
+                <div className="text-center lg:text-left">
+                  <h1 className="text-5xl lg:text-6xl font-bold mb-6">
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
+                      Sacred
+                    </span>
+                    <br />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 via-purple-400 to-fuchsia-600">
+                      Practice
+                    </span>
+                    <br />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-fuchsia-500 to-purple-500">
+                      Tracker
+                    </span>
+                  </h1>
+                  
+                  <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                    Transform your spiritual journey with personalized sadhana practices. 
+                    Create, track, and evolve your daily rituals with divine guidance.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-8">
+                    <Button 
+                      size="lg" 
+                      className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-lg px-8 py-6"
+                      asChild
+                    >
+                      <Link to="/signup">
+                        Start Your Journey
+                        <Sparkles className="ml-2 h-5 w-5" />
+                      </Link>
+                    </Button>
+                    
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="border-purple-500/40 text-lg px-8 py-6 hover:bg-purple-500/10"
+                      asChild
+                    >
+                      <Link to="/library">
+                        Explore Practices
+                        <BookOpen className="ml-2 h-5 w-5" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Spiritual Stats */}
+                <div className="grid grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
+                  <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 hover:border-purple-500/30 transition-all duration-300">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-purple-400">10,000+</div>
+                      <div className="text-sm text-muted-foreground">Active Practitioners</div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="backdrop-blur-md bg-background/20 border-fuchsia-500/10 hover:border-fuchsia-500/30 transition-all duration-300">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-fuchsia-400">500+</div>
+                      <div className="text-sm text-muted-foreground">Sacred Practices</div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="backdrop-blur-md bg-background/20 border-blue-500/10 hover:border-blue-500/30 transition-all duration-300">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-blue-400">98%</div>
+                      <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="backdrop-blur-md bg-background/20 border-green-500/10 hover:border-green-500/30 transition-all duration-300">
+                    <CardContent className="p-4 text-center">
+                      <div className="text-2xl font-bold text-green-400">24/7</div>
+                      <div className="text-sm text-muted-foreground">Divine Support</div>
+                    </CardContent>
+                  </Card>
+                </div>
+                
+                {/* Featured Quote */}
+                <div className="relative">
+                  <Card className="backdrop-blur-md bg-gradient-to-br from-purple-500/10 via-fuchsia-500/10 to-purple-500/10 border-purple-500/20">
+                    <CardContent className="p-6">
+                      <div className="text-lg italic text-center text-muted-foreground mb-4">
+                        "The mind is everything. What you think you become."
+                      </div>
+                      <div className="text-center text-sm text-purple-400 font-medium">
+                        — Buddha
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <div className="absolute -top-2 left-4 text-purple-400">
+                    <Star className="w-6 h-6" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
 
-        {/* Features Section - Marketing focused */}
-        <section className="py-16 container mx-auto px-4">
+          {/* Features Section - Marketing focused */}
+          <section className="py-16 container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Powerful Features for Your Spiritual Growth</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -176,10 +355,10 @@ const HomePage = () => {
               );
             })}
           </div>
-        </section>
+          </section>
 
-        {/* Popular Practices Section */}
-        <section className="py-16 bg-gradient-to-b from-background/30 to-background/50">
+          {/* Popular Practices Section */}
+          <section className="py-16 bg-gradient-to-b from-background/30 to-background/50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4">Popular Spiritual Practices</h2>
@@ -224,10 +403,10 @@ const HomePage = () => {
               </Button>
             </div>
           </div>
-        </section>
+          </section>
 
-        {/* Testimonials Section */}
-        <section className="py-16 container mx-auto px-4">
+          {/* Testimonials Section */}
+          <section className="py-16 container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">What Practitioners Say</h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -254,10 +433,10 @@ const HomePage = () => {
               </Card>
             ))}
           </div>
-        </section>
+          </section>
 
-        {/* Values Section */}
-        <section className="py-16 bg-gradient-to-b from-background/30 to-background/50">
+          {/* Values Section */}
+          <section className="py-16 bg-gradient-to-b from-background/30 to-background/50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold mb-4">Our Sacred Values</h2>
@@ -309,10 +488,10 @@ const HomePage = () => {
               </Card>
             </div>
           </div>
-        </section>
+          </section>
 
-        {/* Call to Action */}
-        <section className="py-20 text-center relative overflow-hidden">
+          {/* Call to Action */}
+          <section className="py-20 text-center relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-background/20 to-background/30 backdrop-blur-sm"></div>
           <div className="relative z-10 max-w-3xl mx-auto px-4">
             <MoonStar className="h-16 w-16 text-purple-400 mx-auto mb-6" />
@@ -377,17 +556,17 @@ const HomePage = () => {
               </CardContent>
             </Card>
           </div>
-        </section>
+          </section>
 
-        {/* Footer */}
-        <footer className="backdrop-blur-md bg-background/30 border-t border-purple-500/10 mt-12">
+          {/* Footer */}
+          <footer className="backdrop-blur-md bg-background/30 border-t border-purple-500/10 mt-12">
           <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex items-center space-x-2 mb-4 md:mb-0">
                 <img
                   src="/lovable-uploads/sadhanaboard_logo.png"
                   alt="SadhanaBoard Logo"
-                  className="h-8 w-8 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110"
+                  className="h-8 w-8 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110 border-2 border-purple-500/30"
                 />
                 <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-fuchsia-500">
                   SadhanaBoard
@@ -409,9 +588,10 @@ const HomePage = () => {
               © {new Date().getFullYear()} SadhanaBoard. All rights reserved. A sacred space for spiritual practitioners.
             </div>
           </div>
-        </footer>
+          </footer>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

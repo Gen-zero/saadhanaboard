@@ -14,7 +14,8 @@ import {
   X,
   ArrowLeft,
   ArrowRight,
-  CheckSquare
+  CheckSquare,
+  LogIn
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSettings } from '@/hooks/useSettings';
@@ -95,7 +96,51 @@ const WalkthroughPage = () => {
   const IconComponent = currentStepData.icon;
 
   return (
-    <div className="min-h-screen cosmic-nebula-bg flex items-center justify-center p-4">
+    <div className="min-h-screen cosmic-nebula-bg flex items-center justify-center p-4 relative">
+      {/* Sticky Navigation Bar with Saadhana Paper Texture */}
+      <nav className="sticky top-4 z-50 mx-4 bg-[url('/textures/parchment.jpg')] bg-cover bg-center border border-amber-500/30 rounded-lg shadow-2xl backdrop-blur-sm" style={{
+        backgroundImage: 'url(/textures/parchment.jpg)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: 'rgba(255, 248, 220, 0.9)',
+        backdropFilter: 'blur(8px)',
+        boxShadow: 'inset 0 0 20px rgba(255, 215, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3)'
+      }}>
+        {/* Decorative border overlay */}
+        <div className="absolute inset-0 border-[8px] border-[rgba(255,215,0,0.4)] rounded-lg pointer-events-none"></div>
+        
+        <div className="flex items-center justify-between p-4 relative z-10">
+          <div className="flex items-center gap-2">
+            <img 
+              src="/lovable-uploads/sadhanaboard_logo.png" 
+              alt="Saadhana Board Logo" 
+              className="h-8 w-8 rounded-full border-2 border-amber-600/30" 
+            />
+            <span className="text-lg font-semibold text-amber-900 font-serif drop-shadow-sm">
+              SadhanaBoard
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSkip}
+              className="text-amber-800 hover:text-amber-900 hover:bg-amber-200/30"
+            >
+              Skip Tour
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/login')}
+              className="border-amber-600/30 hover:border-amber-600/50 text-amber-800 hover:text-amber-900 hover:bg-amber-200/30"
+            >
+              <LogIn className="w-4 h-4 mr-2" />
+              Login
+            </Button>
+          </div>
+        </div>
+      </nav>
       {/* Cosmic particles animation - hidden for Shiva theme */}
       <div className={`fixed inset-0 overflow-hidden pointer-events-none ${isShivaTheme ? 'hidden' : ''}`}>
         {Array.from({ length: 50 }, (_, i) => (
@@ -111,22 +156,14 @@ const WalkthroughPage = () => {
         ))}
       </div>
 
-      <Card className="w-full max-w-2xl bg-background/80 backdrop-blur-sm border border-purple-500/20 shadow-2xl">
+      <Card className="w-full max-w-2xl bg-background/80 backdrop-blur-sm border border-purple-500/20 shadow-2xl mt-20">
         <CardHeader className="text-center relative">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleSkip}
-            className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"
-          >
-            <X className="w-4 h-4" />
-          </Button>
           
           <div className="flex items-center justify-center mb-4">
             <img 
               src="/lovable-uploads/sadhanaboard_logo.png" 
               alt="Saadhana Board Logo" 
-              className="h-12 w-12" 
+              className="h-12 w-12 border-2 border-purple-500/30 rounded-full" 
             />
             <Sparkles className="ml-2 h-6 w-6 text-purple-500 animate-pulse" />
           </div>
