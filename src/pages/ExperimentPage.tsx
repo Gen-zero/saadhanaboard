@@ -8,7 +8,7 @@ import { motion, useInView, useAnimation, useScroll, useTransform } from "framer
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import ThemePanel from "@/components/ThemePanel";
+
 // Mahakali animated background component — mount for experimentation
 import MahakaliAnimatedBackground from "@/components/MahakaliAnimatedBackground";
 
@@ -83,60 +83,12 @@ const InteractiveYantra = () => {
         lineWidth={hovered ? 3 : 1.5}
       />
       
-      {/* Bindu - representing the skull */}
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[0.15, 16, 16]} />
-        <meshBasicMaterial 
-          color={hovered ? "#fbbf24" : "#f87171"} 
-          transparent 
-          opacity={0.9}
-        />
-        <pointLight 
-          intensity={hovered ? 3 : 1.5} 
-          distance={5} 
-          color={hovered ? "#fbbf24" : "#f87171"} 
-        />
-      </mesh>
+
     </group>
   );
 };
 
-// Floating elements - cremation ground theme
-const FloatingElements = () => {
-  return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none z-10">
-      {[...Array(30)].map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute text-red-500/40"
-          initial={{
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-          }}
-          animate={{
-            y: [null, Math.random() * window.innerHeight - 150, Math.random() * window.innerHeight + 150],
-            x: [null, Math.random() * window.innerWidth - 150, Math.random() * window.innerWidth + 150],
-            rotate: [0, 360],
-            scale: [1, 1.3, 1],
-            opacity: [0.3, 0.7, 0.3],
-          }}
-          transition={{
-            duration: Math.random() * 20 + 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            fontSize: `${Math.random() * 30 + 20}px`,
-          }}
-        >
-          {['☠', '⚱', '🔥', '🦴', '💀'][Math.floor(Math.random() * 5)]}
-        </motion.div>
-      ))}
-    </div>
-  );
-};
+
 
 const ExperimentPage = () => {
   const [sankalpa, setSankalpa] = useState("");
@@ -347,30 +299,121 @@ const ExperimentPage = () => {
 
   </div>
 
-      {/* Custom header for landing page - cremation ground theme */}
-      <header className="border-b border-red-800/30 backdrop-blur-md bg-background/10 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-red-700 to-red-900 flex items-center justify-center">
-                <Flame className="h-6 w-6 text-yellow-300" />
+      {/* Beta banner */}
+      <div className="px-2 sm:px-4 pt-2">
+        <div className="mx-auto max-w-5xl rounded-lg border border-amber-400/30 bg-amber-500/10 text-amber-200 text-xs sm:text-sm px-3 sm:px-4 py-2 flex items-center justify-center gap-2">
+          <span className="inline-block rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] sm:text-xs font-semibold">BETA</span>
+          We're in private beta. New registrations are closed — join the waitlist to get early access.
+        </div>
+      </div>
+
+      {/* Sticky Navigation Bar - Glassy Spiritual Theme with Mahakali colors */}
+      <div 
+        className="sticky top-0 left-0 right-0 z-[999999] px-2 sm:px-4 pt-2 sm:pt-4"
+        style={{
+          pointerEvents: 'auto'
+        }}
+      >
+        <nav 
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl transition-all duration-500 hover:shadow-2xl group"
+          style={
+            {
+              background: 'linear-gradient(135deg, rgba(139, 0, 0, 0.08), rgba(139, 0, 0, 0.12), rgba(139, 0, 0, 0.08))',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              border: '1px solid rgba(255, 0, 0, 0.25)',
+              boxShadow: '0 8px 32px rgba(139, 0, 0, 0.1), 0 0 0 1px rgba(255, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+            }
+          }
+        >
+          {/* Subtle gradient overlay */}
+          <div 
+            className="absolute inset-0 opacity-30 group-hover:opacity-50 transition-opacity duration-500"
+            style={
+              {
+                background: 'linear-gradient(45deg, rgba(255, 0, 0, 0.05), transparent, rgba(139, 0, 0, 0.05))'
+              }
+            }
+          />
+          
+  
+          
+          <div className="relative flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4">
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+              <div className="relative">
+                <img
+                  src="/lovable-uploads/sadhanaboard_logo.png"
+                  alt="SadhanaBoard Logo"
+                  className="h-8 w-8 sm:h-12 sm:w-12 rounded-full cursor-pointer scale-110 shadow-lg shadow-red-500/30"
+                  style={
+                    {
+                      filter: 'drop-shadow(0 0 8px rgba(255, 0, 0, 0.3))'
+                    }
+                  }
+                />
+                {/* Constant glowing ring around logo */}
+                <div 
+                  className="absolute inset-0 rounded-full"
+                  style={
+                    {
+                      background: 'conic-gradient(from 0deg, rgba(255, 0, 0, 0.3), rgba(139, 0, 0, 0.3), rgba(255, 0, 0, 0.3))',
+                      padding: '2px'
+                    }
+                  }
+                >
+                  <div className="w-full h-full rounded-full bg-background/20" />
+                </div>
               </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-300 to-yellow-300">
-                Mahakali's Cremation Ground
-              </span>
+              
+              <div className="flex flex-col">
+                <span className="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-300 via-red-400 to-red-300">
+                  Mahakali's Cremation Ground
+                </span>
+                <span className="text-[10px] sm:text-xs text-red-400/70 font-medium tracking-wider hidden xs:block">
+                  🔥 Destroyer of Illusions
+                </span>
+              </div>
             </Link>
-            <div className="flex items-center space-x-4">
-              <ThemePanel />
-              <Button asChild variant="ghost" className="text-red-200 hover:text-yellow-300 hover:bg-red-900/30">
-                <Link to="/login">Enter</Link>
+            
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Button 
+                asChild 
+                variant="ghost" 
+                size="sm"
+                className="relative text-foreground/80 hover:text-foreground hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-red-400/40 transition-all duration-300 group/btn overflow-hidden px-3 sm:px-4 py-2 text-sm"
+              >
+                <Link to="/login">
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                  <span className="relative z-10">Enter</span>
+                </Link>
               </Button>
-              <Button asChild className="bg-gradient-to-r from-red-700 to-red-900 hover:from-red-800 hover:to-black backdrop-blur-sm border border-red-600">
-                <Link to="/signup">Begin Transformation</Link>
+              
+              <Button 
+                asChild 
+                size="sm"
+                className="relative bg-gradient-to-r from-red-500/80 via-red-600/80 to-red-500/80 hover:from-red-400 hover:via-red-500 hover:to-red-400 backdrop-blur-sm border border-red-400/30 hover:border-red-400/50 shadow-lg hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 group/cta overflow-hidden px-3 sm:px-4 py-2 text-sm"
+              >
+                <Link to="/waitlist">
+                  {/* Animated gradient background */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-red-400/20 via-red-500/20 to-red-400/20 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500"
+                  />
+                  {/* Floating sparkles - Smaller on mobile */}
+                  <div className="absolute top-0.5 sm:top-1 right-1 sm:right-2 w-0.5 sm:w-1 h-0.5 sm:h-1 bg-red-300 rounded-full animate-ping opacity-0 group-hover/cta:opacity-100" />
+                  <div className="absolute bottom-0.5 sm:bottom-1 left-1 sm:left-3 w-0.5 h-0.5 bg-white rounded-full animate-pulse opacity-0 group-hover/cta:opacity-100" style={{ animationDelay: '0.5s' }} />
+                  
+                  <span className="relative z-10 flex items-center">
+                    <span className="hidden xs:inline">Join Waitlist</span>
+                    <span className="xs:hidden">Waitlist</span>
+                    <Flame className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 group-hover/cta:animate-spin" style={{ animationDuration: '2s' }} />
+                  </span>
+                </Link>
               </Button>
             </div>
           </div>
-        </div>
-      </header>
+        </nav>
+      </div>
 
       <div className="space-y-0 relative z-20">
         {/* Hero Section - cremation ground theme */}
@@ -435,33 +478,18 @@ const ExperimentPage = () => {
                     </h2>
                   </div>
                   <p className="text-lg text-red-200 mb-6">
-                    What will you burn in the sacred fire of transformation?
+                    Join the waitlist to get early access to this transformative experience.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <Input
-                      type="text"
-                      value={sankalpa}
-                      onChange={(e) => setSankalpa(e.target.value)}
-                      placeholder="e.g., 'I destroy my fear of failure and embrace divine power'"
-                      className="flex-1 bg-red-900/30 border-red-700/50 text-white placeholder:text-red-300/60 focus:border-yellow-400 focus:ring-yellow-400 h-16 text-lg px-6 backdrop-blur-sm"
-                    />
                     <Button
                       size="lg"
                       className="bg-gradient-to-r from-red-700 to-red-900 hover:from-red-800 hover:to-black h-16 px-10 text-xl group shadow-2xl shadow-red-900/40 border border-red-700"
-                      onClick={handleEnterSpace}
-                      disabled={isEntering}
+                      asChild
                     >
-                      {isEntering ? (
-                        <>
-                          <span className="h-5 w-5 rounded-full border-2 border-yellow-300 border-r-transparent animate-spin mr-3"></span>
-                          Burning...
-                        </>
-                      ) : (
-                        <>
-                          Enter the Fire
-                          <ChevronRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-                        </>
-                      )}
+                      <Link to="/waitlist">
+                        Join the Waitlist
+                        <ChevronRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -765,6 +793,80 @@ const ExperimentPage = () => {
           </div>
         </motion.section>
 
+        {/* Theme Changing Section - Mahakali Theme */}
+        <section className="py-16 container mx-auto px-4 relative overflow-hidden">
+          <div className="relative z-10 max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center justify-center mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-yellow-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
+                <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-red-600 to-yellow-600 flex items-center justify-center mx-auto">
+                  <span className="text-2xl text-white">🎨</span>
+                </div>
+              </div>
+            </div>
+            <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-red-400 via-yellow-500 to-red-400">
+              Divine Themes for Your Practice
+            </h2>
+            <p className="text-xl text-red-200 max-w-2xl mx-auto mb-10">
+              Personalize your spiritual journey with themes inspired by Hindu deities and traditions
+            </p>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
+              {[{
+                name: "Mahakali's Cremation Ground",
+                description: "Embrace the fierce power of transformation through destruction and renewal",
+                color: "from-red-800 to-red-900",
+                icon: "🔥",
+                link: "/MahakaliLandingpage"
+              }, {
+                name: "Cosmic Mystery",
+                description: "Unlock hidden knowledge and universal wisdom through cosmic exploration",
+                color: "from-indigo-800 to-indigo-900",
+                icon: "🔮",
+                link: "/MysteryLandingpage"
+              }].map((theme, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="group cursor-pointer h-full"
+                >
+                  <Link to={theme.link} className="h-full block">
+                    <div className="relative bg-gradient-to-br from-background/80 to-background/60 rounded-2xl p-6 border border-red-200/50 hover:border-red-300/70 transition-all duration-500 hover:shadow-2xl transform hover:-translate-y-2 backdrop-blur-sm h-full flex flex-col">
+                      <div className={`absolute inset-0 bg-gradient-to-br ${theme.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl`}></div>
+                      <div className="relative z-10 flex flex-col h-full">
+                        <div className="text-4xl mb-4 flex justify-center">
+                          {theme.icon}
+                        </div>
+                        <h3 className="font-bold text-lg mb-2 text-foreground group-hover:text-red-300 transition-colors duration-300">
+                          {theme.name}
+                        </h3>
+                        <p className="text-red-200 text-sm mb-4 leading-relaxed flex-grow">
+                          {theme.description}
+                        </p>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="border-red-300/50 text-red-300 hover:bg-red-500/10 text-sm w-full transition-all duration-300 group-hover:border-red-400/70 mt-auto"
+                        >
+                          Explore Theme
+                        </Button>
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+            
+            <div className="mt-10 inline-flex items-center bg-gradient-to-r from-red-500/15 to-yellow-500/15 border border-red-500/40 rounded-full px-6 py-3">
+              <Sparkles className="h-5 w-5 text-red-500 mr-3" />
+              <span className="text-base font-medium text-red-300">More themes coming soon with beta updates!</span>
+            </div>
+          </div>
+        </section>
+
         {/* Final CTA Section - cremation ground theme */}
         <motion.section 
           ref={ctaRef} 
@@ -773,34 +875,7 @@ const ExperimentPage = () => {
         >
           <div className="absolute inset-0 bg-gradient-to-b from-red-900/40 via-black/30 to-black/50 backdrop-blur-sm"></div>
           
-          {/* Enhanced Animated Background Elements with fire and skulls */}
-          <div className="absolute inset-0 overflow-hidden">
-            {[...Array(30)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute text-red-500/50"
-                style={{
-                  left: `${Math.random() * 100}%`,
-                  top: `${Math.random() * 100}%`,
-                  fontSize: `${Math.random() * 20 + 10}px`,
-                }}
-                animate={{
-                  y: [0, -200, -400],
-                  opacity: [0, 1, 0],
-                  x: [0, (Math.random() - 0.5) * 150],
-                  scale: [0.5, 1.5, 0.5],
-                  rotate: [0, 360],
-                }}
-                transition={{
-                  duration: Math.random() * 8 + 8,
-                  repeat: Infinity,
-                  delay: Math.random() * 8,
-                }}
-              >
-                {['🔥', '☠', '🦴'][Math.floor(Math.random() * 3)]}
-              </motion.div>
-            ))}
-          </div>
+
           
           <div className="relative z-10 max-w-5xl mx-auto px-4">
             <motion.div
@@ -845,8 +920,8 @@ const ExperimentPage = () => {
                     className="bg-gradient-to-r from-red-700 via-red-800 to-black hover:from-red-800 hover:via-red-900 hover:to-black text-2xl px-16 py-10 backdrop-blur-sm shadow-2xl shadow-red-900/50 rounded-2xl border border-red-700"
                     asChild
                   >
-                    <Link to="/signup">
-                      Walk the Path
+                    <Link to="/waitlist">
+                      Join the Waitlist
                       <ChevronRight className="ml-3 h-8 w-8" />
                     </Link>
                   </Button>
@@ -876,7 +951,7 @@ const ExperimentPage = () => {
                   >
                     <Link to="/your-atma-yantra" className="flex items-center">
                       <Flame className="mr-3 h-8 w-8 text-yellow-400" />
-                      Experience Your Yantras
+                      Explore Features
                     </Link>
                   </Button>
                 </motion.div>

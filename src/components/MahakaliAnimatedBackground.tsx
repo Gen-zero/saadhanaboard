@@ -182,144 +182,7 @@ const MahakaliScene: React.FC<{ intensity: number; enableParticles: boolean; ena
   const emberLightsRef = useRef<THREE.PointLight[]>([]);
 
 
-  // --------------------------- Helper components ---------------------------
 
-  // Skull mesh: cranium sphere + simple eye sockets and nasal cavity approximation
-  const SkullMesh: React.FC<{
-    index: number;
-    radius: number;
-    speed: number;
-    z: number;
-    offset: number;
-    intensity: number;
-  }> = ({ index, radius, speed, z, offset, intensity }) => {
-    const ref = useRef<THREE.Group | null>(null);
-    const eyeLightRef = useRef<THREE.PointLight | null>(null);
-
-    const craniumGeo = useMemo(() => new THREE.SphereGeometry(0.45, 24, 24), []);
-    const eyeGeo = useMemo(() => new THREE.CylinderGeometry(0.08, 0.08, 0.02, 8), []);
-    const nasalGeo = useMemo(() => new THREE.ConeGeometry(0.06, 0.12, 6), []);
-
-    const skullMat = useMemo(
-      () =>
-        new THREE.MeshStandardMaterial({ color: '#f5f5dc', roughness: 0.8, metalness: 0.02, transparent: true, opacity: 0.7 }), // Added transparency
-      []
-    );
-
-    // soft emissive cracks material (shader-like flicker using onFrame)
-    const crackMat = useMemo(
-      () =>
-        new THREE.MeshStandardMaterial({ color: '#6b0000', emissive: '#330000', emissiveIntensity: 0.0, roughness: 1, transparent: true, opacity: 0.6 }), // Added transparency
-      []
-    );
-
-    useEffect(() => {
-      return () => {
-        craniumGeo.dispose();
-        eyeGeo.dispose();
-        nasalGeo.dispose();
-        skullMat.dispose();
-        crackMat.dispose();
-      };
-    }, [craniumGeo, eyeGeo, nasalGeo, skullMat, crackMat]);
-
-    useFrame(({ clock }) => {
-      const t = clock.getElapsedTime();
-      const ang = t * speed + offset;
-      const x = radius * Math.cos(ang + index);
-      const y = Math.sin(t * 2 + offset) * 0.15;
-      if (ref.current) {
-        ref.current.position.set(x, y, z);
-        ref.current.rotation.y = t * 0.2 + index;
-        ref.current.rotation.x = Math.sin(t * 0.3 + index) * 0.15;
-      }
-      if (eyeLightRef.current) {
-        // flicker intensity per skull
-        eyeLightRef.current.intensity = (0.06 + Math.abs(Math.sin(t * 3 + index)) * 0.10) * intensity; // Reduced from 0.08/0.12 to 0.06/0.10
-      }
-      // update crack emissive intensity (simulate intermittent glow)
-      // increased animated emissive range for stronger crack glow
-      const emiss = 0.15 + Math.abs(Math.sin(t * 2 + index)) * 0.6; // Reduced from 0.2/0.8 to 0.15/0.6
-      crackMat.emissiveIntensity = emiss * intensity;
-    });
-
-    return (
-      <group ref={ref}>
-        <mesh geometry={craniumGeo} material={skullMat} castShadow receiveShadow>
-          {/* subtle cracks overlay as a slightly larger transparent mesh */}
-        </mesh>
-        <mesh geometry={nasalGeo} material={crackMat} position={[0, -0.06, 0.4]} rotation={[-Math.PI / 2, 0, 0]} />
-        <mesh geometry={eyeGeo} material={crackMat} position={[0.15, 0.08, 0.35]} rotation={[Math.PI / 2, 0, 0]} />
-        <mesh geometry={eyeGeo} material={crackMat} position={[-0.15, 0.08, 0.35]} rotation={[Math.PI / 2, 0, 0]} />
-        <pointLight ref={eyeLightRef} color={'#ff4444'} distance={1.2} intensity={0.06} /> {/* Reduced from 0.08 to 0.06 */}
-      </group>
-    );
-  };
-
-  // Bone mesh - simple tapered cylinder
-  const BoneMesh: React.FC<{ matrix: THREE.Matrix4; material: THREE.Material }> = ({ matrix, material }) => {
-    // not used as a standalone mesh when using instancing; kept for clarity
-    return (
-      <mesh matrix={matrix} material={material} />
-    );
-  };
-
-  // Floating skulls group
-  const FloatingSkullsGroup: React.FC<{ count?: number; intensity: number }> = ({ count = 10, intensity }) => {
-    const groupRef = useRef<THREE.Group>(null);
-    const items = useMemo(() => {
-      const arr = [] as { radius: number; speed: number; z: number; offset: number }[];
-      for (let i = 0; i < count; i++) {
-        arr.push({ radius: 1.5 + Math.random() * 3.5, speed: 0.05 + Math.random() * 0.25, z: -1 - Math.random() * 2, offset: Math.random() * Math.PI * 2 });
-      }
-      return arr;
-    }, [count]);
-
-    return (
-      <group ref={groupRef} renderOrder={1}>
-        {items.map((it, i) => (
-          <SkullMesh key={i} index={i} radius={it.radius} speed={it.speed} z={it.z} offset={it.offset} intensity={intensity} />
-        ))}
-      </group>
-    );
-  };
-
-  // Floating bones group implemented using InstancedMesh for performance
-  const FloatingBonesGroup: React.FC<{ count?: number }> = ({ count = 18 }) => {
-    const instRef = useRef<THREE.InstancedMesh>(null);
-    const dummy = useMemo(() => new THREE.Object3D(), []);
-    const boneGeo = useMemo(() => new THREE.CylinderGeometry(0.06, 0.08, 0.9, 8), []);
-    const boneMat = useMemo(() => new THREE.MeshStandardMaterial({ color: '#efe6d6', roughness: 0.9, transparent: true, opacity: 0.6 }), []); // Added transparency
-
-    useEffect(() => {
-      return () => {
-        boneGeo.dispose();
-        boneMat.dispose();
-      };
-    }, [boneGeo, boneMat]);
-
-    useFrame(({ clock }) => {
-      const t = clock.getElapsedTime();
-      if (!instRef.current) return;
-      for (let i = 0; i < count; i++) {
-        const speed = 0.03 + (i % 5) * 0.01;
-        const a = t * speed + i;
-        const rx = Math.cos(a * 0.7) * (1.2 + (i % 3) * 0.4);
-        const ry = Math.sin(a * 1.1) * (0.6 + (i % 4) * 0.3);
-        const rz = -0.5 - ((i % 6) * 0.2);
-        dummy.position.set(rx, ry - 0.2, rz);
-        dummy.rotation.set(t * 0.5 + i, t * 0.3 + i * 0.2, t * 0.2 + i * 0.1);
-        dummy.updateMatrix();
-        instRef.current.setMatrixAt(i, dummy.matrix);
-      }
-      instRef.current.instanceMatrix.needsUpdate = true;
-    });
-
-    return (
-      <instancedMesh ref={instRef} args={[boneGeo, boneMat, count]} castShadow receiveShadow renderOrder={1}>
-      </instancedMesh>
-    );
-  };
 
   // Particles group: smoke, embers, ash using Sparkles + simple transforms
   const ParticlesGroup: React.FC<{ enabled: boolean }> = ({ enabled }) => {
@@ -447,17 +310,17 @@ const MahakaliScene: React.FC<{ intensity: number; enableParticles: boolean; ena
       ))}
 
       <group position={[0, 0, 0]}> 
-        {/* Energy waves behind yantra */}
-        <mesh position={[0, 0, -0.5]} renderOrder={-1}>
+        {/* Energy waves behind yantra - HIDDEN */}
+        {/* <mesh position={[0, 0, -0.5]} renderOrder={-1}>
           <planeGeometry args={[8, 8]} />
           <primitive object={wavesMaterial} attach="material" />
-        </mesh>
+        </mesh> */}
 
-        {/* Eclipse aura behind yantra */}
-        <mesh ref={eclipseRef} position={[0, 0, -1.5]} renderOrder={-3}>
+        {/* Eclipse aura behind yantra - HIDDEN */}
+        {/* <mesh ref={eclipseRef} position={[0, 0, -1.5]} renderOrder={-3}>
           <planeGeometry args={[10, 10]} />
           <primitive object={eclipseMaterial} attach="material" />
-        </mesh>
+        </mesh> */}
 
         {/* Central yantra plane */}
         <mesh ref={meshRef} position={[0, 0, 0]} renderOrder={0}>
@@ -472,12 +335,7 @@ const MahakaliScene: React.FC<{ intensity: number; enableParticles: boolean; ena
           <primitive object={innerMaterial} attach="material" />
         </mesh>
 
-        {/* Placeholder geometry for future elements */}
-        {/* Floating bones and skull groups - ensure they render after yantra */}
-        <FloatingBonesGroup count={18} />
-        <group renderOrder={1}>
-          <FloatingSkullsGroup count={10} intensity={intensity} />
-        </group>
+
 
         {/* Particles: smoke, embers, ash (conditional) */}
         <ParticlesGroup enabled={enableParticles} />

@@ -3,7 +3,7 @@ import { StoreSadhana } from '@/types/store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Clock, Users } from 'lucide-react';
+import { BookOpen, Clock, Users, Sparkles } from 'lucide-react';
 
 interface FoundationsCategoryProps {
   onSadhanaSelect: (sadhana: StoreSadhana) => void;
@@ -113,7 +113,8 @@ const FoundationsCategory = ({ onSadhanaSelect }: FoundationsCategoryProps) => {
   return (
     <div className="space-y-6">
       <div className="text-center py-6">
-        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600 mb-2">
+        <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600 mb-2 flex items-center justify-center gap-2">
+          <Sparkles className="h-6 w-6" />
           Foundations for Your Journey
         </h2>
         <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -128,7 +129,7 @@ const FoundationsCategory = ({ onSadhanaSelect }: FoundationsCategoryProps) => {
             key={sadhana.id} 
             className="group relative overflow-hidden border border-purple-500/20 bg-gradient-to-b from-purple-600/10 via-purple-500/5 to-purple-400/10 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1"
           >
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 bg-gradient-to-r from-purple-500/5 via-fuchsia-500/5 to-purple-500/5">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-lg leading-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
                   {sadhana.title}
@@ -144,7 +145,7 @@ const FoundationsCategory = ({ onSadhanaSelect }: FoundationsCategoryProps) => {
               </p>
             </CardHeader>
             
-            <CardContent>
+            <CardContent className="pt-4">
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Clock className="h-4 w-4" />
@@ -167,7 +168,7 @@ const FoundationsCategory = ({ onSadhanaSelect }: FoundationsCategoryProps) => {
                 
                 <Button
                   onClick={() => onSadhanaSelect(sadhana)}
-                  className="w-full mt-4 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 hover:from-purple-500/30 hover:to-fuchsia-500/30"
+                  className="w-full mt-4 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 hover:from-purple-500/30 hover:to-fuchsia-500/30 transition-all duration-300"
                   size="sm"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />

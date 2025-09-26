@@ -229,17 +229,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
 
           <div className="flex items-center justify-between p-4 border-b border-purple-500/10 pt-10">
-            <div className="flex items-center gap-2">
-              <img
-                src="/lovable-uploads/sadhanaboard_logo.png"
-                alt="Saadhana Board Logo"
-                className="h-16 w-16 cursor-pointer transition-transform duration-300 hover:scale-110 border-2 border-purple-500/30 rounded-full"
-                onClick={() => {
-                  navigate('/');
-                }}
-              />
+            <div className="flex items-center gap-3">
+              <div className="relative group">
+                <img
+                  src="/lovable-uploads/sadhanaboard_logo.png"
+                  alt="Saadhana Board Logo"
+                  className="h-16 w-16 cursor-pointer transition-all duration-500 hover:scale-110 border-2 border-purple-500/30 rounded-full shadow-lg shadow-purple-500/20 group-hover:shadow-xl group-hover:shadow-purple-500/40"
+                  onClick={() => {
+                    navigate('/');
+                  }}
+                />
+                {/* Glow effect on hover */}
+                <div className="absolute inset-0 rounded-full bg-purple-500/20 blur-xl scale-125 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"></div>
+              </div>
               <h1 
-                className="text-2xl font-semibold text-sidebar-foreground cursor-pointer transition-all duration-300 hover:text-purple-300"
+                className="text-2xl font-bold text-sidebar-foreground cursor-pointer transition-all duration-300 hover:text-purple-300 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400"
                 onClick={() => {
                   navigate('/');
                 }}

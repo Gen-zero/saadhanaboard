@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Search, BookOpen, Store as StoreIcon } from "lucide-react";
 import BookViewer from "./BookViewer";
 import BookShelf from "./BookShelf";
 import LibraryHeader from "./LibraryHeader";
@@ -84,10 +84,12 @@ const LibraryContainer = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="books" className="flex items-center gap-2">
-            📚 Sacred Books
+            <BookOpen className="h-4 w-4" />
+            Sacred Books
           </TabsTrigger>
           <TabsTrigger value="store" className="flex items-center gap-2">
-            🏪 Sadhana Store
+            <StoreIcon className="h-4 w-4" />
+            Sadhana Store
           </TabsTrigger>
         </TabsList>
         
@@ -100,11 +102,14 @@ const LibraryContainer = () => {
           
           <div className="mb-4 p-4 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 rounded-lg border border-purple-500/20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 className="font-medium text-lg">Request a Sacred Text</h3>
-                <p className="text-sm text-muted-foreground">
-                  Can't find the book you're looking for? Request it from our admins and we'll add it to the library.
-                </p>
+              <div className="flex items-start gap-3">
+                <Search className="h-5 w-5 text-purple-500 mt-0.5" />
+                <div>
+                  <h3 className="font-medium text-lg">Request a Sacred Text</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Can't find the book you're looking for? Request it from our admins and we'll add it to the library.
+                  </p>
+                </div>
               </div>
               <BookRequestDialog />
             </div>
@@ -136,11 +141,14 @@ const LibraryContainer = () => {
         <TabsContent value="store">
           <div className="mb-4 p-4 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 rounded-lg border border-purple-500/20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div>
-                <h3 className="font-medium text-lg">Expand Your Spiritual Journey</h3>
-                <p className="text-sm text-muted-foreground">
-                  Visit our full store for premium themes, 3D yantras, merchandise, and workshops
-                </p>
+              <div className="flex items-start gap-3">
+                <StoreIcon className="h-5 w-5 text-purple-500 mt-0.5" />
+                <div>
+                  <h3 className="font-medium text-lg">Expand Your Spiritual Journey</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Visit our full store for premium themes, 3D yantras, merchandise, and workshops
+                  </p>
+                </div>
               </div>
               <Link to="/store">
                 <Button className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600">
@@ -152,8 +160,6 @@ const LibraryContainer = () => {
           </div>
           <SadhanaStore />
         </TabsContent>
-        
-
       </Tabs>
     </div>
   );

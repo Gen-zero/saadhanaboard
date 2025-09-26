@@ -35,7 +35,7 @@ const BookShelf = ({ books, onSelectBook, view }: BookShelfProps) => {
           ))}
         </div>
       ) : (
-        <ScrollArea className="h-[500px] rounded-xl border border-purple-500/20 bg-background/80 backdrop-blur-sm">
+        <ScrollArea className="h-[500px] rounded-xl border border-purple-500/20 bg-gradient-to-b from-background/70 to-secondary/10 backdrop-blur-sm">
           <div className="p-4">
             {books.map((book) => (
               <BookListItem key={book.id} book={book} onSelect={onSelectBook} />
@@ -98,7 +98,7 @@ const BookCard = ({ book, onSelect }: BookCardProps) => {
           <Button 
             variant="outline" 
             size="sm" 
-            className="w-full bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 hover:from-purple-500/30 hover:to-fuchsia-500/30"
+            className="w-full bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 hover:from-purple-500/30 hover:to-fuchsia-500/30 transition-all duration-300"
             onClick={() => onSelect(book.id)}
           >
             <BookOpen className="mr-2 h-4 w-4" />
@@ -144,9 +144,13 @@ const BookListItem = ({ book, onSelect }: BookCardProps) => {
           ))}
         </div>
         <Button 
-          variant="ghost" 
+          variant="outline" 
           size="sm" 
-          className="text-purple-600 hover:text-purple-700 hover:bg-purple-500/10"
+          className="text-purple-600 hover:text-purple-700 hover:bg-purple-500/10 border border-purple-500/30 bg-purple-500/10"
+          onClick={(e) => {
+            e.stopPropagation();
+            onSelect(book.id);
+          }}
         >
           <BookOpen className="h-4 w-4" />
           <span className="sr-only">Read</span>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BookOpen, Trophy, Calendar, Users, Sparkles, MoonStar, Flame, Target, Heart, Mountain, Star, TrendingUp, Play, Volume2, Eye } from "lucide-react";
+import { BookOpen, Trophy, Calendar, Users, Sparkles, MoonStar, Flame, Target, Heart, Mountain, Star, TrendingUp, Play, Volume2, Eye, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -36,29 +36,32 @@ const SpiritualLibraryShowcase = () => {
     {
       id: 1,
       title: "21-Day Mindful Awakening",
-      description: "Begin your meditation journey",
+      description: "Begin your meditation journey with guided mindfulness practices",
       duration: "21 days",
       difficulty: "Beginner",
       icon: "🧘‍♂️",
-      color: "from-blue-500 to-cyan-500"
+      color: "from-blue-500 to-cyan-500",
+      practices: ["Breathing Exercises", "Body Scanning", "Mindful Walking"]
     },
     {
       id: 2,
       title: "Om Namah Shivaya",
-      description: "Sacred mantra practice",
+      description: "Sacred mantra practice for spiritual transformation and inner peace",
       duration: "108 days",
       difficulty: "Intermediate",
       icon: "🕉️",
-      color: "from-orange-500 to-amber-500"
+      color: "from-orange-500 to-amber-500",
+      practices: ["Mantra Chanting", "Conscious Breathing", "Meditation"]
     },
     {
       id: 3,
       title: "Krishna Bhakti",
-      description: "Divine love through devotion",
+      description: "Immerse in divine love through Krishna consciousness and devotional practices",
       duration: "49 days",
       difficulty: "Beginner",
       icon: "💝",
-      color: "from-pink-500 to-rose-500"
+      color: "from-pink-500 to-rose-500",
+      practices: ["Bhajan Singing", "Scripture Reading", "Devotional Meditation"]
     }
   ];
 
@@ -69,7 +72,8 @@ const SpiritualLibraryShowcase = () => {
       author: "Vyasa",
       tradition: "Hinduism",
       excerpt: "You are what you believe yourself to be...",
-      pages: "18 Chapters"
+      pages: "18 Chapters",
+      rating: 4.9
     },
     {
       id: 2,
@@ -77,7 +81,8 @@ const SpiritualLibraryShowcase = () => {
       author: "Laozi",
       tradition: "Taoism",
       excerpt: "The Tao that can be told is not the eternal Tao...",
-      pages: "81 Verses"
+      pages: "81 Verses",
+      rating: 4.8
     },
     {
       id: 3,
@@ -85,28 +90,37 @@ const SpiritualLibraryShowcase = () => {
       author: "Patanjali",
       tradition: "Yoga",
       excerpt: "Yoga is the cessation of fluctuations of the mind...",
-      pages: "196 Sutras"
+      pages: "196 Sutras",
+      rating: 4.7
     }
   ];
 
   return (
-    <Card className="bg-background/95 backdrop-blur-sm border border-amber-500/30 shadow-xl overflow-hidden">
-      <CardHeader className="text-center pb-3">
-        <div className="flex items-center justify-center mb-3">
-          <div className="text-2xl mr-2">📚</div>
-          <CardTitle className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-500 to-amber-700">
+    <Card className="bg-background/95 backdrop-blur-sm border border-amber-500/30 shadow-2xl overflow-hidden relative">
+      {/* Enhanced animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(255,215,0,0.08)_0%,rgba(0,0,0,0)_70%)]"></div>
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-fuchsia-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+      </div>
+      
+      <CardHeader className="text-center pb-4 relative z-10">
+        <div className="flex items-center justify-center mb-4">
+          <div className="text-3xl mr-3">📚</div>
+          <CardTitle className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-500 to-amber-700">
             A Living Spiritual Library, Always Within Reach
           </CardTitle>
         </div>
-        <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
           Discover a sacred space where everything you need for your practice lives together — sadhanas to guide you, 
           texts to inspire you. No more searching, no more scattered rituals — just a single home for your journey.
         </p>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Interactive Tabs */}
-        <div className="flex justify-center space-x-1 bg-muted/50 p-1 rounded-lg max-w-sm mx-auto">
+      <CardContent className="space-y-6 relative z-10">
+        {/* Enhanced Interactive Tabs with glow effect */}
+        <div className="flex justify-center space-x-2 bg-muted/50 p-2 rounded-xl max-w-md mx-auto shadow-inner">
           {[
             { id: 'sadhanas', label: 'Sacred Practices', icon: '🧘‍♂️' },
             { id: 'texts', label: 'Holy Texts', icon: '📖' }
@@ -114,20 +128,20 @@ const SpiritualLibraryShowcase = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-md transition-all duration-300 text-xs ${
+              className={`flex items-center space-x-2 px-5 py-3 rounded-lg transition-all duration-300 text-base font-medium ${
                 activeTab === tab.id
-                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md transform scale-105'
+                  ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg transform scale-105'
                   : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
               }`}
             >
-              <span className="text-sm">{tab.icon}</span>
-              <span className="font-medium">{tab.label}</span>
+              <span className="text-lg">{tab.icon}</span>
+              <span>{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* Content Area */}
-        <div className="min-h-[250px]">
+        <div className="min-h-[350px]">
           <AnimatePresence mode="wait">
             {activeTab === 'sadhanas' && (
               <motion.div
@@ -135,40 +149,67 @@ const SpiritualLibraryShowcase = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                transition={{ duration: 0.5 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
               >
                 {sampleSadhanas.map((sadhana, index) => (
                   <motion.div
                     key={sadhana.id}
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: index * 0.2 }}
                     onMouseEnter={() => setHoveredSadhana(sadhana.id)}
                     onMouseLeave={() => setHoveredSadhana(null)}
-                    className="group relative overflow-hidden rounded-lg border border-amber-200/50 bg-gradient-to-br from-background/80 to-background/40 p-4 hover:shadow-lg transition-all duration-300 cursor-pointer"
+                    className="group relative overflow-hidden rounded-2xl border border-amber-200/50 bg-gradient-to-br from-background/90 to-background/60 p-6 hover:shadow-2xl transition-all duration-500 cursor-pointer transform hover:-translate-y-2"
                   >
-                    <div className={`absolute inset-0 bg-gradient-to-br ${sadhana.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+                    {/* Enhanced animated background gradient on hover */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${sadhana.color} opacity-0 group-hover:opacity-20 transition-all duration-700`}></div>
+                    
+                    {/* Floating particles effect */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute top-4 right-4 w-2 h-2 bg-white/20 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-6 left-6 w-1 h-1 bg-white/30 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+                    </div>
                     
                     <div className="relative z-10">
-                      <div className="text-2xl mb-3 transform group-hover:scale-110 transition-transform duration-300">
+                      <div className="text-4xl mb-5 transform group-hover:scale-110 transition-transform duration-300 flex justify-center">
                         {sadhana.icon}
                       </div>
                       
-                      <h3 className="font-bold text-base mb-2 text-foreground group-hover:text-amber-700 transition-colors">
+                      <h3 className="font-bold text-xl mb-3 text-foreground group-hover:text-amber-700 transition-colors duration-300">
                         {sadhana.title}
                       </h3>
                       
-                      <p className="text-muted-foreground text-xs mb-3 leading-relaxed">
+                      <p className="text-muted-foreground text-base mb-5 leading-relaxed">
                         {sadhana.description}
                       </p>
                       
-                      <div className="flex justify-between items-center text-xs gap-2">
-                        <Badge variant="secondary" className="bg-amber-100/50 text-amber-800 border-amber-200/50 text-[10px] px-2 py-0.5">
+                      <div className="flex justify-between items-center text-base gap-3 mb-4">
+                        <Badge variant="secondary" className="bg-amber-100/50 text-amber-800 border-amber-200/50 text-sm px-4 py-1.5">
                           {sadhana.duration}
                         </Badge>
-                        <Badge variant="outline" className="border-amber-300/50 text-amber-700 text-[10px] px-2 py-0.5">
+                        <Badge variant="outline" className="border-amber-300/50 text-amber-700 text-sm px-4 py-1.5">
                           {sadhana.difficulty}
+                        </Badge>
+                      </div>
+                      
+                      {/* Practices list */}
+                      <div className="mb-5">
+                        <p className="text-sm font-medium text-amber-700 mb-2">Includes:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {sadhana.practices.map((practice, idx) => (
+                            <Badge key={idx} variant="outline" className="text-xs border-amber-300/50 text-amber-600 px-2 py-0.5">
+                              {practice}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      {/* Enhanced Call to action badge for first-time visitors */}
+                      <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                        <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm w-full justify-center py-2 hover:from-green-600 hover:to-emerald-600 transition-all duration-300">
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Start Your Journey
                         </Badge>
                       </div>
                       
@@ -176,11 +217,12 @@ const SpiritualLibraryShowcase = () => {
                         <motion.div
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
-                          className="absolute inset-0 bg-gradient-to-br from-amber-500/90 to-orange-500/90 backdrop-blur-sm rounded-lg flex items-center justify-center"
+                          className="absolute inset-0 bg-gradient-to-br from-amber-500/95 to-orange-500/95 backdrop-blur-sm rounded-2xl flex items-center justify-center"
                         >
-                          <div className="text-white text-center">
-                            <Play className="w-6 h-6 mx-auto mb-1" />
-                            <p className="font-semibold text-sm">Start Practice</p>
+                          <div className="text-white text-center p-4">
+                            <Play className="w-12 h-12 mx-auto mb-3" />
+                            <p className="font-bold text-lg">Begin Practice</p>
+                            <p className="text-sm opacity-90 mt-1">Click to start your spiritual journey</p>
                           </div>
                         </motion.div>
                       )}
@@ -188,16 +230,17 @@ const SpiritualLibraryShowcase = () => {
                   </motion.div>
                 ))}
                 
-                {/* Browse More Sadhanas Button */}
-                <div className="mt-6 w-full flex justify-center">
+                {/* Enhanced Browse More Sadhanas Button */}
+                <div className="mt-8 w-full flex justify-center">
                   <Button 
                     variant="outline" 
-                    size="default" 
-                    className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 text-sm px-6 py-3 font-medium"
+                    size="lg" 
+                    className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 text-lg px-10 py-7 font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl bg-gradient-to-r from-amber-50/50 to-orange-50/50"
                     asChild
                   >
                     <Link to="/sadhanas">
-                      Browse More Sadhanas
+                      <Sparkles className="w-6 h-6 mr-3" />
+                      Browse Our Complete Collection of Sadhanas
                     </Link>
                   </Button>
                 </div>
@@ -210,34 +253,55 @@ const SpiritualLibraryShowcase = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                transition={{ duration: 0.5 }}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
               >
                 {sampleBooks.map((book, index) => (
                   <motion.div
                     key={book.id}
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -30 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
+                    transition={{ delay: index * 0.2 }}
                     onClick={() => setSelectedBook(selectedBook === book.id ? null : book.id)}
                     className="group cursor-pointer"
                   >
-                    <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/50 dark:to-orange-950/50 rounded-lg p-4 border border-amber-200/50 hover:border-amber-300/70 transition-all duration-300 hover:shadow-lg">
-                      <div className="flex items-start space-x-3">
-                        <div className="w-8 h-12 bg-gradient-to-b from-amber-600 to-orange-600 rounded shadow-md flex items-center justify-center text-white text-sm font-bold transform group-hover:scale-105 transition-transform">
+                    <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/60 dark:to-orange-950/60 rounded-2xl p-6 border border-amber-200/50 hover:border-amber-300/70 transition-all duration-500 hover:shadow-2xl transform hover:-translate-y-2">
+                      {/* Enhanced animated glow effect */}
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-amber-400/15 to-orange-400/15 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
+                      
+                      {/* Corner decorative elements */}
+                      <div className="absolute top-3 right-3 text-amber-400/20 text-2xl">❦</div>
+                      <div className="absolute bottom-3 left-3 text-amber-400/20 text-2xl">❧</div>
+                      
+                      <div className="flex items-start space-x-5 relative z-10">
+                        <div className="w-16 h-20 bg-gradient-to-b from-amber-600 to-orange-600 rounded-xl shadow-lg flex items-center justify-center text-white text-xl font-bold transform group-hover:scale-105 transition-transform duration-300">
                           📖
                         </div>
                         
                         <div className="flex-1">
-                          <h3 className="font-bold text-sm text-amber-800 dark:text-amber-200 mb-1">
-                            {book.title}
-                          </h3>
-                          <p className="text-xs text-amber-600 dark:text-amber-300 mb-1">
+                          <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-bold text-lg text-amber-800 dark:text-amber-200 group-hover:text-amber-900 transition-colors duration-300">
+                              {book.title}
+                            </h3>
+                            <div className="flex items-center gap-1">
+                              <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+                              <span className="text-sm font-medium text-amber-700">{book.rating}</span>
+                            </div>
+                          </div>
+                          <p className="text-base text-amber-600 dark:text-amber-300 mb-3">
                             by {book.author}
                           </p>
-                          <Badge variant="outline" className="text-[10px] border-amber-300 text-amber-700 dark:text-amber-300 px-2 py-0.5">
+                          <Badge variant="outline" className="text-sm border-amber-300 text-amber-700 dark:text-amber-300 px-3 py-1">
                             {book.tradition}
                           </Badge>
+                          
+                          {/* Enhanced Highlight for first-time visitors */}
+                          <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                            <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm w-full justify-center py-1.5">
+                              <BookOpen className="h-4 w-4 mr-2" />
+                              Free Preview Available
+                            </Badge>
+                          </div>
                         </div>
                       </div>
                       
@@ -247,16 +311,16 @@ const SpiritualLibraryShowcase = () => {
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: 'auto', opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.3 }}
-                            className="mt-3 pt-3 border-t border-amber-200/50"
+                            transition={{ duration: 0.4 }}
+                            className="mt-5 pt-5 border-t border-amber-200/50 relative z-10"
                           >
-                            <p className="text-xs text-muted-foreground italic mb-2 leading-relaxed">
+                            <p className="text-base text-muted-foreground italic mb-4 leading-relaxed">
                               "{book.excerpt}"
                             </p>
                             <div className="flex justify-between items-center">
-                              <span className="text-[10px] text-amber-600">{book.pages}</span>
-                              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-xs px-3 py-1 h-6">
-                                <BookOpen className="w-3 h-3 mr-1" />
+                              <span className="text-sm text-amber-600">{book.pages}</span>
+                              <Button size="sm" className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-sm px-5 py-2.5 h-9 transition-all duration-300 hover:scale-105">
+                                <BookOpen className="w-4 h-4 mr-2" />
                                 Read Now
                               </Button>
                             </div>
@@ -267,16 +331,17 @@ const SpiritualLibraryShowcase = () => {
                   </motion.div>
                 ))}
                 
-                {/* Browse More Texts Button */}
-                <div className="mt-6 w-full flex justify-center">
+                {/* Enhanced Browse More Texts Button */}
+                <div className="mt-8 w-full flex justify-center">
                   <Button 
                     variant="outline" 
-                    size="default" 
-                    className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 text-sm px-6 py-3 font-medium"
+                    size="lg" 
+                    className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 text-lg px-10 py-7 font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl bg-gradient-to-r from-amber-50/50 to-orange-50/50"
                     asChild
                   >
                     <Link to="/library">
-                      Browse More Texts
+                      <BookOpen className="w-6 h-6 mr-3" />
+                      Explore Our Complete Spiritual Library
                     </Link>
                   </Button>
                 </div>
@@ -285,24 +350,29 @@ const SpiritualLibraryShowcase = () => {
           </AnimatePresence>
         </div>
 
-        {/* Call to Action */}
-        <div className="text-center pt-6 border-t border-amber-200/50">
-          <div className="max-w-xl mx-auto">
-            <h4 className="text-lg font-semibold text-amber-800 dark:text-amber-200 mb-2">
+        {/* Enhanced Call to Action with Urgency for First-Time Visitors */}
+        <div className="text-center pt-10 border-t border-amber-200/50 relative z-10">
+          <div className="max-w-3xl mx-auto">
+            <div className="inline-flex items-center bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-500/40 rounded-full px-6 py-3 mb-6 animate-pulse">
+              <Zap className="h-5 w-5 text-amber-500 mr-3" />
+              <span className="text-base font-bold text-amber-700">First-time visitor? Start with our curated beginner collection!</span>
+            </div>
+            <h4 className="text-3xl font-bold text-amber-800 dark:text-amber-200 mb-4">
               Ready to Begin Your Sacred Journey?
             </h4>
-            <p className="text-muted-foreground mb-4 text-sm">
+            <p className="text-muted-foreground mb-8 text-lg max-w-2xl mx-auto">
               Join thousands of seekers who have found their spiritual home in our integrated practice platform.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-6 text-sm" asChild>
+            <div className="flex flex-col sm:flex-row gap-5 justify-center">
+              <Button className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 px-10 py-7 text-lg font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl" asChild>
                 <Link to="/signup">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Start Your Practice
+                  <Sparkles className="w-6 h-6 mr-3" />
+                  Start Your Practice - Free Trial
                 </Link>
               </Button>
-              <Button variant="outline" className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 px-6 text-sm" asChild>
+              <Button variant="outline" className="border-amber-300/50 text-amber-700 hover:bg-amber-50/50 px-10 py-7 text-lg font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl" asChild>
                 <Link to="/library">
+                  <BookOpen className="w-6 h-6 mr-3" />
                   Explore Library
                 </Link>
               </Button>
@@ -533,6 +603,7 @@ const HomePage = () => {
                 className="relative bg-gradient-to-r from-purple-500/80 via-fuchsia-500/80 to-purple-500/80 hover:from-purple-400 hover:via-fuchsia-400 hover:to-purple-400 backdrop-blur-sm border border-purple-400/30 hover:border-yellow-400/50 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 group/cta overflow-hidden px-3 sm:px-4 py-2 text-sm"
               >
                 <Link to="/waitlist">
+
                   {/* Animated gradient background */}
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-purple-400/20 to-fuchsia-400/20 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500"
@@ -931,10 +1002,11 @@ const HomePage = () => {
           {/* Animated stats strip removed for beta landing */}
 
           {/* Features Section - Marketing focused */}
-          <section className="py-16 container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Powerful Features for Your Spiritual Growth</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          <section className="py-20 container mx-auto px-4 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-purple-900/5 to-fuchsia-900/5 rounded-3xl"></div>
+          <div className="relative z-10 text-center mb-16">
+            <h2 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-fuchsia-400">Powerful Features for Your Spiritual Growth</h2>
+            <p className="text-2xl text-muted-foreground max-w-3xl mx-auto">
               Everything you need to maintain and deepen your spiritual practice in one comprehensive platform
             </p>
           </div>
@@ -944,22 +1016,97 @@ const HomePage = () => {
               return (
                 <Card 
                   key={index} 
-                  className="backdrop-blur-md bg-background/20 border-purple-500/10 hover:border-purple-500/30 hover:bg-background/30 transition-all duration-300 h-full"
+                  className="backdrop-blur-lg bg-background/30 border-purple-500/20 hover:border-purple-400/50 hover:bg-background/40 transition-all duration-500 h-full transform hover:-translate-y-2 hover:shadow-2xl rounded-2xl overflow-hidden group"
                 >
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <CardHeader>
-                    <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center mb-4">
-                      <Icon className="h-8 w-8 text-purple-400" />
+                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center mb-6 mx-auto group-hover:from-purple-500/30 group-hover:to-fuchsia-500/30 transition-all duration-300">
+                      <Icon className="h-10 w-10 text-purple-400 group-hover:text-purple-300 transition-colors duration-300" />
                     </div>
-                    <CardTitle className="text-2xl">{feature.title}</CardTitle>
+                    <CardTitle className="text-3xl text-center group-hover:text-purple-300 transition-colors duration-300">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground/80 mb-4">{feature.description}</p>
-                    <p className="text-sm text-muted-foreground">{feature.details}</p>
+                    <p className="text-muted-foreground/90 mb-4 text-lg text-center">{feature.description}</p>
+                    <p className="text-base text-muted-foreground text-center group-hover:text-foreground/80 transition-colors duration-300">{feature.details}</p>
                   </CardContent>
                 </Card>
               );
             })}
           </div>
+          </section>
+
+          {/* Theme Changing Section */}
+          <section className="py-16 container mx-auto px-4 relative overflow-hidden">
+            <div className="relative z-10 max-w-4xl mx-auto text-center">
+              <div className="inline-flex items-center justify-center mb-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
+                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-amber-600 to-orange-600 flex items-center justify-center mx-auto">
+                    <span className="text-2xl text-white">🎨</span>
+                  </div>
+                </div>
+              </div>
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-orange-500 to-amber-400">
+                Divine Themes for Your Practice
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
+                Personalize your spiritual journey with themes inspired by Hindu deities and traditions
+              </p>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                {[{
+                  name: "Mahakali's Cremation Ground",
+                  description: "Embrace the fierce power of transformation through destruction and renewal",
+                  color: "from-red-800 to-red-900",
+                  icon: "🔥",
+                  link: "/MahakaliLandingpage"
+                }, {
+                  name: "Cosmic Mystery",
+                  description: "Unlock hidden knowledge and universal wisdom through cosmic exploration",
+                  color: "from-indigo-800 to-indigo-900",
+                  icon: "🔮",
+                  link: "/MysteryLandingpage"
+                }].map((theme, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    className="group cursor-pointer h-full"
+                  >
+                    <Link to={theme.link} className="h-full block">
+                      <div className="relative bg-gradient-to-br from-background/80 to-background/60 rounded-2xl p-6 border border-amber-200/50 hover:border-amber-300/70 transition-all duration-500 hover:shadow-2xl transform hover:-translate-y-2 backdrop-blur-sm h-full flex flex-col">
+                        <div className={`absolute inset-0 bg-gradient-to-br ${theme.color} opacity-0 group-hover:opacity-10 transition-opacity duration-500 rounded-2xl`}></div>
+                        <div className="relative z-10 flex flex-col h-full">
+                          <div className="text-4xl mb-4 flex justify-center">
+                            {theme.icon}
+                          </div>
+                          <h3 className="font-bold text-lg mb-2 text-foreground group-hover:text-amber-700 transition-colors duration-300">
+                            {theme.name}
+                          </h3>
+                          <p className="text-muted-foreground text-sm mb-4 leading-relaxed flex-grow">
+                            {theme.description}
+                          </p>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="border-amber-300/50 text-amber-700 hover:bg-amber-500/10 text-sm w-full transition-all duration-300 group-hover:border-amber-400/70 mt-auto"
+                          >
+                            Explore Theme
+                          </Button>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+              
+              <div className="mt-10 inline-flex items-center bg-gradient-to-r from-amber-500/15 to-orange-500/15 border border-amber-500/40 rounded-full px-6 py-3">
+                <Sparkles className="h-5 w-5 text-amber-500 mr-3" />
+                <span className="text-base font-medium text-amber-700">More themes coming soon with beta updates!</span>
+              </div>
+            </div>
           </section>
 
           {/* Spiritual Library Showcase Section */}
@@ -968,128 +1115,160 @@ const HomePage = () => {
           </section>
 
           {/* Testimonials Section */}
-          <section className="py-16 container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">What Practitioners Say</h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Join thousands of practitioners who have deepened their spiritual journey with SadhanaBoard
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {testimonials.map((testimonial, index) => (
-              <Card key={index} className="backdrop-blur-md bg-background/20 border-purple-500/10 hover:border-purple-500/30 transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="w-10 h-10 rounded-full bg-purple-500/10 mr-3 flex items-center justify-center text-sm font-medium">
-                      {testimonial.avatar}
-                    </div>
-                    <div>
-                      <p className="font-medium">{testimonial.name}</p>
-                      <p className="text-sm text-muted-foreground/70">{testimonial.role}</p>
-                    </div>
-                  </div>
-                  <p className="text-muted-foreground/80 text-sm">
-                    "{testimonial.content}"
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
+          <section className="py-16 container mx-auto px-4 relative overflow-hidden">
+          <div className="relative z-10">
+            <div className="text-center mb-10">
+              <h2 className="text-3xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-fuchsia-400 to-purple-400">
+                What Practitioners Say
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Join thousands of practitioners who have deepened their spiritual journey
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {testimonials.slice(0, 2).map((testimonial, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  className="h-full"
+                >
+                  <Card className="bg-background/30 border border-purple-500/20 hover:border-purple-400/40 transition-all duration-300 h-full rounded-xl overflow-hidden">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center mr-3 text-lg">
+                          {testimonial.avatar}
+                        </div>
+                        <div>
+                          <p className="font-bold text-sm">{testimonial.name}</p>
+                          <p className="text-xs text-muted-foreground/70">{testimonial.role}</p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <p className="text-muted-foreground text-sm">
+                        "{testimonial.content}"
+                      </p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </div>
           </section>
 
-          {/* Values Section */}
-          <section className="py-16 bg-gradient-to-b from-background/30 to-background/50">
-          <div className="container mx-auto px-4">
+          {/* Our Sacred Values */}
+          <section className="py-24 container mx-auto px-4 relative overflow-hidden">
+          {/* Enhanced background elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_center,rgba(138,43,226,0.03)_0%,rgba(0,0,0,0)_70%)]"></div>
+            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-fuchsia-500/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          </div>
+          
+          <div className="relative z-10">
             <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">Our Sacred Values</h2>
+              <div className="inline-flex items-center justify-center mb-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-full blur-lg opacity-30 animate-pulse"></div>
+                  <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-fuchsia-600 flex items-center justify-center mx-auto">
+                    <span className="text-2xl text-white">✨</span>
+                  </div>
+                </div>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-fuchsia-400 to-purple-400">
+                Our Sacred Values
+              </h2>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Principles that guide our spiritual community
+                The guiding principles that shape our sacred space and spiritual community
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl text-purple-400">🕉️</span>
-                  </div>
-                  <CardTitle className="text-xl">Discipline as Devotion</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    We honor daily practice not as a burden, but as a sacred offering — each act of discipline becomes worship.
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-full bg-fuchsia-500/10 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl text-fuchsia-400">🪔</span>
-                  </div>
-                  <CardTitle className="text-xl">Unity in Diversity</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Every path, every mantra, every deity has a place here. SadhanaBoard is a mandala where seekers of all traditions can walk side by side.
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl text-blue-400">🔱</span>
-                  </div>
-                  <CardTitle className="text-xl">Authenticity over Appearance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    We value genuine practice and inner growth above show or performance. Your journey is yours — honest, simple, and sacred.
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl text-amber-400">🔯</span>
-                  </div>
-                  <CardTitle className="text-xl">Sacred Technology</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    We believe technology can be a yantra — a living tool to deepen awareness, discipline, and divine connection when built with purity of intent.
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl text-green-400">☸️</span>
-                  </div>
-                  <CardTitle className="text-xl">Collective Awakening</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Each seeker's practice strengthens the whole mandala. By growing individually, we lift each other and move humanity closer to awakening.
-                  </p>
-                </CardContent>
-              </Card>
-              
-              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl text-rose-400">🧘‍♂️</span>
-                  </div>
-                  <CardTitle className="text-xl">Grace in Growth</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    We walk the path with patience and compassion — honoring progress, embracing setbacks, and trusting that grace accompanies every step.
-                  </p>
-                </CardContent>
-              </Card>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+              {[
+                {
+                  title: "Spiritual Growth",
+                  description: "We believe in fostering genuine spiritual development through consistent practice",
+                  detailedDescription: "True spiritual growth emerges from dedicated daily practice, mindful reflection, and the cultivation of inner wisdom. Our platform supports your journey with personalized tracking, insightful analytics, and guided practices that adapt to your evolving needs.",
+                  icon: "⛰️",
+                  knowledge: "Ancient wisdom traditions teach that spiritual development is a gradual process requiring patience, discipline, and consistent effort. Modern neuroscience confirms that regular spiritual practices rewire the brain for greater compassion, resilience, and awareness."
+                },
+                {
+                  title: "Community Connection",
+                  description: "Building bridges between practitioners to share wisdom and support",
+                  detailedDescription: "Spiritual growth flourishes in community. We connect you with like-minded practitioners, experienced guides, and wisdom keepers worldwide. Share experiences, seek guidance, and celebrate milestones together in our supportive ecosystem.",
+                  icon: "👥",
+                  knowledge: "The Sanskrit concept of 'Satsang' emphasizes the transformative power of spiritual community. Research shows that group practice amplifies individual benefits, creating a collective energy field that supports deeper states of consciousness and personal transformation."
+                },
+                {
+                  title: "Divine Inspiration",
+                  description: "Drawing strength and guidance from the divine energies that surround us",
+                  detailedDescription: "We honor the sacred connection between the human and divine. Through carefully curated practices, sacred texts, and devotional tools, we create space for divine inspiration to flow into your daily life, offering guidance, strength, and profound inner peace.",
+                  icon: "✨",
+                  knowledge: "Bhakti traditions recognize that divine grace flows through devotion, surrender, and remembrance. Quantum physics suggests that consciousness and energy are fundamentally interconnected, supporting the ancient understanding that we are never separate from the divine source."
+                },
+                {
+                  title: "Authentic Practice",
+                  description: "Encouraging sincere and dedicated spiritual practices rooted in tradition",
+                  detailedDescription: "Authenticity means honoring both ancient wisdom and modern understanding. Our practices are rooted in time-tested traditions while embracing contemporary insights about psychology, neuroscience, and human development to create genuinely transformative experiences.",
+                  icon: "❤️",
+                  knowledge: "The Yoga Sutras define authentic practice (Abhyasa) as sustained effort over time. Modern research confirms that practices combining traditional wisdom with evidence-based methods produce the most profound and lasting transformation in practitioners."
+                }
+              ].map((value, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="h-full"
+                >
+                  <Card className="backdrop-blur-lg bg-background/40 border-2 border-purple-500/30 hover:border-purple-400/50 transition-all duration-500 h-full transform hover:-translate-y-3 hover:shadow-2xl rounded-3xl overflow-hidden group relative shadow-xl hover:shadow-purple-500/20 transition-shadow duration-300">
+                    {/* Enhanced hover effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    {/* Floating particles */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute top-4 right-4 w-2 h-2 bg-purple-400/20 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-6 left-6 w-1 h-1 bg-fuchsia-400/30 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+                    </div>
+                    
+                    <CardHeader>
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/30 to-fuchsia-500/30 flex items-center justify-center mx-auto mb-5 group-hover:from-purple-500/40 group-hover:to-fuchsia-500/40 transition-all duration-300 text-3xl group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        {value.icon}
+                      </div>
+                      <CardTitle className="text-2xl text-center group-hover:text-purple-300 transition-colors duration-300 font-bold">{value.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-6 pb-6">
+                      <p className="text-muted-foreground text-base text-center leading-relaxed group-hover:text-foreground/90 transition-colors duration-300 mb-4">
+                        {value.description}
+                      </p>
+                      <div className="border-t border-purple-500/20 pt-4 mt-4 group-hover:border-purple-400/30 transition-colors duration-300">
+                        <p className="text-foreground/80 text-sm leading-relaxed mb-3">
+                          {value.detailedDescription}
+                        </p>
+                        <div className="bg-purple-500/5 rounded-xl p-3 border border-purple-500/10 group-hover:bg-purple-500/10 transition-colors duration-300">
+                          <p className="text-xs text-purple-300 italic leading-relaxed">
+                            <span className="font-semibold text-purple-200">Wisdom Insight:</span> {value.knowledge}
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                    {/* Enhanced hover effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-fuchsia-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    
+                    {/* Floating particles */}
+                    <div className="absolute inset-0 pointer-events-none">
+                      <div className="absolute top-4 right-4 w-3 h-3 bg-purple-400/30 rounded-full animate-ping"></div>
+                      <div className="absolute bottom-8 left-8 w-2 h-2 bg-fuchsia-400/40 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
+                      <div className="absolute top-1/2 left-4 w-1 h-1 bg-violet-400/50 rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+                    </div>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           </div>
           </section>
@@ -1101,7 +1280,7 @@ const HomePage = () => {
             <MoonStar className="h-16 w-16 text-purple-400 mx-auto mb-6" />
             <h2 className="text-4xl font-bold mb-6">Private Beta Is Live</h2>
             <p className="text-muted-foreground/90 mb-10 text-xl">
-              We’re onboarding in waves. Join the waitlist to secure early access and explore our features.
+              We're onboarding in waves. Join the waitlist to secure early access and explore our features.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button 

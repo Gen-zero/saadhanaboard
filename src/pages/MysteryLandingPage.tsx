@@ -8,7 +8,7 @@ import { motion, useInView, useAnimation, useScroll, useTransform } from "framer
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Line, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-import ThemePanel from "@/components/ThemePanel";
+
 
 // Dynamic yantra that responds to user interaction - mystery theme
 const InteractiveYantra = () => {
@@ -399,30 +399,126 @@ const MysteryLandingPage = () => {
       {/* Floating Elements */}
       <FloatingElements />
 
-      {/* Custom header for landing page - mystery theme */}
-      <header className="border-b border-indigo-800/30 backdrop-blur-md bg-background/10 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-indigo-700 to-indigo-900 flex items-center justify-center">
-                <Eye className="h-6 w-6 text-indigo-300" />
+      {/* Beta banner */}
+      <div className="px-2 sm:px-4 pt-2">
+        <div className="mx-auto max-w-5xl rounded-lg border border-amber-400/30 bg-amber-500/10 text-amber-200 text-xs sm:text-sm px-3 sm:px-4 py-2 flex items-center justify-center gap-2">
+          <span className="inline-block rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] sm:text-xs font-semibold">BETA</span>
+          We're in private beta. New registrations are closed — join the waitlist to get early access.
+        </div>
+      </div>
+
+      {/* Sticky Navigation Bar - Glassy Spiritual Theme with Cosmic Mystery colors */}
+      <div 
+        className="sticky top-0 left-0 right-0 z-[999999] px-2 sm:px-4 pt-2 sm:pt-4"
+        style={{
+          pointerEvents: 'auto'
+        }}
+      >
+        <nav 
+          className="relative overflow-hidden rounded-xl sm:rounded-2xl transition-all duration-500 hover:shadow-2xl group"
+          style={
+            {
+              background: 'linear-gradient(135deg, rgba(75, 0, 130, 0.08), rgba(75, 0, 130, 0.12), rgba(148, 0, 211, 0.08))',
+              backdropFilter: 'blur(20px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              border: '1px solid rgba(138, 43, 226, 0.25)',
+              boxShadow: '0 8px 32px rgba(75, 0, 130, 0.1), 0 0 0 1px rgba(138, 43, 226, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+            }
+          }
+        >
+          {/* Subtle gradient overlay */}
+          <div 
+            className="absolute inset-0 opacity-30 group-hover:opacity-50 transition-opacity duration-500"
+            style={
+              {
+                background: 'linear-gradient(45deg, rgba(138, 43, 226, 0.05), transparent, rgba(148, 0, 211, 0.05))'
+              }
+            }
+          />
+          
+          {/* Floating spiritual particles in navbar - Responsive positioning */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-1 sm:top-2 left-8 sm:left-16 w-0.5 sm:w-1 h-0.5 sm:h-1 bg-purple-400/60 rounded-full animate-pulse" />
+            <div className="absolute top-2 sm:top-4 right-8 sm:right-20 w-1 sm:w-1.5 h-1 sm:h-1.5 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
+            <div className="absolute bottom-1 sm:bottom-3 left-16 sm:left-32 w-0.5 sm:w-1 h-0.5 sm:h-1 bg-fuchsia-400/50 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+          </div>
+          
+          <div className="relative flex items-center justify-between px-3 sm:px-6 py-3 sm:py-4">
+            <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
+              <div className="relative">
+                <img
+                  src="/lovable-uploads/sadhanaboard_logo.png"
+                  alt="SadhanaBoard Logo"
+                  className="h-8 w-8 sm:h-12 sm:w-12 rounded-full cursor-pointer scale-110 shadow-lg shadow-purple-500/30"
+                  style={
+                    {
+                      filter: 'drop-shadow(0 0 8px rgba(138, 43, 226, 0.3))'
+                    }
+                  }
+                />
+                {/* Constant glowing ring around logo */}
+                <div 
+                  className="absolute inset-0 rounded-full"
+                  style={
+                    {
+                      background: 'conic-gradient(from 0deg, rgba(138, 43, 226, 0.3), rgba(148, 0, 211, 0.3), rgba(138, 43, 226, 0.3))',
+                      padding: '2px'
+                    }
+                  }
+                >
+                  <div className="w-full h-full rounded-full bg-background/20" />
+                </div>
               </div>
-              <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 to-purple-300">
-                Cosmic Mystery
-              </span>
+              
+              <div className="flex flex-col">
+                <span className="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 via-fuchsia-300 to-purple-300">
+                  Cosmic Mystery
+                </span>
+                <span className="text-[10px] sm:text-xs text-purple-400/70 font-medium tracking-wider hidden xs:block">
+                  🔮 Unlock Hidden Knowledge
+                </span>
+              </div>
             </Link>
-            <div className="flex items-center space-x-4">
-              <ThemePanel />
-              <Button asChild variant="ghost" className="text-indigo-200 hover:text-indigo-300 hover:bg-indigo-900/30">
-                <Link to="/login">Enter</Link>
+            
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <Button 
+                asChild 
+                variant="ghost" 
+                size="sm"
+                className="relative text-foreground/80 hover:text-foreground hover:bg-white/10 backdrop-blur-sm border border-white/10 hover:border-purple-400/40 transition-all duration-300 group/btn overflow-hidden px-3 sm:px-4 py-2 text-sm"
+              >
+                <Link to="/login">
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                  <span className="relative z-10">Enter</span>
+                </Link>
               </Button>
-              <Button asChild className="bg-gradient-to-r from-indigo-700 to-indigo-900 hover:from-indigo-800 hover:to-black backdrop-blur-sm border border-indigo-600">
-                <Link to="/signup">Begin Journey</Link>
+              
+              <Button 
+                asChild 
+                size="sm"
+                className="relative bg-gradient-to-r from-purple-500/80 via-fuchsia-500/80 to-purple-500/80 hover:from-purple-400 hover:via-fuchsia-400 hover:to-purple-400 backdrop-blur-sm border border-purple-400/30 hover:border-purple-400/50 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 group/cta overflow-hidden px-3 sm:px-4 py-2 text-sm"
+              >
+                <Link to="/waitlist">
+                  {/* Animated gradient background */}
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-r from-purple-400/20 via-fuchsia-400/20 to-purple-400/20 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500"
+                  />
+                  {/* Floating sparkles - Smaller on mobile */}
+                  <div className="absolute top-0.5 sm:top-1 right-1 sm:right-2 w-0.5 sm:w-1 h-0.5 sm:h-1 bg-purple-300 rounded-full animate-ping opacity-0 group-hover/cta:opacity-100" />
+                  <div className="absolute bottom-0.5 sm:bottom-1 left-1 sm:left-3 w-0.5 h-0.5 bg-white rounded-full animate-pulse opacity-0 group-hover/cta:opacity-100" style={{ animationDelay: '0.5s' }} />
+                  
+                  <span className="relative z-10 flex items-center">
+                    <span className="hidden xs:inline">Join Waitlist</span>
+                    <span className="xs:hidden">Waitlist</span>
+                    <Eye className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 group-hover/cta:animate-spin" style={{ animationDuration: '2s' }} />
+                  </span>
+                </Link>
               </Button>
             </div>
           </div>
-        </div>
-      </header>
+        </nav>
+      </div>
 
       <div className="space-y-0 relative z-20">
         {/* Hero Section - mystery theme */}
@@ -544,33 +640,18 @@ const MysteryLandingPage = () => {
                     </h2>
                   </div>
                   <p className="text-lg text-indigo-200 mb-6">
-                    What cosmic mystery will you unlock today?
+                    Join the waitlist to get early access to this cosmic experience.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4">
-                    <Input
-                      type="text"
-                      value={sankalpa}
-                      onChange={(e) => setSankalpa(e.target.value)}
-                      placeholder="e.g., 'I unlock the secrets of the universe and embrace cosmic wisdom'"
-                      className="flex-1 bg-indigo-900/30 border-indigo-700/50 text-white placeholder:text-indigo-300/60 focus:border-indigo-400 focus:ring-indigo-400 h-16 text-lg px-6 backdrop-blur-sm"
-                    />
                     <Button
                       size="lg"
                       className="bg-gradient-to-r from-indigo-700 to-indigo-900 hover:from-indigo-800 hover:to-black h-16 px-10 text-xl group shadow-2xl shadow-indigo-900/40 border border-indigo-700"
-                      onClick={handleEnterSpace}
-                      disabled={isEntering}
+                      asChild
                     >
-                      {isEntering ? (
-                        <>
-                          <span className="h-5 w-5 rounded-full border-2 border-indigo-300 border-r-transparent animate-spin mr-3"></span>
-                          Unlocking...
-                        </>
-                      ) : (
-                        <>
-                          Enter the Cosmos
-                          <ChevronRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-                        </>
-                      )}
+                      <Link to="/waitlist">
+                        Join the Waitlist
+                        <ChevronRight className="ml-3 h-6 w-6 group-hover:translate-x-2 transition-transform" />
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -665,6 +746,319 @@ const MysteryLandingPage = () => {
             })}
           </div>
         </motion.section>
+
+        {/* Sadhana Paper Section - Cosmic Theme */}
+        <section className="py-16 container mx-auto px-4 relative overflow-hidden">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
+              {/* Left Side - Cosmic Content */}
+              <div className="lg:col-span-8 space-y-6 sm:space-y-8">
+                <div className="text-center lg:text-left">
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-indigo-300 via-purple-300 to-indigo-300">
+                    Embark on Your Cosmic Journey
+                  </h2>
+                  <p className="text-lg text-indigo-200 mb-6 max-w-3xl mx-auto leading-relaxed">
+                    Unlock the mysteries of the universe through mindful practice and cosmic awareness.
+                  </p>
+                  <p className="text-indigo-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    Join thousands of seekers who have found their cosmic home in our integrated practice platform.
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <Button 
+                      size="lg" 
+                      className="bg-gradient-to-r from-indigo-700 to-indigo-900 hover:from-indigo-800 hover:to-black px-8 py-6 text-lg shadow-lg hover:shadow-2xl transition-all duration-300"
+                      asChild
+                    >
+                      <Link to="/signup">
+                        <Sparkles className="w-6 h-6 mr-3" />
+                        Begin Your Practice
+                      </Link>
+                    </Button>
+                    
+                    <Button 
+                      size="lg" 
+                      variant="outline" 
+                      className="border-indigo-500/40 text-lg px-8 py-6 hover:bg-indigo-500/10 backdrop-blur-sm transition-all duration-300"
+                      asChild
+                    >
+                      <Link to="/library">
+                        <BookOpen className="w-6 h-6 mr-3" />
+                        Explore Library
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Right Side - Cosmic Sadhana Paper (Transparent Cosmic Metallic) */}
+              <div className="lg:col-span-4 relative">
+                <div className="relative max-w-xl mx-auto lg:mx-0">
+                  {/* Paper Container - Transparent Cosmic Metallic styling */}
+                  <div 
+                    className="relative p-6 rounded-2xl border-2 backdrop-blur-md"
+                    style={{
+                      background: 'linear-gradient(145deg, rgba(165, 180, 252, 0.05) 0%, rgba(129, 140, 248, 0.08) 30%, rgba(139, 92, 246, 0.04) 70%, rgba(192, 132, 252, 0.06) 100%)',
+                      borderColor: 'rgba(129, 140, 248, 0.3)',
+                      fontFamily: 'Georgia, serif',
+                      boxShadow: `
+                        0 8px 32px rgba(129, 140, 248, 0.12),
+                        0 0 0 1px rgba(129, 140, 248, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                        inset 0 -1px 0 rgba(129, 140, 248, 0.08)
+                      `,
+                      backdropFilter: 'blur(14px) saturate(140%)',
+                      WebkitBackdropFilter: 'blur(14px) saturate(140%)'
+                    }}
+                  >
+                    {/* Metallic overlay gradient */}
+                    <div 
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{
+                        background: `
+                          linear-gradient(135deg, 
+                            rgba(199, 210, 254, 0.08) 0%, 
+                            transparent 25%, 
+                            rgba(165, 180, 252, 0.05) 50%, 
+                            transparent 75%, 
+                            rgba(237, 229, 253, 0.03) 100%
+                          )
+                        `,
+                        opacity: 0.5
+                      }}
+                    />
+                    
+                    {/* Enhanced ornate corners with cosmic metallic effect */}
+                    <div 
+                      className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 rounded-tl-lg"
+                      style={{
+                        borderColor: 'rgba(129, 140, 248, 0.8)',
+                        filter: 'drop-shadow(0 0 4px rgba(129, 140, 248, 0.4))'
+                      }}
+                    />
+                    <div 
+                      className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 rounded-tr-lg"
+                      style={{
+                        borderColor: 'rgba(129, 140, 248, 0.8)',
+                        filter: 'drop-shadow(0 0 4px rgba(129, 140, 248, 0.4))'
+                      }}
+                    />
+                    <div 
+                      className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 rounded-bl-lg"
+                      style={{
+                        borderColor: 'rgba(129, 140, 248, 0.8)',
+                        filter: 'drop-shadow(0 0 4px rgba(129, 140, 248, 0.4))'
+                      }}
+                    />
+                    <div 
+                      className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 rounded-br-lg"
+                      style={{
+                        borderColor: 'rgba(129, 140, 248, 0.8)',
+                        filter: 'drop-shadow(0 0 4px rgba(129, 140, 248, 0.4))'
+                      }}
+                    />
+                    
+                    {/* Header with enhanced cosmic styling */}
+                    <div className="text-center mb-4 relative z-10">
+                      <h3 
+                        className="text-2xl font-bold mb-2" 
+                        style={{ 
+                          fontFamily: 'Georgia, serif',
+                          color: 'rgba(165, 180, 252, 0.95)',
+                          textShadow: '0 0 8px rgba(129, 140, 248, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                        }}
+                      >
+                        🌌 Cosmic Sadhana Paper
+                      </h3>
+                      <div 
+                        className="w-20 h-0.5 mx-auto"
+                        style={{
+                          background: 'linear-gradient(to right, transparent, rgba(129, 140, 248, 0.8), transparent)',
+                          filter: 'drop-shadow(0 0 2px rgba(129, 140, 248, 0.4))'
+                        }}
+                      />
+                    </div>
+
+                    {/* Content with enhanced cosmic metallic text */}
+                    <div className="space-y-2 relative z-10" style={{ fontFamily: 'Georgia, serif' }}>
+                      <div>
+                        <div 
+                          className="font-semibold mb-1 text-base"
+                          style={{
+                            color: 'rgba(165, 180, 252, 0.95)',
+                            textShadow: '0 0 4px rgba(129, 140, 248, 0.4)'
+                          }}
+                        >
+                          Purpose:
+                        </div>
+                        <div 
+                          className="text-sm leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
+                          To align with universal consciousness during the sacred practice of Zen meditation and invoke cosmic energy for inner peace and spiritual growth.
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div 
+                          className="font-semibold mb-1 text-base"
+                          style={{
+                            color: 'rgba(165, 180, 252, 0.95)',
+                            textShadow: '0 0 4px rgba(129, 140, 248, 0.4)'
+                          }}
+                        >
+                          Goal:
+                        </div>
+                        <div 
+                          className="text-sm leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
+                          Achieve mindful awareness and inner stillness through daily meditation practices for spiritual purification and universal connection.
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div 
+                          className="font-semibold mb-1 text-base"
+                          style={{
+                            color: 'rgba(165, 180, 252, 0.95)',
+                            textShadow: '0 0 4px rgba(129, 140, 248, 0.4)'
+                          }}
+                        >
+                          Cosmic Focus:
+                        </div>
+                        <div 
+                          className="text-sm leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
+                          Universal Consciousness and the infinite cosmos
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div 
+                          className="font-semibold mb-1 text-base"
+                          style={{
+                            color: 'rgba(165, 180, 252, 0.95)',
+                            textShadow: '0 0 4px rgba(129, 140, 248, 0.4)'
+                          }}
+                        >
+                          Duration:
+                        </div>
+                        <div 
+                          className="text-sm leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
+                          21 days
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div 
+                          className="font-semibold mb-1 text-base"
+                          style={{
+                            color: 'rgba(165, 180, 252, 0.95)',
+                            textShadow: '0 0 4px rgba(129, 140, 248, 0.4)'
+                          }}
+                        >
+                          Message:
+                        </div>
+                        <div 
+                          className="text-sm italic leading-relaxed pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
+                          "May the universal consciousness illuminate my path and transform my being with infinite peace and cosmic wisdom."
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <div 
+                          className="font-semibold mb-1 text-base"
+                          style={{
+                            color: 'rgba(165, 180, 252, 0.95)',
+                            textShadow: '0 0 4px rgba(129, 140, 248, 0.4)'
+                          }}
+                        >
+                          My Offerings:
+                        </div>
+                        <div 
+                          className="text-sm space-y-0.5 pl-2"
+                          style={{
+                            color: 'rgba(255, 255, 255, 0.85)',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                          }}
+                        >
+                          <div>1. Daily Zen meditation (30 minutes)</div>
+                          <div>2. Mindful breathing exercises</div>
+                          <div>3. Evening gratitude practice</div>
+                          <div>4. Cosmic awareness journaling</div>
+                          <div>5. Universal love meditation</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Enhanced metallic texture overlay */}
+                    <div 
+                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      style={{
+                        background: `
+                          radial-gradient(circle at 20% 30%, rgba(165, 180, 252, 0.05) 0%, transparent 40%),
+                          radial-gradient(circle at 80% 70%, rgba(129, 140, 248, 0.04) 0%, transparent 40%),
+                          radial-gradient(circle at 40% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 30%)
+                        `,
+                        opacity: 0.4
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Enhanced floating cosmic elements with cosmic glow */}
+                  <div 
+                    className="absolute -top-3 -right-3 text-2xl animate-pulse"
+                    style={{
+                      filter: 'drop-shadow(0 0 6px rgba(129, 140, 248, 0.6))',
+                      opacity: 0.8
+                    }}
+                  >
+                    🌟
+                  </div>
+                  <div 
+                    className="absolute -bottom-3 -left-3 text-xl animate-pulse"
+                    style={{
+                      filter: 'drop-shadow(0 0 6px rgba(129, 140, 248, 0.6))',
+                      opacity: 0.8
+                    }}
+                  >
+                    🪐
+                  </div>
+                  <div 
+                    className="absolute top-1/2 -left-6 text-lg animate-bounce"
+                    style={{
+                      filter: 'drop-shadow(0 0 4px rgba(129, 140, 248, 0.5))',
+                      opacity: 0.7
+                    }}
+                  >
+                    ✨
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Testimonials with Auto-Rotation */}
         <motion.section 
@@ -855,6 +1249,9 @@ const MysteryLandingPage = () => {
           </div>
         </motion.section>
 
+        {/* Theme Changing Section - Removed as per requirements */}
+        {/* This section has been removed from landing pages as per project specifications */}
+
         {/* Final CTA Section - mystery theme */}
         <motion.section 
           ref={ctaRef} 
@@ -936,8 +1333,8 @@ const MysteryLandingPage = () => {
                     className="bg-gradient-to-r from-indigo-700 via-indigo-800 to-black hover:from-indigo-800 hover:via-indigo-900 hover:to-black text-2xl px-16 py-10 backdrop-blur-sm shadow-2xl shadow-indigo-900/50 rounded-2xl border border-indigo-700"
                     asChild
                   >
-                    <Link to="/signup">
-                      Walk the Path
+                    <Link to="/waitlist">
+                      Join the Waitlist
                       <ChevronRight className="ml-3 h-8 w-8" />
                     </Link>
                   </Button>
@@ -967,7 +1364,7 @@ const MysteryLandingPage = () => {
                   >
                     <Link to="/your-atma-yantra" className="flex items-center">
                       <Eye className="mr-3 h-8 w-8 text-indigo-400" />
-                      Experience Your Yantras
+                      Explore Features
                     </Link>
                   </Button>
                 </motion.div>

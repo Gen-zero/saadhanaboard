@@ -198,12 +198,12 @@ const RecommendedRow = () => {
         </h2>
         <div className="flex space-x-4 overflow-x-auto pb-4">
           {[...Array(4)].map((_, index) => (
-            <Card key={index} className="min-w-[280px] animate-pulse">
+            <Card key={index} className="min-w-[280px] animate-pulse border border-purple-500/20 bg-gradient-to-b from-purple-600/10 via-purple-500/5 to-purple-400/10">
               <CardContent className="p-4">
-                <div className="h-4 bg-gray-700 rounded w-3/4 mb-3"></div>
-                <div className="h-3 bg-gray-700 rounded w-full mb-2"></div>
-                <div className="h-3 bg-gray-700 rounded w-5/6 mb-4"></div>
-                <div className="h-8 bg-gray-700 rounded"></div>
+                <div className="h-4 bg-purple-500/20 rounded w-3/4 mb-3"></div>
+                <div className="h-3 bg-purple-500/10 rounded w-full mb-2"></div>
+                <div className="h-3 bg-purple-500/10 rounded w-5/6 mb-4"></div>
+                <div className="h-8 bg-purple-500/20 rounded"></div>
               </CardContent>
             </Card>
           ))}
@@ -219,10 +219,10 @@ const RecommendedRow = () => {
       </h2>
       <div className="flex space-x-4 overflow-x-auto pb-4">
         {recommendedItems.map((item) => (
-          <Card key={item.id} className="min-w-[280px] flex-shrink-0 border border-purple-500/20 bg-gradient-to-b from-purple-600/10 via-purple-500/5 to-purple-400/10 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-300">
+          <Card key={item.id} className="min-w-[280px] flex-shrink-0 border border-purple-500/20 bg-gradient-to-b from-purple-600/10 via-purple-500/5 to-purple-400/10 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1">
             <CardContent className="p-4">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg line-clamp-2">{item.title}</h3>
+                <h3 className="font-semibold text-lg line-clamp-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">{item.title}</h3>
                 {item.type === 'sadhana' && item.price === 0 && (
                   <Badge variant="secondary" className="bg-green-500/20 text-green-400">
                     Free
@@ -233,7 +233,7 @@ const RecommendedRow = () => {
               
               <div className="flex flex-wrap gap-2 mb-4">
                 {item.type === 'sadhana' && item.difficulty && (
-                  <Badge variant="outline" className="text-xs">
+                  <Badge variant="outline" className="text-xs bg-blue-500/10 border-blue-500/30">
                     {item.difficulty}
                   </Badge>
                 )}
@@ -256,7 +256,7 @@ const RecommendedRow = () => {
                 )}
               </div>
               
-              <Button size="sm" className="w-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600">
+              <Button size="sm" className="w-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 transition-all duration-300">
                 <BookOpen className="h-4 w-4 mr-2" />
                 {item.type === 'sadhana' ? 'View Practice' : 'Read Book'}
               </Button>

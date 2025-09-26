@@ -94,21 +94,23 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
         <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
           {sadhana.title}
         </h2>
-        <Button variant="ghost" size="icon" onClick={onClose}>
+        <Button variant="outline" size="icon" onClick={onClose} className="border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20">
           <X className="h-5 w-5" />
         </Button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Sadhana Information */}
-        <Card className="backdrop-blur-sm bg-background/70 border border-purple-500/20">
-          <CardHeader>
+        <Card className="backdrop-blur-sm bg-gradient-to-b from-background/70 to-secondary/10 border border-purple-500/20">
+          <CardHeader className="bg-gradient-to-r from-purple-500/10 via-fuchsia-500/10 to-purple-500/10">
             <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-purple-500" />
+              <div className="p-2 rounded-lg bg-purple-500/10">
+                <BookOpen className="h-5 w-5 text-purple-500" />
+              </div>
               <span>About This Practice</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             <p className="text-muted-foreground">{sadhana.description}</p>
             
             <div className="flex flex-wrap gap-2">
@@ -158,14 +160,16 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
         </Card>
 
         {/* Customization Form */}
-        <Card className="backdrop-blur-sm bg-background/70 border border-purple-500/20">
-          <CardHeader>
+        <Card className="backdrop-blur-sm bg-gradient-to-b from-background/70 to-secondary/10 border border-purple-500/20">
+          <CardHeader className="bg-gradient-to-r from-purple-500/10 via-fuchsia-500/10 to-purple-500/10">
             <CardTitle className="flex items-center gap-2">
-              <Heart className="h-5 w-5 text-purple-500" />
+              <div className="p-2 rounded-lg bg-purple-500/10">
+                <Heart className="h-5 w-5 text-purple-500" />
+              </div>
               <span>Personalize Your Practice</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             <div className="space-y-2">
               <Label htmlFor="purpose">Your Purpose</Label>
               <Textarea 
@@ -173,7 +177,7 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
                 value={customData.purpose}
                 onChange={(e) => setCustomData(prev => ({ ...prev, purpose: e.target.value }))}
                 placeholder="What is the purpose of your spiritual practice?"
-                className="min-h-[80px]"
+                className="min-h-[80px] border-purple-500/20 focus:border-purple-500/50"
               />
             </div>
             
@@ -184,7 +188,7 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
                 value={customData.goal}
                 onChange={(e) => setCustomData(prev => ({ ...prev, goal: e.target.value }))}
                 placeholder="What is your specific spiritual goal?"
-                className="min-h-[80px]"
+                className="min-h-[80px] border-purple-500/20 focus:border-purple-500/50"
               />
             </div>
             
@@ -195,7 +199,7 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
                 value={customData.message}
                 onChange={(e) => setCustomData(prev => ({ ...prev, message: e.target.value }))}
                 placeholder="What message would you like to share with the divine?"
-                className="min-h-[80px]"
+                className="min-h-[80px] border-purple-500/20 focus:border-purple-500/50"
               />
             </div>
             
@@ -208,12 +212,13 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
                       value={offering} 
                       onChange={(e) => handleOfferingChange(index, e.target.value)}
                       placeholder={`Offering or practice ${index + 1}`}
+                      className="border-purple-500/20 focus:border-purple-500/50"
                     />
                     {customData.offerings.length > 1 && (
                       <Button 
-                        variant="ghost" 
+                        variant="outline" 
                         size="icon" 
-                        className="shrink-0"
+                        className="shrink-0 border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20"
                         onClick={() => handleRemoveOffering(index)}
                       >
                         <X className="h-4 w-4" />
@@ -224,7 +229,7 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full"
+                  className="w-full border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20"
                   onClick={handleAddOffering}
                 >
                   + Add Offering
@@ -245,6 +250,7 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
                     type="date" 
                     value={customData.startDate}
                     onChange={(e) => handleStartDateChange(e.target.value)}
+                    className="border-purple-500/20 focus:border-purple-500/50"
                   />
                 </div>
                 <div className="flex-1">
@@ -254,13 +260,14 @@ const FoundationSadhanaViewer = ({ sadhana, onClose, onStart }: FoundationSadhan
                     type="date" 
                     value={customData.endDate}
                     readOnly
+                    className="border-purple-500/20 focus:border-purple-500/50"
                   />
                 </div>
               </div>
             </div>
             
             <Button 
-              className="w-full mt-6 bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600"
+              className="w-full mt-6 bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 transition-all duration-300 hover:scale-[1.02]"
               onClick={handleStartSadhana}
             >
               <BookOpen className="mr-2 h-4 w-4" />

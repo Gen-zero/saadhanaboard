@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpen, AlignCenter, Loader2, Info } from "lucide-react";
+import { BookOpen, AlignCenter, Loader2, Grid, List, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
@@ -36,10 +36,27 @@ const LibraryHeader = ({
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
+          ) : view === "grid" ? (
+            <>
+              <List className="h-4 w-4" />
+              <span>List View</span>
+            </>
           ) : (
-            <AlignCenter className="h-4 w-4" />
+            <>
+              <Grid className="h-4 w-4" />
+              <span>Grid View</span>
+            </>
           )}
-          <span>{view === "grid" ? "List View" : "Grid View"}</span>
+        </Button>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex items-center gap-1 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border-purple-500/30 hover:bg-purple-500/20 text-purple-700 dark:text-purple-300"
+          onClick={() => navigate('/store')}
+        >
+          <ShoppingCart className="h-4 w-4" />
+          <span>Store</span>
         </Button>
       </div>
     </div>
