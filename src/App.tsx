@@ -13,6 +13,15 @@ import PsychologicalLeversPage from "./pages/PsychologicalLeversPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import WalkthroughPage from "./pages/WalkthroughPage";
 import HomePage from "./pages/HomePage";
+import AdminLoginPage from "./pages/AdminLoginPage";
+import AdminLayout from "./pages/AdminLayout";
+import AdminDashboardPage from "./pages/AdminDashboardPage";
+import AdminUsersPage from "./pages/AdminUsersPage";
+import AdminLogsPage from "./pages/AdminLogsPage";
+import AdminAssetsPage from "./pages/AdminAssetsPage";
+import AdminThemesPage from "./pages/AdminThemesPage";
+import AdminTemplatesPage from "./pages/AdminTemplatesPage";
+import AdminSettingsReportsPage from "./pages/AdminSettingsReportsPage";
 import ExperimentPage from "./pages/ExperimentPage";
 import MysteryLandingPage from "./pages/MysteryLandingPage";
 import AboutPage from "./pages/AboutPage";
@@ -183,6 +192,17 @@ const AppRoutes = () => {
       <Route path="/MahakaliLandingpage" element={<ExperimentPage />} />
       <Route path="/MysteryLandingpage" element={<MysteryLandingPage />} />
       <Route path="/about" element={<AboutPage />} />
+      {/* Admin Panel */}
+      <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboardPage />} />
+        <Route path="users" element={<AdminUsersPage />} />
+        <Route path="logs" element={<AdminLogsPage />} />
+        <Route path="assets" element={<AdminAssetsPage />} />
+        <Route path="themes" element={<AdminThemesPage />} />
+        <Route path="templates" element={<AdminTemplatesPage />} />
+        <Route path="settings" element={<AdminSettingsReportsPage />} />
+      </Route>
       <Route path="/dashboard" element={<OnboardingRoute><DashboardPage /></OnboardingRoute>} />
       <Route path="/sadhana" element={<OnboardingRoute><SadhanaPage /></OnboardingRoute>} />
       <Route path="/saadhanas" element={<OnboardingRoute><SaadhanasPage /></OnboardingRoute>} />

@@ -1,10 +1,29 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Trophy, Calendar, Users, Sparkles, MoonStar, Flame, Target, Heart, Mountain, Star, TrendingUp, Play, Volume2, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Simple count-up hook for animated stats
+const useCountUp = (targetValue: number, durationMs: number = 1500) => {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    let rafId: number;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const progress = Math.min(1, elapsed / durationMs);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.floor(eased * targetValue));
+      if (progress < 1) rafId = requestAnimationFrame(tick);
+    };
+    rafId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(rafId);
+  }, [targetValue, durationMs]);
+  return value;
+};
 
 // Spiritual Library Showcase Component
 const SpiritualLibraryShowcase = () => {
@@ -296,6 +315,29 @@ const SpiritualLibraryShowcase = () => {
 };
 
 const HomePage = () => {
+  // Ambient audio toggle
+  const [audioOn, setAudioOn] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  useEffect(() => {
+    if (!audioRef.current) return;
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.25;
+    if (audioOn) {
+      audioRef.current.play().catch(() => {});
+    } else {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [audioOn]);
+
+  // Subtle parallax sparkles in hero
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    setMousePos({ x, y });
+  };
   const features = [
     {
       title: "Sadhana Tracker",
@@ -514,8 +556,35 @@ const HomePage = () => {
       <div className="min-h-screen bg-transparent">
         <div className="space-y-16 animate-fade-in min-h-screen flex flex-col">
           {/* Hero Section with Sadhana Paper */}
-          <section className="flex-1 flex items-center justify-center px-2 sm:px-4 mt-6 sm:mt-10">
-            <div className="container mx-auto max-w-7xl">
+          <section className="flex-1 flex items-center justify-center px-2 sm:px-4 mt-6 sm:mt-10 relative overflow-hidden">
+            {/* Yantra watermark behind hero */}
+            <div className="pointer-events-none absolute inset-0 opacity-[0.07] -z-10 flex items-center justify-center">
+              <svg width="800" height="800" viewBox="0 0 200 200" className="drop-shadow-[0_0_12px_rgba(255,215,0,0.15)]">
+                <g fill="none" stroke="url(#grad)" strokeWidth="0.4">
+                  <circle cx="100" cy="100" r="20" />
+                  <circle cx="100" cy="100" r="40" />
+                  <circle cx="100" cy="100" r="60" />
+                  <circle cx="100" cy="100" r="80" />
+                  <polygon points="100,20 140,100 100,180 60,100" />
+                  <polygon points="100,30 135,100 100,170 65,100" />
+                  <line x1="20" y1="100" x2="180" y2="100" />
+                  <line x1="100" y1="20" x2="100" y2="180" />
+                </g>
+                <defs>
+                  <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#FDE68A" />
+                    <stop offset="100%" stopColor="#C084FC" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+            {/* Parallax sparkles */}
+            <div className="pointer-events-none absolute inset-0 -z-10" style={{ transform: `translate(${mousePos.x * 6}px, ${mousePos.y * 6}px)` }}>
+              <div className="absolute top-16 left-12 text-xl">✨</div>
+              <div className="absolute bottom-24 right-16 text-2xl">🪔</div>
+              <div className="absolute top-1/3 right-1/4 text-lg">🌸</div>
+            </div>
+            <div className="container mx-auto max-w-7xl" onMouseMove={handleMouseMove}>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
               {/* Left Side - Spiritual Content */}
               <div className="lg:col-span-7 lg:col-start-2 space-y-6 sm:space-y-8">
@@ -560,6 +629,14 @@ const HomePage = () => {
                       <Link to="/library">
                         🌙 See How It Works
                       </Link>
+                    </Button>
+                    <Button 
+                      size="lg"
+                      variant="ghost"
+                      className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
+                      onClick={() => setAudioOn((v) => !v)}
+                    >
+                      <Volume2 className="w-5 h-5 mr-2" /> {audioOn ? 'Sound: On' : 'Sound: Off'}
                     </Button>
                   </div>
                   
@@ -841,6 +918,33 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
+            </div>
+          </section>
+
+          {/* Animated stats strip */}
+          <section className="py-8 sm:py-10">
+            <div className="container mx-auto px-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 rounded-xl border border-purple-500/20 bg-background/40 backdrop-blur-md p-4 sm:p-6">
+                {stats.map((s, i) => {
+                  // Parse numeric part for count-up
+                  const numeric = parseInt(String(s.value).replace(/[^0-9]/g, '')) || 0;
+                  const unit = String(s.value).replace(/[0-9]/g, '');
+                  const count = useCountUp(numeric, 1200 + i * 200);
+                  const Icon = s.icon;
+                  return (
+                    <div key={i} className="text-center">
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <Icon className="w-4 h-4 text-purple-400" />
+                        <span className="text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-purple-300 to-fuchsia-300">
+                          {count}
+                          <span className="text-lg sm:text-xl font-semibold ml-0.5">{unit}</span>
+                        </span>
+                      </div>
+                      <div className="text-[11px] sm:text-xs text-muted-foreground">{s.label}</div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </section>
 
