@@ -515,10 +515,10 @@ const HomePage = () => {
         <div className="space-y-16 animate-fade-in min-h-screen flex flex-col">
           {/* Hero Section with Sadhana Paper */}
           <section className="flex-1 flex items-center justify-center px-2 sm:px-4 mt-6 sm:mt-10">
-            <div className="container mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center">
+            <div className="container mx-auto max-w-7xl">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
               {/* Left Side - Spiritual Content */}
-              <div className="space-y-6 sm:space-y-8">
+              <div className="lg:col-span-7 lg:col-start-2 space-y-6 sm:space-y-8">
                 <div className="text-center lg:text-left">
                   <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
@@ -576,8 +576,8 @@ const HomePage = () => {
               </div>
               
               {/* Right Side - Sadhana Paper (Transparent Golden Metallic) */}
-              <div className="relative">
-                <div className="relative max-w-lg mx-auto">
+              <div className="lg:col-span-4 relative">
+                <div className="relative max-w-lg mx-auto lg:mx-0">
                   {/* Paper Container - Transparent Golden Metallic styling */}
                   <div 
                     className="relative p-6 rounded-2xl border-2 backdrop-blur-md"
@@ -876,54 +876,6 @@ const HomePage = () => {
           </div>
           </section>
 
-          {/* Popular Practices Section */}
-          <section className="py-16 bg-gradient-to-b from-background/30 to-background/50">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold mb-4">Popular Spiritual Practices</h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Discover transformative practices designed by our spiritual community
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {practices.map((practice, index) => (
-                <Card key={index} className="backdrop-blur-md bg-background/20 border-purple-500/10 hover:border-purple-500/30 transition-all duration-300">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <CardTitle className="text-lg">{practice.title}</CardTitle>
-                      <span className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-full">
-                        {practice.level}
-                      </span>
-                    </div>
-                    <div className="flex items-center text-sm text-muted-foreground mt-2">
-                      <Flame className="h-4 w-4 mr-1" />
-                      <span>{practice.duration}</span>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground/80 mb-4 text-sm">{practice.description}</p>
-                    <div className="flex justify-between text-xs">
-                      <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded">
-                        {practice.deity}
-                      </span>
-                      <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded">
-                        {practice.tradition}
-                      </span>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <div className="text-center mt-12">
-              <Button asChild variant="outline" className="border-purple-500/40 hover:bg-purple-500/10">
-                <Link to="/signup">
-                  Explore All Practices
-                </Link>
-              </Button>
-            </div>
-          </div>
-          </section>
-
           {/* Spiritual Library Showcase Section */}
           <section className="py-16 container mx-auto px-4">
             <SpiritualLibraryShowcase />
@@ -968,17 +920,17 @@ const HomePage = () => {
                 Principles that guide our spiritual community
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
                 <CardHeader>
                   <div className="w-16 h-16 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4">
-                    <Mountain className="h-8 w-8 text-purple-400" />
+                    <span className="text-2xl text-purple-400">🕉️</span>
                   </div>
-                  <CardTitle className="text-2xl">Spiritual Growth</CardTitle>
+                  <CardTitle className="text-xl">Discipline as Devotion</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
-                    We believe in fostering genuine spiritual development through consistent practice and divine connection.
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    We honor daily practice not as a burden, but as a sacred offering — each act of discipline becomes worship.
                   </p>
                 </CardContent>
               </Card>
@@ -986,13 +938,13 @@ const HomePage = () => {
               <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
                 <CardHeader>
                   <div className="w-16 h-16 rounded-full bg-fuchsia-500/10 flex items-center justify-center mx-auto mb-4">
-                    <Heart className="h-8 w-8 text-fuchsia-400" />
+                    <span className="text-2xl text-fuchsia-400">🪔</span>
                   </div>
-                  <CardTitle className="text-2xl">Community Connection</CardTitle>
+                  <CardTitle className="text-xl">Unity in Diversity</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
-                    Building bridges between practitioners to share wisdom, support, and spiritual experiences.
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Every path, every mantra, every deity has a place here. SadhanaBoard is a mandala where seekers of all traditions can walk side by side.
                   </p>
                 </CardContent>
               </Card>
@@ -1000,13 +952,55 @@ const HomePage = () => {
               <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
                 <CardHeader>
                   <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-4">
-                    <Sparkles className="h-8 w-8 text-blue-400" />
+                    <span className="text-2xl text-blue-400">🔱</span>
                   </div>
-                  <CardTitle className="text-2xl">Divine Inspiration</CardTitle>
+                  <CardTitle className="text-xl">Authenticity over Appearance</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
-                    Drawing strength and guidance from the divine energies that surround and inspire us on our journey.
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    We value genuine practice and inner growth above show or performance. Your journey is yours — honest, simple, and sacred.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
+                <CardHeader>
+                  <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl text-amber-400">🔯</span>
+                  </div>
+                  <CardTitle className="text-xl">Sacred Technology</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    We believe technology can be a yantra — a living tool to deepen awareness, discipline, and divine connection when built with purity of intent.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
+                <CardHeader>
+                  <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl text-green-400">☸️</span>
+                  </div>
+                  <CardTitle className="text-xl">Collective Awakening</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Each seeker's practice strengthens the whole mandala. By growing individually, we lift each other and move humanity closer to awakening.
+                  </p>
+                </CardContent>
+              </Card>
+              
+              <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 text-center">
+                <CardHeader>
+                  <div className="w-16 h-16 rounded-full bg-rose-500/10 flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl text-rose-400">🧘‍♂️</span>
+                  </div>
+                  <CardTitle className="text-xl">Grace in Growth</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    We walk the path with patience and compassion — honoring progress, embracing setbacks, and trusting that grace accompanies every step.
                   </p>
                 </CardContent>
               </Card>
@@ -1044,90 +1038,117 @@ const HomePage = () => {
                 </Link>
               </Button>
             </div>
-            
-            {/* Demo Preview */}
-            <Card className="backdrop-blur-md bg-background/20 border-purple-500/10 max-w-2xl mx-auto">
-              <CardHeader>
-                <CardTitle className="flex items-center justify-center gap-2">
-                  <Play className="h-5 w-5 text-purple-400" />
-                  <span>Experience a Preview</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  See how SaadhanaBoard can enhance your spiritual practice with divine themes, tracking tools, and community features.
-                </p>
-                <div className="flex flex-col gap-2">
-                  <Button asChild variant="ghost" className="text-purple-300 hover:text-purple-200 justify-start">
-                    <Link to="/your-atma-yantra">
-                      <Volume2 className="h-4 w-4 mr-2" />
-                      View Your Yantras
-                    </Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="text-red-500 hover:text-red-400 justify-start bg-red-500/5 hover:bg-red-500/10 border border-red-500/20">
-                    <Link to="/MahakaliLandingpage">
-                      <Flame className="h-4 w-4 mr-2" />
-                      Experience Mahakali Theme 🔥
-                    </Link>
-                  </Button>
-                  <Button asChild variant="ghost" className="text-indigo-500 hover:text-indigo-400 justify-start bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20">
-                    <Link to="/MysteryLandingpage">
-                      <Eye className="h-4 w-4 mr-2" />
-                      Experience Mystery Theme 🔮
-                    </Link>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
           </div>
           </section>
 
           {/* Footer */}
-          <footer className="backdrop-blur-md bg-background/30 border-t border-purple-500/10 mt-12">
-          <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                <div className="relative">
-                  <img
-                    src="/lovable-uploads/sadhanaboard_logo.png"
-                    alt="SadhanaBoard Logo"
-                    className="h-8 w-8 rounded-full cursor-pointer transition-transform duration-300 hover:scale-110 relative z-10"
-                    style={{
-                      filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.3))'
-                    }}
-                  />
-                  {/* Constant glowing ring around logo */}
-                  <div 
-                    className="absolute inset-0 rounded-full"
-                    style={{
-                      background: 'conic-gradient(from 0deg, rgba(255, 215, 0, 0.3), rgba(138, 43, 226, 0.3), rgba(255, 215, 0, 0.3))',
-                      padding: '2px'
-                    }}
-                  >
-                    <div className="w-full h-full rounded-full bg-background/20" />
+          <div className="px-4 sm:px-4 pb-4 sm:pb-4">
+            <footer 
+              className="relative overflow-hidden rounded-xl sm:rounded-2xl transition-all duration-500 hover:shadow-2xl group"
+              style={{
+                background: 'linear-gradient(135deg, rgba(139, 69, 19, 0.08), rgba(75, 0, 130, 0.12), rgba(148, 0, 211, 0.08))',
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+                border: '1px solid rgba(255, 215, 0, 0.25)',
+                boxShadow: `
+                  0 8px 32px rgba(139, 69, 19, 0.1),
+                  0 0 0 1px rgba(255, 215, 0, 0.15),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1)
+                `,
+              }}
+            >
+              {/* Subtle gradient overlay */}
+              <div 
+                className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none opacity-30 group-hover:opacity-50 transition-opacity duration-500"
+                style={{
+                  background: 'linear-gradient(45deg, rgba(255, 215, 0, 0.05), transparent, rgba(138, 43, 226, 0.05))'
+                }}
+              />
+              
+              {/* Floating spiritual particles in footer - Hidden on mobile to avoid interference */}
+              <div className="absolute inset-0 overflow-hidden pointer-events-none hidden sm:block">
+                <div className="absolute top-2 left-8 w-1 h-1 bg-yellow-400/60 rounded-full animate-pulse" />
+                <div className="absolute top-4 right-20 w-1.5 h-1.5 bg-purple-400/40 rounded-full animate-bounce" style={{ animationDelay: '1s' }} />
+                <div className="absolute bottom-3 left-32 w-1 h-1 bg-fuchsia-400/50 rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
+                <div className="absolute bottom-2 right-8 w-0.5 h-0.5 bg-amber-400/60 rounded-full animate-pulse" style={{ animationDelay: '3s' }} />
+              </div>
+
+              <div className="relative z-20 container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                  <div className="flex items-center space-x-3 sm:space-x-3">
+                    <div className="relative">
+                      <img
+                        src="/lovable-uploads/sadhanaboard_logo.png"
+                        alt="SadhanaBoard Logo"
+                        className="h-10 w-10 sm:h-10 sm:w-10 rounded-full cursor-pointer scale-110 shadow-lg shadow-purple-500/30 relative z-10"
+                        style={{
+                          filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.3))'
+                        }}
+                      />
+                      {/* Constant glowing ring around logo */}
+                      <div 
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background: 'conic-gradient(from 0deg, rgba(255, 215, 0, 0.3), rgba(138, 43, 226, 0.3), rgba(255, 215, 0, 0.3))',
+                          padding: '2px'
+                        }}
+                      >
+                        <div className="w-full h-full rounded-full bg-background/20" />
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col">
+                      <span className="text-xl sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-purple-300 to-fuchsia-300">
+                        SadhanaBoard
+                      </span>
+                      <span className="text-xs sm:text-xs text-yellow-400/70 font-medium tracking-wider">
+                        ✨ Your Digital Yantra
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex space-x-6 sm:space-x-6 text-sm">
+                    <Link 
+                      to="/about" 
+                      className="relative text-foreground hover:text-yellow-300 transition-all duration-300 group/link overflow-hidden px-2 py-1 z-10"
+                    >
+                      {/* Shimmer effect */}
+                      <div className="absolute inset-0 -translate-x-full group-hover/link:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                      <span className="relative z-10">About</span>
+                    </Link>
+                    <a 
+                      href="#" 
+                      className="relative text-foreground hover:text-yellow-300 transition-all duration-300 group/link overflow-hidden px-2 py-1 z-10"
+                    >
+                      {/* Shimmer effect */}
+                      <div className="absolute inset-0 -translate-x-full group-hover/link:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                      <span className="relative z-10">Privacy</span>
+                    </a>
+                    <a 
+                      href="#" 
+                      className="relative text-foreground hover:text-yellow-300 transition-all duration-300 group/link overflow-hidden px-2 py-1 z-10"
+                    >
+                      {/* Shimmer effect */}
+                      <div className="absolute inset-0 -translate-x-full group-hover/link:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+                      <span className="relative z-10">Terms</span>
+                    </a>
                   </div>
                 </div>
-                <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-fuchsia-500">
-                  SadhanaBoard
-                </span>
+                
+                <div className="mt-6 text-center">
+                  <div 
+                    className="inline-block px-4 py-2 rounded-full text-xs text-muted-foreground/80"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(138, 43, 226, 0.08))',
+                      border: '1px solid rgba(255, 215, 0, 0.15)'
+                    }}
+                  >
+                    © {new Date().getFullYear()} SadhanaBoard. All rights reserved. A sacred space for spiritual practitioners.
+                  </div>
+                </div>
               </div>
-              <div className="flex space-x-6 text-sm text-muted-foreground/80">
-                <Link to="/about" className="hover:text-foreground transition-colors">
-                  About
-                </Link>
-                <a href="#" className="hover:text-foreground transition-colors">
-                  Privacy
-                </a>
-                <a href="#" className="hover:text-foreground transition-colors">
-                  Terms
-                </a>
-              </div>
-            </div>
-            <div className="mt-6 text-center text-xs text-muted-foreground/70">
-              © {new Date().getFullYear()} SadhanaBoard. All rights reserved. A sacred space for spiritual practitioners.
-            </div>
+            </footer>
           </div>
-          </footer>
         </div>
       </div>
     </>
