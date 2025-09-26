@@ -12,20 +12,19 @@ const profileRoutes = require('./routes/profile');
 const settingsRoutes = require('./routes/settings');
 const bookRoutes = require('./routes/books');
 const sadhanaRoutes = require('./routes/sadhanas');
+const { setupAdminTables } = require('./utils/adminSetup');
 
 // Load environment variables
 dotenv.config();
+
+// Initialize admin panel on startup
+setupAdminTables().catch(console.error);
 
 const app = express();
 const PORT = process.env.PORT || 3002; // Changed from 3001 to 3002
 
 // Middleware
 app.use(cors({ origin: true, credentials: true }));
-// Parse cookies so adminAuth can read httpOnly cookie easily
-try {
-  const cookieParser = require('cookie-parser');
-  app.use(cookieParser());
-} catch {}
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 

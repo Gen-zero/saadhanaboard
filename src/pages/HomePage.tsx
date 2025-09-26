@@ -532,7 +532,7 @@ const HomePage = () => {
                 size="sm"
                 className="relative bg-gradient-to-r from-purple-500/80 via-fuchsia-500/80 to-purple-500/80 hover:from-purple-400 hover:via-fuchsia-400 hover:to-purple-400 backdrop-blur-sm border border-purple-400/30 hover:border-yellow-400/50 shadow-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 group/cta overflow-hidden px-3 sm:px-4 py-2 text-sm"
               >
-                <Link to="/signup">
+                <Link to="/waitlist">
                   {/* Animated gradient background */}
                   <div 
                     className="absolute inset-0 bg-gradient-to-r from-yellow-400/20 via-purple-400/20 to-fuchsia-400/20 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500"
@@ -542,8 +542,8 @@ const HomePage = () => {
                   <div className="absolute bottom-0.5 sm:bottom-1 left-1 sm:left-3 w-0.5 h-0.5 bg-white rounded-full animate-pulse opacity-0 group-hover/cta:opacity-100" style={{ animationDelay: '0.5s' }} />
                   
                   <span className="relative z-10 flex items-center">
-                    <span className="hidden xs:inline">Sign Up</span>
-                    <span className="xs:hidden">Join</span>
+                    <span className="hidden xs:inline">Join Waitlist</span>
+                    <span className="xs:hidden">Waitlist</span>
                     <Sparkles className="ml-1 sm:ml-2 h-3 w-3 sm:h-4 sm:w-4 group-hover/cta:animate-spin" style={{ animationDuration: '2s' }} />
                   </span>
                 </Link>
@@ -554,6 +554,13 @@ const HomePage = () => {
       </div>
 
       <div className="min-h-screen bg-transparent">
+        {/* Beta banner */}
+        <div className="px-2 sm:px-4 pt-2">
+          <div className="mx-auto max-w-5xl rounded-lg border border-amber-400/30 bg-amber-500/10 text-amber-200 text-xs sm:text-sm px-3 sm:px-4 py-2 flex items-center justify-center gap-2">
+            <span className="inline-block rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] sm:text-xs font-semibold">BETA</span>
+            We’re in private beta. New registrations are closed — join the waitlist to get early access.
+          </div>
+        </div>
         <div className="space-y-16 animate-fade-in min-h-screen flex flex-col">
           {/* Hero Section with Sadhana Paper */}
           <section className="flex-1 flex items-center justify-center px-2 sm:px-4 mt-6 sm:mt-10 relative overflow-hidden">
@@ -584,12 +591,12 @@ const HomePage = () => {
               <div className="absolute bottom-24 right-16 text-2xl">🪔</div>
               <div className="absolute top-1/3 right-1/4 text-lg">🌸</div>
             </div>
-            <div className="container mx-auto max-w-7xl" onMouseMove={handleMouseMove}>
+            <div className="max-w-7xl mx-0 sm:mx-2 lg:mx-4" onMouseMove={handleMouseMove}>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
               {/* Left Side - Spiritual Content */}
-              <div className="lg:col-span-7 lg:col-start-2 space-y-6 sm:space-y-8">
+              <div className="lg:col-span-8 space-y-6 sm:space-y-8">
                 <div className="text-center lg:text-left">
-                  <h1 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6">
+                  <h1 className="text-4xl xs:text-5xl sm:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6">
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
                       ✨ The First Digital Platform
                     </span>
@@ -599,22 +606,22 @@ const HomePage = () => {
                     </span>
                   </h1>
                   
-                  <p className="text-lg sm:text-xl text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
+                  <p className="text-xl sm:text-2xl text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
                     Design, track, and deepen your spiritual practice in one sacred space.
                   </p>
                   
-                  <p className="text-base sm:text-lg text-muted-foreground/90 mb-6 sm:mb-8 leading-relaxed">
+                  <p className="text-lg sm:text-xl text-muted-foreground/90 mb-6 sm:mb-8 leading-relaxed">
                     Join the private waitlist and be among the first to experience discipline, guidance, and growth through SaadhanaBoard.
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-4 sm:mb-6">
                     <Button 
                       size="lg" 
-                      className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-400 hover:to-fuchsia-400 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 shadow-lg hover:shadow-2xl transition-all duration-300"
+                      className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-400 hover:to-fuchsia-400 text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 shadow-lg hover:shadow-2xl transition-all duration-300"
                       style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.3)' }}
                       asChild
                     >
-                      <Link to="/signup">
+                      <Link to="/waitlist">
                         🌟 Join the Waitlist
                       </Link>
                     </Button>
@@ -622,26 +629,26 @@ const HomePage = () => {
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="border-purple-500/40 text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
+                      className="border-purple-500/40 text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
                       style={{ boxShadow: '0 0 15px rgba(168, 85, 247, 0.1)' }}
                       asChild
                     >
-                      <Link to="/library">
-                        🌙 See How It Works
+                      <Link to="/about">
+                        🌙 Explore Features
                       </Link>
                     </Button>
                     <Button 
                       size="lg"
                       variant="ghost"
-                      className="text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
+                      className="text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
                       onClick={() => setAudioOn((v) => !v)}
                     >
-                      <Volume2 className="w-5 h-5 mr-2" /> {audioOn ? 'Sound: On' : 'Sound: Off'}
+                      <Volume2 className="w-6 h-6 mr-2" /> {audioOn ? 'Sound: On' : 'Sound: Off'}
                     </Button>
                   </div>
                   
                   {/* Urgency + Exclusivity Line */}
-                  <div className="flex items-center justify-center lg:justify-start gap-2 text-xs sm:text-sm">
+                  <div className="flex items-center justify-center lg:justify-start gap-2 text-sm sm:text-base">
                     <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20 backdrop-blur-sm">
                       <span className="text-purple-400">🔒</span>
                       <span className="text-muted-foreground text-center sm:text-left">
@@ -654,22 +661,22 @@ const HomePage = () => {
               
               {/* Right Side - Sadhana Paper (Transparent Golden Metallic) */}
               <div className="lg:col-span-4 relative">
-                <div className="relative max-w-lg mx-auto lg:mx-0">
+                <div className="relative max-w-xl mx-auto lg:mx-0">
                   {/* Paper Container - Transparent Golden Metallic styling */}
                   <div 
                     className="relative p-6 rounded-2xl border-2 backdrop-blur-md"
                     style={{
-                      background: 'linear-gradient(145deg, rgba(255, 215, 0, 0.08) 0%, rgba(218, 165, 32, 0.12) 30%, rgba(255, 223, 0, 0.06) 70%, rgba(212, 175, 55, 0.10) 100%)',
-                      borderColor: 'rgba(255, 215, 0, 0.4)',
+                      background: 'linear-gradient(145deg, rgba(255, 223, 0, 0.05) 0%, rgba(255, 215, 0, 0.08) 30%, rgba(255, 207, 0, 0.04) 70%, rgba(255, 199, 0, 0.06) 100%)',
+                      borderColor: 'rgba(255, 215, 0, 0.3)',
                       fontFamily: 'Georgia, serif',
                       boxShadow: `
-                        0 8px 32px rgba(255, 215, 0, 0.15),
-                        0 0 0 1px rgba(255, 215, 0, 0.2),
+                        0 8px 32px rgba(255, 215, 0, 0.12),
+                        0 0 0 1px rgba(255, 215, 0, 0.15),
                         inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                        inset 0 -1px 0 rgba(255, 215, 0, 0.1)
+                        inset 0 -1px 0 rgba(255, 215, 0, 0.08)
                       `,
-                      backdropFilter: 'blur(16px) saturate(150%)',
-                      WebkitBackdropFilter: 'blur(16px) saturate(150%)'
+                      backdropFilter: 'blur(14px) saturate(140%)',
+                      WebkitBackdropFilter: 'blur(14px) saturate(140%)'
                     }}
                   >
                     {/* Metallic overlay gradient */}
@@ -678,14 +685,14 @@ const HomePage = () => {
                       style={{
                         background: `
                           linear-gradient(135deg, 
-                            rgba(255, 255, 255, 0.1) 0%, 
+                            rgba(255, 255, 200, 0.08) 0%, 
                             transparent 25%, 
-                            rgba(255, 215, 0, 0.08) 50%, 
+                            rgba(255, 223, 0, 0.05) 50%, 
                             transparent 75%, 
-                            rgba(255, 255, 255, 0.05) 100%
+                            rgba(255, 255, 180, 0.03) 100%
                           )
                         `,
-                        opacity: 0.7
+                        opacity: 0.5
                       }}
                     />
                     
@@ -722,11 +729,11 @@ const HomePage = () => {
                     {/* Header with enhanced golden styling */}
                     <div className="text-center mb-4 relative z-10">
                       <h3 
-                        className="text-xl font-bold mb-2" 
+                        className="text-2xl font-bold mb-2" 
                         style={{ 
                           fontFamily: 'Georgia, serif',
-                          color: 'rgba(255, 215, 0, 0.95)',
-                          textShadow: '0 0 8px rgba(255, 215, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                          color: 'rgba(255, 223, 0, 0.95)',
+                          textShadow: '0 0 8px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3)'
                         }}
                       >
                         🕉️ Sadhana Paper
@@ -744,16 +751,16 @@ const HomePage = () => {
                     <div className="space-y-2 relative z-10" style={{ fontFamily: 'Georgia, serif' }}>
                       <div>
                         <div 
-                          className="font-semibold mb-1 text-sm"
+                          className="font-semibold mb-1 text-base"
                           style={{
-                            color: 'rgba(255, 215, 0, 0.9)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                            color: 'rgba(255, 223, 0, 0.95)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
                           }}
                         >
                           Purpose:
                         </div>
                         <div 
-                          className="text-xs leading-relaxed pl-2"
+                          className="text-sm leading-relaxed pl-2"
                           style={{
                             color: 'rgba(255, 255, 255, 0.85)',
                             textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
@@ -765,16 +772,16 @@ const HomePage = () => {
                       
                       <div>
                         <div 
-                          className="font-semibold mb-1 text-sm"
+                          className="font-semibold mb-1 text-base"
                           style={{
-                            color: 'rgba(255, 215, 0, 0.9)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                            color: 'rgba(255, 223, 0, 0.95)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
                           }}
                         >
                           Goal:
                         </div>
                         <div 
-                          className="text-xs leading-relaxed pl-2"
+                          className="text-sm leading-relaxed pl-2"
                           style={{
                             color: 'rgba(255, 255, 255, 0.85)',
                             textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
@@ -786,16 +793,16 @@ const HomePage = () => {
                       
                       <div>
                         <div 
-                          className="font-semibold mb-1 text-sm"
+                          className="font-semibold mb-1 text-base"
                           style={{
-                            color: 'rgba(255, 215, 0, 0.9)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                            color: 'rgba(255, 223, 0, 0.95)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
                           }}
                         >
                           Divine Focus:
                         </div>
                         <div 
-                          className="text-xs leading-relaxed pl-2"
+                          className="text-sm leading-relaxed pl-2"
                           style={{
                             color: 'rgba(255, 255, 255, 0.85)',
                             textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
@@ -807,16 +814,16 @@ const HomePage = () => {
                       
                       <div>
                         <div 
-                          className="font-semibold mb-1 text-sm"
+                          className="font-semibold mb-1 text-base"
                           style={{
-                            color: 'rgba(255, 215, 0, 0.9)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                            color: 'rgba(255, 223, 0, 0.95)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
                           }}
                         >
                           Duration:
                         </div>
                         <div 
-                          className="text-xs leading-relaxed pl-2"
+                          className="text-sm leading-relaxed pl-2"
                           style={{
                             color: 'rgba(255, 255, 255, 0.85)',
                             textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
@@ -828,16 +835,16 @@ const HomePage = () => {
                       
                       <div>
                         <div 
-                          className="font-semibold mb-1 text-sm"
+                          className="font-semibold mb-1 text-base"
                           style={{
-                            color: 'rgba(255, 215, 0, 0.9)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                            color: 'rgba(255, 223, 0, 0.95)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
                           }}
                         >
                           Message:
                         </div>
                         <div 
-                          className="text-xs italic leading-relaxed pl-2"
+                          className="text-sm italic leading-relaxed pl-2"
                           style={{
                             color: 'rgba(255, 255, 255, 0.85)',
                             textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
@@ -849,16 +856,16 @@ const HomePage = () => {
                       
                       <div>
                         <div 
-                          className="font-semibold mb-1 text-sm"
+                          className="font-semibold mb-1 text-base"
                           style={{
-                            color: 'rgba(255, 215, 0, 0.9)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.3)'
+                            color: 'rgba(255, 223, 0, 0.95)',
+                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
                           }}
                         >
                           My Offerings:
                         </div>
                         <div 
-                          className="text-xs space-y-0.5 pl-2"
+                          className="text-sm space-y-0.5 pl-2"
                           style={{
                             color: 'rgba(255, 255, 255, 0.85)',
                             textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
@@ -878,11 +885,11 @@ const HomePage = () => {
                       className="absolute inset-0 rounded-2xl pointer-events-none"
                       style={{
                         background: `
-                          radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.08) 0%, transparent 40%),
-                          radial-gradient(circle at 80% 70%, rgba(255, 223, 0, 0.06) 0%, transparent 40%),
-                          radial-gradient(circle at 40% 80%, rgba(218, 165, 32, 0.05) 0%, transparent 30%)
+                          radial-gradient(circle at 20% 30%, rgba(255, 223, 0, 0.05) 0%, transparent 40%),
+                          radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.04) 0%, transparent 40%),
+                          radial-gradient(circle at 40% 80%, rgba(255, 207, 0, 0.03) 0%, transparent 30%)
                         `,
-                        opacity: 0.6
+                        opacity: 0.4
                       }}
                     />
                   </div>
@@ -921,32 +928,7 @@ const HomePage = () => {
             </div>
           </section>
 
-          {/* Animated stats strip */}
-          <section className="py-8 sm:py-10">
-            <div className="container mx-auto px-4">
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 rounded-xl border border-purple-500/20 bg-background/40 backdrop-blur-md p-4 sm:p-6">
-                {stats.map((s, i) => {
-                  // Parse numeric part for count-up
-                  const numeric = parseInt(String(s.value).replace(/[^0-9]/g, '')) || 0;
-                  const unit = String(s.value).replace(/[0-9]/g, '');
-                  const count = useCountUp(numeric, 1200 + i * 200);
-                  const Icon = s.icon;
-                  return (
-                    <div key={i} className="text-center">
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <Icon className="w-4 h-4 text-purple-400" />
-                        <span className="text-2xl sm:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-yellow-300 via-purple-300 to-fuchsia-300">
-                          {count}
-                          <span className="text-lg sm:text-xl font-semibold ml-0.5">{unit}</span>
-                        </span>
-                      </div>
-                      <div className="text-[11px] sm:text-xs text-muted-foreground">{s.label}</div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
+          {/* Animated stats strip removed for beta landing */}
 
           {/* Features Section - Marketing focused */}
           <section className="py-16 container mx-auto px-4">
@@ -1117,9 +1099,9 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-background/20 to-background/30 backdrop-blur-sm"></div>
           <div className="relative z-10 max-w-3xl mx-auto px-4">
             <MoonStar className="h-16 w-16 text-purple-400 mx-auto mb-6" />
-            <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Practice?</h2>
+            <h2 className="text-4xl font-bold mb-6">Private Beta Is Live</h2>
             <p className="text-muted-foreground/90 mb-10 text-xl">
-              Join thousands of practitioners who have deepened their spiritual journey with SaadhanaBoard.
+              We’re onboarding in waves. Join the waitlist to secure early access and explore our features.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
               <Button 
@@ -1127,8 +1109,8 @@ const HomePage = () => {
                 className="bg-gradient-to-r from-purple-500/90 to-fuchsia-500/90 hover:from-purple-500 hover:to-fuchsia-500 text-lg px-8 py-6 backdrop-blur-sm"
                 asChild
               >
-                <Link to="/signup">
-                  Start Your Free Journey
+                <Link to="/waitlist">
+                  Join the Waitlist
                 </Link>
               </Button>
               <Button 
@@ -1138,7 +1120,7 @@ const HomePage = () => {
                 asChild
               >
                 <Link to="/about">
-                  Learn More
+                  Explore Features
                 </Link>
               </Button>
             </div>

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
+const db = require('../config/db');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
 const ADMIN_COOKIE = 'admin_token';
@@ -23,6 +23,18 @@ function setAdminCookie(res, token) {
   });
 }
 
+// Admin logging function
+async function logAdminAction(userId, action, targetType = null, targetId = null, details = null) {
+  try {
+    await db.query(
+      'INSERT INTO admin_logs (admin_id, action, target_type, target_id, details, created_at) VALUES ($1, $2, $3, $4, $5, NOW())',
+      [userId, action, targetType, targetId, details ? JSON.stringify(details) : null]
+    );
+  } catch (err) {
+    console.error('Failed to log admin action:', err);
+  }
+}
+
 const adminAuthenticate = (req, res, next) => {
   try {
     const cookies = req.cookies || parseCookie(req.headers.cookie || '');
@@ -35,6 +47,8 @@ const adminAuthenticate = (req, res, next) => {
       return res.status(403).json({ message: 'Access denied' });
     }
     req.user = { id: decoded.userId || 0, role: decoded.role, username: decoded.username };
+    req.logAdminAction = logAdminAction; // Add logging function to request
+    
     // Refresh inactivity window by re-issuing cookie with new expiry
     const refreshed = jwt.sign({ username: decoded.username, role: 'admin', userId: decoded.userId || 0 }, JWT_SECRET, { expiresIn: '1h' });
     if (typeof res.cookie === 'function') {
@@ -46,6 +60,6 @@ const adminAuthenticate = (req, res, next) => {
   }
 };
 
-module.exports = { adminAuthenticate, setAdminCookie, ADMIN_COOKIE };
+module.exports = { adminAuthenticate, setAdminCookie, ADMIN_COOKIE, logAdminAction };
 
 
