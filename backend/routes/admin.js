@@ -5,52 +5,15 @@ const { adminAuthenticate, setAdminCookie, ADMIN_COOKIE, logAdminAction } = requ
 const { setupAdminTables } = require('../utils/adminSetup');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password';
+// authentication handled by adminAuthController and admin_details table
 
 // Initialize admin tables on first load
 setupAdminTables().catch(console.error);
 
-// Admin login: environment variable fallback + DB is_admin=true
-router.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    // Environment variable admin
-    const envAdminOk = username === ADMIN_USERNAME && password === ADMIN_PASSWORD;
-    let dbAdmin = null;
-    if (!envAdminOk) {
-      const q = await db.query('SELECT id, email, display_name, is_admin, password FROM users WHERE (email=$1 OR display_name=$1) AND is_admin = true', [username]);
-      if (q.rows.length) {
-        dbAdmin = q.rows[0];
-        // For simplicity now, accept plain password equality if present in DB, else fallback disabled.
-        // In real setup, compare bcrypt hash.
-        if (!dbAdmin.password || dbAdmin.password === password) {
-          // ok
-        } else {
-          return res.status(401).json({ message: 'Invalid credentials' });
-        }
-      }
-    }
-    if (!envAdminOk && !dbAdmin) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-    const token = jwt.sign({ role: 'admin', username, userId: dbAdmin ? dbAdmin.id : 0 }, JWT_SECRET, { expiresIn: '1h' });
-    setAdminCookie(res, token);
-    
-    // Log successful login (use secureLog where possible)
-    if (req && typeof req.secureLog === 'function') {
-      try { await req.secureLog('LOGIN', 'admin', dbAdmin ? dbAdmin.id : 0, { username }); } catch (e) { /* best-effort */ }
-    } else {
-      await logAdminAction(dbAdmin ? dbAdmin.id : 0, 'LOGIN', 'admin', dbAdmin ? dbAdmin.id : 0, { username, ip: req.ip });
-    }
-    
-    return res.json({ message: 'Login successful' });
-  } catch (e) {
-    console.error('Admin login error:', e);
-    return res.status(500).json({ message: 'Login error' });
-  }
-});
+// Admin login: delegate to new adminAuthController to use admin_details table exclusively
+const adminAuthController = require('../controllers/adminAuthController');
+// Mount the admin auth controller login handler directly so it uses admin_details
+router.post('/login', adminAuthController.login);
 
 router.post('/logout', async (req, res) => {
   try {

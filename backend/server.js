@@ -175,7 +175,7 @@ try { app.use(require('compression')()); } catch (e) { /* best-effort if not ins
 // Security headers (helmet) and CORS configuration for frontend origin
 try {
   const helmet = require('helmet');
-  const connectSrc = ["'self'", process.env.CORS_ORIGIN || 'http://localhost:8080'];
+  const connectSrc = ["'self'", process.env.CORS_ORIGIN || 'http://localhost:8080', 'http://localhost:5173'];
   app.use(helmet({
     contentSecurityPolicy: {
       directives: {
@@ -185,15 +185,34 @@ try {
     }
   }));
 } catch (e) { /* best-effort */ }
+
+// Build CORS origins list: support single origin or comma-separated list
+const rawOrigin = process.env.CORS_ORIGIN || process.env.CORS_ORIGINS || 'http://localhost:8080,http://localhost:5173';
+const allowedOrigins = Array.isArray(rawOrigin) ? rawOrigin : String(rawOrigin).split(',').map(s => s.trim()).filter(Boolean);
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN || true,
+  origin: function(origin, callback) {
+    // allow requests with no origin like curl or server-to-server
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf('*') >= 0 || allowedOrigins.indexOf(origin) >= 0) return callback(null, true);
+    const msg = `CORS policy: origin ${origin} not allowed`;
+    console.warn(msg);
+    return callback(new Error(msg), false);
+  },
   credentials: true,
   optionsSuccessStatus: 200,
-  // Add connect-src for SSE/Socket connections
-  exposedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS']
 };
+
+app.use((req, res, next) => {
+  // Simple debug logging for admin endpoints
+  if (req.path && req.path.startsWith('/api/admin')) {
+    console.log('[ADMIN_REQ]', req.method, req.path, 'from', req.headers.origin || req.ip);
+  }
+  // Do not short-circuit OPTIONS here: let the `cors` middleware add the proper headers.
+  next();
+});
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
