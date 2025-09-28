@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { adminApi } from '@/services/adminApi';
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Shield, Users, LineChart, Image as ImageIcon, Palette, ScrollText } from 'lucide-react';
+import { BookOpen, Shield, Users, LineChart, Image as ImageIcon, Palette, ScrollText, Activity } from 'lucide-react';
 
 const AdminLayout = () => {
   const [loading, setLoading] = useState(true);
@@ -37,15 +37,16 @@ const AdminLayout = () => {
           <NavLink to="/admin/users" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
             <Users className="w-4 h-4" /> Users
           </NavLink>
-          <NavLink to="/admin/assets" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
-            <ImageIcon className="w-4 h-4" /> Assets
+          <NavLink to="/admin/community" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
+            <Users className="w-4 h-4" /> Community
           </NavLink>
-          <NavLink to="/admin/themes" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
-            <Palette className="w-4 h-4" /> Themes
+          <NavLink to="/admin/content" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
+            <ImageIcon className="w-4 h-4" /> Content
           </NavLink>
-          <NavLink to="/admin/templates" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
-            <ScrollText className="w-4 h-4" /> Templates
+          <NavLink to="/admin/system" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
+            <Activity className="w-4 h-4" /> System
           </NavLink>
+          {/* Legacy pages (Assets/Themes/Templates) are intentionally de-emphasized in the sidebar to avoid duplication. They remain reachable directly if needed. */}
           <NavLink to="/admin/logs" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
             <Shield className="w-4 h-4" /> Audit Logs
           </NavLink>
@@ -67,5 +68,3 @@ const AdminLayout = () => {
 };
 
 export default AdminLayout;
-
-

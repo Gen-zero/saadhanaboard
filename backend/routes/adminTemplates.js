@@ -54,10 +54,11 @@ router.post('/', adminAuthenticate, async (req, res) => {
     writeJson(STORE, list);
     
     // Log template creation
-    await req.logAdminAction(req.user.id, 'CREATE_TEMPLATE', 'template', item.id, {
-      title: item.title,
-      type: item.type
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('CREATE_TEMPLATE', 'template', item.id, { title: item.title, type: item.type });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'CREATE_TEMPLATE', 'template', item.id, { title: item.title, type: item.type });
+    }
     
     res.json({ template: item });
   } catch (error) {
@@ -88,10 +89,11 @@ router.patch('/:id', adminAuthenticate, async (req, res) => {
     writeJson(STORE, list);
     
     // Log template update
-    await req.logAdminAction(req.user.id, 'UPDATE_TEMPLATE', 'template', id, {
-      changes: req.body,
-      original: originalTemplate
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('UPDATE_TEMPLATE', 'template', id, { changes: req.body, original: originalTemplate });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'UPDATE_TEMPLATE', 'template', id, { changes: req.body, original: originalTemplate });
+    }
     
     res.json({ template: list[idx] });
   } catch (error) {
@@ -115,10 +117,11 @@ router.delete('/:id', adminAuthenticate, async (req, res) => {
     writeJson(STORE, filtered);
     
     // Log template deletion
-    await req.logAdminAction(req.user.id, 'DELETE_TEMPLATE', 'template', id, {
-      title: template.title,
-      type: template.type
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('DELETE_TEMPLATE', 'template', id, { title: template.title, type: template.type });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'DELETE_TEMPLATE', 'template', id, { title: template.title, type: template.type });
+    }
     
     res.json({ message: 'Template deleted successfully' });
   } catch (error) {

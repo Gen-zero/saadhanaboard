@@ -1,4 +1,5 @@
-const API_BASE_URL = 'http://localhost:3002/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const USE_CREDENTIALS = (import.meta.env.VITE_API_USE_CREDENTIALS === 'true');
 
 class ApiService {
   constructor() {
@@ -168,6 +169,7 @@ class ApiService {
       const config = {
         method: 'POST',
         body: formData,
+        ...(USE_CREDENTIALS ? { credentials: 'include' } : {}),
         headers: {
           ...(this.token && { 'Authorization': `Bearer ${this.token}` }),
         },

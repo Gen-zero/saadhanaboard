@@ -60,10 +60,11 @@ router.put('/settings', adminAuthenticate, async (req, res) => {
     writeJson(SETTINGS, mergedSettings);
     
     // Log settings update
-    await req.logAdminAction(req.user.id, 'UPDATE_SETTINGS', 'settings', 1, {
-      changes: newSettings,
-      admin: req.user.username
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('UPDATE_SETTINGS', 'settings', 1, { changes: newSettings, admin: req.user.username });
+    } else {
+      await req.logAdminAction(req.user.id, 'UPDATE_SETTINGS', 'settings', 1, { changes: newSettings, admin: req.user.username });
+    }
     
     res.json({ message: 'Settings saved successfully', settings: mergedSettings });
   } catch (error) {
@@ -99,13 +100,30 @@ router.get('/reports/users.csv', adminAuthenticate, async (req, res) => {
       ORDER BY id DESC
     `, params);
     
+    const esc = (v) => {
+      if (v == null) return '';
+      const s = String(v);
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+
     const header = 'id,email,display_name,is_admin,active,created_at,last_login,login_attempts\n';
     const rows = q.rows.map(r => 
-      `${r.id},"${r.email}","${r.display_name}",${r.is_admin},${r.active},${r.created_at?.toISOString?.() || ''},${r.last_login?.toISOString?.() || ''},${r.login_attempts || 0}`
+      `${r.id},${esc(r.email)},${esc(r.display_name)},${r.is_admin},${r.active},${esc(r.created_at?.toISOString?.() || '')},${esc(r.last_login?.toISOString?.() || '')},${r.login_attempts || 0}`
     ).join('\n');
     
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename="users-${new Date().toISOString().split('T')[0]}.csv"`);
+      try {
+        // best effort: log export action but don't fail the request if logging throws
+        if (typeof req.secureLog === 'function') {
+          try { await req.secureLog('EXPORT_USERS_CSV', 'reports', q.rowCount); } catch (e) { console.error('Admin log failed:', e); }
+        } else if (typeof req.logAdminAction === 'function') {
+          try { await req.logAdminAction(req.user.id, 'EXPORT_USERS_CSV', 'reports', q.rowCount); } catch (e) { console.error('Admin log failed:', e); }
+        }
+      } catch (e) {
+        console.error('Logging wrapper error:', e);
+      }
+
     res.send(header + rows);
   } catch (e) {
     console.error('CSV export error:', e);
@@ -132,13 +150,29 @@ router.get('/reports/sadhanas.csv', adminAuthenticate, async (req, res) => {
       ORDER BY s.created_at DESC
     `);
     
+    const esc = (v) => {
+      if (v == null) return '';
+      const s = String(v);
+      return '"' + s.replace(/"/g, '""') + '"';
+    };
+
     const header = 'id,title,status,duration,start_date,end_date,created_at,user_email,user_name\n';
     const rows = q.rows.map(r => 
-      `${r.id},"${r.title}",${r.status},${r.duration},${r.start_date || ''},${r.end_date || ''},${r.created_at?.toISOString?.() || ''},"${r.user_email || ''}","${r.user_name || ''}"`
+      `${r.id},${esc(r.title)},${r.status},${r.duration},${esc(r.start_date || '')},${esc(r.end_date || '')},${esc(r.created_at?.toISOString?.() || '')},${esc(r.user_email || '')},${esc(r.user_name || '')}`
     ).join('\n');
     
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', `attachment; filename="sadhanas-${new Date().toISOString().split('T')[0]}.csv"`);
+    try {
+      if (typeof req.secureLog === 'function') {
+        try { await req.secureLog('EXPORT_SADHANAS_CSV', 'reports', q.rowCount); } catch (e) { console.error('Admin log failed:', e); }
+      } else if (typeof req.logAdminAction === 'function') {
+        try { await req.logAdminAction(req.user.id, 'EXPORT_SADHANAS_CSV', 'reports', q.rowCount); } catch (e) { console.error('Admin log failed:', e); }
+      }
+    } catch (e) {
+      console.error('Logging wrapper error:', e);
+    }
+
     res.send(header + rows);
   } catch (e) {
     console.error('Sadhanas CSV export error:', e);

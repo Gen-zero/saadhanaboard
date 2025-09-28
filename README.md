@@ -46,8 +46,8 @@ saadhanaboard/
 
 ### 📋 Prerequisites
 - 🟩 Node.js (v18+)
-- 🗄️ PostgreSQL database
-- 📦 npm or yarn
+- 🧧 Bun (optional, project includes a bun.lockb)
+- 🗄️ PostgreSQL database or Supabase
 
 ### 🖥️ Frontend Setup
 ```bash
@@ -64,23 +64,25 @@ npm run dev
 
 ### 🔧 Backend Setup
 ```bash
+cd backend
 # Install backend dependencies
-npm run backend:install
-
+npm install
 # Start backend server
-npm run backend:dev
+npm run dev
 ```
 
 ### 🗄️ Database Setup
-1. Create a PostgreSQL database named `saadhanaboard`
-2. Update the database configuration in `backend/.env`
+1. Create a PostgreSQL database named `saadhanaboard` (or use Supabase)
+2. Update the database configuration in `backend/.env` (copy from `backend/.env.example`)
 3. Run the database initialization script:
 ```bash
 node backend/utils/initDb.js
 ```
 
 ### 🔐 Environment Variables
-Create a `.env` file in the backend directory with the following:
+Create a `.env` file in the project root for frontend values (copy `.env.example`) and in `backend/.env` for backend values (copy `backend/.env.example`).
+
+Example backend values include:
 ```env
 # Database Configuration
 DB_HOST=localhost
@@ -93,17 +95,17 @@ DB_PASSWORD=your_postgres_password
 JWT_SECRET=your_jwt_secret_key
 
 # Server Configuration
-PORT=3001
+PORT=3004
 ```
 
 ## 🏗️ Development 👷
 
 ### 🎨 Frontend Development
-- 🌐 The frontend runs on http://localhost:5173
+- 🌐 The frontend runs on http://localhost:8080 (configured via Vite)
 - ⚡ Uses Vite for fast development builds
 
 ### ⚙️ Backend Development
-- 🌐 The backend API runs on http://localhost:3001
+- 🌐 The backend API runs on http://localhost:3004
 - 🔗 API endpoints are prefixed with `/api`
 
 ## 🚢 Deployment 🚀

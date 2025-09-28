@@ -41,19 +41,9 @@ const AdminAssetsPage = () => {
   const load = async (offset = 0) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({
-        type: filter.type,
-        search: filter.search,
-        limit: pagination.limit.toString(),
-        offset: offset.toString()
-      });
-      
-      const response = await fetch(`${adminApi.ADMIN_API_BASE || 'http://localhost:3002/api/admin'}/assets?${params}`, {
-        credentials: 'include'
-      });
-      const data = await response.json();
-      setAssets(data.assets || []);
-      setPagination(prev => ({ ...prev, total: data.total || 0, offset: data.offset || 0 }));
+      const data = await adminApi.listAssets();
+      setAssets(data.items || []);
+      setPagination(prev => ({ ...prev, total: data.total || 0, offset: ((data.page && data.limit) ? ((data.page - 1) * data.limit) : 0), limit: data.limit || prev.limit }));
     } catch (error) {
       console.error('Failed to load assets:', error);
     } finally {

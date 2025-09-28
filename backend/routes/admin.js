@@ -6,18 +6,20 @@ const { setupAdminTables } = require('../utils/adminSetup');
 
 const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password';
 
 // Initialize admin tables on first load
 setupAdminTables().catch(console.error);
 
-// Admin login: hardcoded fallback + DB is_admin=true
+// Admin login: environment variable fallback + DB is_admin=true
 router.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    // Hardcoded admin
-    const hardcodedOk = username === 'KaliVaibhav' && password === 'Subham@98';
+    // Environment variable admin
+    const envAdminOk = username === ADMIN_USERNAME && password === ADMIN_PASSWORD;
     let dbAdmin = null;
-    if (!hardcodedOk) {
+    if (!envAdminOk) {
       const q = await db.query('SELECT id, email, display_name, is_admin, password FROM users WHERE (email=$1 OR display_name=$1) AND is_admin = true', [username]);
       if (q.rows.length) {
         dbAdmin = q.rows[0];
@@ -30,14 +32,18 @@ router.post('/login', async (req, res) => {
         }
       }
     }
-    if (!hardcodedOk && !dbAdmin) {
+    if (!envAdminOk && !dbAdmin) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
     const token = jwt.sign({ role: 'admin', username, userId: dbAdmin ? dbAdmin.id : 0 }, JWT_SECRET, { expiresIn: '1h' });
     setAdminCookie(res, token);
     
-    // Log successful login
-    await logAdminAction(dbAdmin ? dbAdmin.id : 0, 'LOGIN', 'admin', dbAdmin ? dbAdmin.id : 0, { username, ip: req.ip });
+    // Log successful login (use secureLog where possible)
+    if (req && typeof req.secureLog === 'function') {
+      try { await req.secureLog('LOGIN', 'admin', dbAdmin ? dbAdmin.id : 0, { username }); } catch (e) { /* best-effort */ }
+    } else {
+      await logAdminAction(dbAdmin ? dbAdmin.id : 0, 'LOGIN', 'admin', dbAdmin ? dbAdmin.id : 0, { username, ip: req.ip });
+    }
     
     return res.json({ message: 'Login successful' });
   } catch (e) {
@@ -50,7 +56,11 @@ router.post('/logout', async (req, res) => {
   try {
     // Log logout action
     if (req.user) {
-      await logAdminAction(req.user.id, 'LOGOUT', 'admin', req.user.id, { username: req.user.username });
+      if (typeof req.secureLog === 'function') {
+        await req.secureLog('LOGOUT', 'admin', req.user.id, { username: req.user.username });
+      } else {
+        await logAdminAction(req.user.id, 'LOGOUT', 'admin', req.user.id, { username: req.user.username });
+      }
     }
     res.clearCookie ? res.clearCookie(ADMIN_COOKIE) : null;
     return res.json({ message: 'Logged out' });
@@ -64,95 +74,190 @@ router.get('/me', adminAuthenticate, (req, res) => {
   return res.json({ user: req.user });
 });
 
-// Enhanced stats for dashboard
+// Enhanced stats for dashboard (legacy endpoint preserved)
+const dashboardStatsService = require('../services/dashboardStatsService');
+const userAnalyticsService = require('../services/userAnalyticsService');
+const messageService = require('../services/messageService');
+
 router.get('/stats', adminAuthenticate, async (req, res) => {
   try {
-    const users = await db.query('SELECT COUNT(*)::int AS c FROM users');
-    const activeUsers = await db.query('SELECT COUNT(*)::int AS c FROM users WHERE active = true');
-    const activeSadhanas = await db.query('SELECT COUNT(*)::int AS c FROM sadhanas WHERE status = $1', ['active']).catch(() => ({ rows:[{ c:0 }] }));
-    const completedSadhanas = await db.query("SELECT COUNT(*)::int AS c FROM sadhanas WHERE status = 'completed'").catch(() => ({ rows:[{ c:0 }] }));
-    const books = await db.query('SELECT COUNT(*)::int AS c FROM books').catch(() => ({ rows:[{ c:0 }] }));
-    const themes = await db.query('SELECT COUNT(*)::int AS c FROM themes').catch(() => ({ rows:[{ c:0 }] }));
-    
-    // Recent activity stats
-    const recentLogins = await db.query(
-      'SELECT COUNT(*)::int AS c FROM users WHERE last_login > NOW() - INTERVAL \'24 hours\''
-    ).catch(() => ({ rows:[{ c:0 }] }));
-    
-    const todaysSadhanas = await db.query(
-      'SELECT COUNT(*)::int AS c FROM sadhanas WHERE created_at > CURRENT_DATE'
-    ).catch(() => ({ rows:[{ c:0 }] }));
-    
-    // Weekly activity data for charts
-    const weeklyLogins = await db.query(`
-      SELECT 
-        DATE_TRUNC('day', last_login) as date,
-        COUNT(*)::int as logins
-      FROM users 
-      WHERE last_login > NOW() - INTERVAL '7 days'
-      GROUP BY DATE_TRUNC('day', last_login)
-      ORDER BY date
-    `).catch(() => ({ rows: [] }));
-    
-    const weeklySadhanaCompletions = await db.query(`
-      SELECT 
-        DATE_TRUNC('day', updated_at) as date,
-        COUNT(*)::int as completions
-      FROM sadhanas 
-      WHERE status = 'completed' AND updated_at > NOW() - INTERVAL '7 days'
-      GROUP BY DATE_TRUNC('day', updated_at)
-      ORDER BY date
-    `).catch(() => ({ rows: [] }));
-    
-    return res.json({
-      totalUsers: users.rows[0].c,
-      activeUsers: activeUsers.rows[0].c,
-      activeSadhanas: activeSadhanas.rows[0].c,
-      completedSadhanas: completedSadhanas.rows[0].c,
-      uploadedBooks: books.rows[0].c,
-      currentThemes: themes.rows[0].c,
-      recentLogins: recentLogins.rows[0].c,
-      todaysSadhanas: todaysSadhanas.rows[0].c,
-      weeklyLogins: weeklyLogins.rows,
-      weeklySadhanaCompletions: weeklySadhanaCompletions.rows
-    });
+    const stats = await dashboardStatsService.getAllDashboardStats();
+    // Provide legacy-compatible fields as before
+    const legacy = {
+      totalUsers: stats.totalUsers,
+      activeUsers: stats.activeUsers,
+      activeSadhanas: stats.activeSadhanas,
+      completedSadhanas: stats.completedSadhanas,
+      uploadedBooks: stats.uploadedBooks,
+      currentThemes: stats.currentThemes,
+      recentLogins: stats.weeklyLogins && stats.weeklyLogins.length ? stats.weeklyLogins.reduce((s, r) => s + (r.logins || 0), 0) : 0,
+      todaysSadhanas: 0,
+      weeklyLogins: stats.weeklyLogins || [],
+      weeklySadhanaCompletions: stats.weeklySadhanaCompletions || []
+    };
+    return res.json(legacy);
   } catch (e) {
     console.error('Stats error:', e);
     return res.status(500).json({ message: 'Failed to fetch stats' });
   }
 });
 
+// Spiritual progress analytics
+router.get('/stats/progress', adminAuthenticate, async (req, res) => {
+  try {
+    const trends = await dashboardStatsService.getWeeklyTrends();
+    const engagement = await dashboardStatsService.getUserEngagement();
+    res.json({ ...trends, ...engagement });
+  } catch (e) {
+    console.error('Progress stats error:', e);
+    res.status(500).json({ message: 'Failed to fetch progress stats' });
+  }
+});
+
+// System health metrics
+router.get('/stats/health', adminAuthenticate, async (req, res) => {
+  try {
+    const health = await dashboardStatsService.getSystemHealth();
+    res.json({ systemHealth: health });
+  } catch (e) {
+    console.error('Health stats error:', e);
+    res.status(500).json({ message: 'Failed to fetch health stats' });
+  }
+});
+
+// Realtime feed endpoint (HTTP fallback) - returns latest snapshot
+router.get('/stats/realtime', adminAuthenticate, async (req, res) => {
+  try {
+    const snapshot = await dashboardStatsService.getAllDashboardStats();
+    res.json({ snapshot });
+  } catch (e) {
+    console.error('Realtime stats error:', e);
+    res.status(500).json({ message: 'Failed to fetch realtime stats' });
+  }
+});
+
 // Users list + basic admin actions
 router.get('/users', adminAuthenticate, async (req, res) => {
-  const { q = '', limit = 20, offset = 0, status = 'all' } = req.query;
-  const like = `%${q}%`;
-  
-  let whereClause = 'WHERE (email ILIKE $1 OR display_name ILIKE $1)';
-  let params = [like, Number(limit), Number(offset)];
-  
-  if (status === 'active') {
-    whereClause += ' AND active = true';
-  } else if (status === 'inactive') {
-    whereClause += ' AND active = false';
-  } else if (status === 'admin') {
-    whereClause += ' AND is_admin = true';
+  try {
+    const {
+      q = '',
+      limit = 20,
+      offset = 0,
+      status = 'all',
+      experience_level,
+      traditions,
+      favorite_deity,
+      onboarding_completed,
+    } = req.query;
+
+    // Build parameterized WHERE clauses to avoid SQL injection and JOIN profiles
+    const params = [];
+    let idx = 1;
+  const where = [];
+
+    if (q && String(q).trim().length > 0) {
+      params.push(`%${String(q).trim()}%`);
+      where.push(`(u.email ILIKE $${idx} OR u.display_name ILIKE $${idx})`);
+      idx++;
+    }
+
+    if (status === 'active') {
+      where.push('u.active = true');
+    } else if (status === 'inactive') {
+      where.push('u.active = false');
+    } else if (status === 'admin') {
+      where.push('u.is_admin = true');
+    }
+
+    // segmentation filters on profiles (profiles table joined as p)
+    if (experience_level) {
+      params.push(String(experience_level));
+      where.push(`p.experience_level = $${idx}`);
+      idx++;
+    }
+
+    if (traditions) {
+      // traditions can be comma separated values
+      const tArr = Array.isArray(traditions) ? traditions : String(traditions).split(',').map(s => s.trim()).filter(Boolean);
+      if (tArr.length) {
+        // We'll check overlap using ANY OR array containment via && with PG array
+        // Pass as text[] using ARRAY[...] construct
+          params.push(tArr);
+          // Use WHERE traditions && $n::text[] (requires profiles.traditions to be a text[] in Postgres)
+          where.push(`p.traditions && $${idx}::text[]`);
+        idx++;
+      }
+    }
+
+    if (favorite_deity) {
+      params.push(String(favorite_deity));
+      where.push(`p.favorite_deity = $${idx}`);
+      idx++;
+    }
+
+    if (typeof onboarding_completed !== 'undefined') {
+      const val = onboarding_completed === 'true' || onboarding_completed === true || onboarding_completed === '1';
+      params.push(val);
+      where.push(`p.onboarding_completed IS NOT DISTINCT FROM $${idx}`);
+      idx++;
+    }
+
+    // Pagination params
+    params.push(Number(limit));
+    params.push(Number(offset));
+
+    const whereSql = where.length ? `WHERE ${where.join(' AND ')}` : '';
+
+    // Select users with a LEFT JOIN to profiles and build a nested `profile` JSON object
+    const selectSql = `SELECT u.id, u.email, u.display_name, u.is_admin, u.active, u.created_at, u.last_login, u.login_attempts,
+      json_build_object(
+        'experience_level', p.experience_level,
+        'traditions', p.traditions,
+        'onboarding_completed', p.onboarding_completed,
+        'favorite_deity', p.favorite_deity
+      ) AS profile
+      FROM users u LEFT JOIN profiles p ON p.user_id = u.id ${whereSql} ORDER BY u.id DESC LIMIT $${idx} OFFSET $${idx + 1}`;
+
+    // For count, use same where clause but count distinct users
+    const countSql = `SELECT COUNT(DISTINCT u.id)::int AS total FROM users u LEFT JOIN profiles p ON p.user_id = u.id ${whereSql}`;
+
+    const r = await db.query(selectSql, params).catch(() => ({ rows: [] }));
+    const countResult = await db.query(countSql, params.slice(0, params.length - 2)).catch(() => ({ rows: [{ total: 0 }] }));
+
+    return res.json({
+      users: r.rows,
+      total: countResult.rows[0].total || 0,
+      limit: Number(limit),
+      offset: Number(offset),
+    });
+  } catch (e) {
+    console.error('Users list error:', e);
+    return res.status(500).json({ message: 'Failed to fetch users' });
   }
-  
-  const r = await db.query(
-    `SELECT id, email, display_name, is_admin, active, created_at, last_login, login_attempts FROM users ${whereClause} ORDER BY id DESC LIMIT $2 OFFSET $3`,
-    params
-  ).catch(() => ({ rows: [] }));
-  
-  // Get total count for pagination
-  const countQuery = `SELECT COUNT(*)::int AS total FROM users ${whereClause.replace('LIMIT $2 OFFSET $3', '')}`;
-  const countResult = await db.query(countQuery, [like]).catch(() => ({ rows: [{ total: 0 }] }));
-  
-  res.json({ 
-    users: r.rows,
-    total: countResult.rows[0].total,
-    limit: Number(limit),
-    offset: Number(offset)
-  });
+});
+
+// Mark a message as read
+router.patch('/users/:id/messages/:messageId/read', adminAuthenticate, async (req, res) => {
+  try {
+    const messageId = Number(req.params.messageId);
+    await messageService.markAsRead(messageId);
+    return res.json({ message: 'Marked as read' });
+  } catch (e) {
+    console.error('Mark message as read error', e);
+    return res.status(500).json({ message: 'Failed to mark message as read' });
+  }
+});
+
+// Segmentation quick endpoint
+router.get('/users/segment', adminAuthenticate, async (req, res) => {
+  try {
+    const filters = req.query || {};
+    const rows = await userAnalyticsService.segmentUsers(filters);
+    res.json({ users: rows });
+  } catch (e) {
+    console.error('User segment error', e);
+    res.status(500).json({ message: 'Failed to segment users' });
+  }
 });
 
 router.patch('/users/:id', adminAuthenticate, async (req, res) => {
@@ -161,11 +266,18 @@ router.patch('/users/:id', adminAuthenticate, async (req, res) => {
   try {
     await db.query('UPDATE users SET display_name=COALESCE($1, display_name), email=COALESCE($2, email), active=COALESCE($3, active), is_admin=COALESCE($4, is_admin) WHERE id=$5', [display_name, email, active, is_admin, id]);
     
-    // Log user update action
-    await req.logAdminAction(req.user.id, 'UPDATE_USER', 'user', id, { 
-      updated_fields: { display_name, email, active, is_admin },
-      admin: req.user.username 
-    });
+    // Log user update action (use secureLog to auto-enrich)
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('UPDATE_USER', 'user', id, { 
+        updated_fields: { display_name, email, active, is_admin },
+        admin: req.user.username 
+      }, { severity: is_admin ? 'warn' : 'info', category: is_admin ? 'security' : 'admin' });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'UPDATE_USER', 'user', id, { 
+        updated_fields: { display_name, email, active, is_admin },
+        admin: req.user.username 
+      });
+    }
     
     res.json({ message: 'Updated' });
   } catch (e) {
@@ -180,11 +292,18 @@ router.delete('/users/:id', adminAuthenticate, async (req, res) => {
   try {
     await db.query('UPDATE users SET active = false WHERE id = $1', [id]);
     
-    // Log user deletion
-    await req.logAdminAction(req.user.id, 'DELETE_USER', 'user', id, { 
-      admin: req.user.username,
-      action: 'soft_delete'
-    });
+    // Log user deletion (sensitive)
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('DELETE_USER', 'user', id, { 
+        admin: req.user.username,
+        action: 'soft_delete'
+      }, { severity: 'warn', category: 'security' });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'DELETE_USER', 'user', id, { 
+        admin: req.user.username,
+        action: 'soft_delete'
+      });
+    }
     
     res.json({ message: 'User deactivated' });
   } catch (e) {
@@ -211,14 +330,84 @@ router.get('/users/:id', adminAuthenticate, async (req, res) => {
       'SELECT id, title, status, created_at FROM sadhanas WHERE user_id = $1 ORDER BY created_at DESC LIMIT 10',
       [id]
     ).catch(() => ({ rows: [] }));
-    
+
+    // get profile
+    const profileQ = await db.query('SELECT * FROM profiles WHERE user_id = $1', [id]).catch(() => ({ rows: [] }));
+
+    // analytics
+    const progress = await userAnalyticsService.getUserProgress(id).catch(() => null);
+    const analytics = await userAnalyticsService.getUserAnalytics(id).catch(() => null);
+
+    // messages count
+    const unread = await messageService.unreadCount(id).catch(() => 0);
+
     res.json({ 
       user: userQuery.rows[0],
-      sadhanas: sadhanaQuery.rows
+      sadhanas: sadhanaQuery.rows,
+      profile: profileQ.rows[0] || null,
+      progress,
+      analytics,
+      unreadMessages: unread
     });
   } catch (e) {
     console.error('User details error:', e);
     res.status(500).json({ message: 'Failed to fetch user details' });
+  }
+});
+
+// user analytics endpoint
+router.get('/users/:id/analytics', adminAuthenticate, async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const analytics = await userAnalyticsService.getUserAnalytics(id);
+    res.json({ analytics });
+  } catch (e) {
+    console.error('User analytics error', e);
+    res.status(500).json({ message: 'Failed to fetch analytics' });
+  }
+});
+
+// user progress endpoint
+router.get('/users/:id/progress', adminAuthenticate, async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const progress = await userAnalyticsService.getUserProgress(id);
+    res.json({ progress });
+  } catch (e) {
+    console.error('User progress error', e);
+    res.status(500).json({ message: 'Failed to fetch progress' });
+  }
+});
+
+// messages endpoints
+router.get('/users/:id/messages', adminAuthenticate, async (req, res) => {
+  const id = Number(req.params.id);
+  const { limit = 50, offset = 0 } = req.query;
+  try {
+    const msgs = await messageService.getMessagesForUser(id, Number(limit), Number(offset));
+    res.json({ messages: msgs });
+  } catch (e) {
+    console.error('Get messages error', e);
+    res.status(500).json({ message: 'Failed to fetch messages' });
+  }
+});
+
+router.post('/users/:id/message', adminAuthenticate, async (req, res) => {
+  const id = Number(req.params.id);
+  try {
+    const adminId = req.user && req.user.id ? req.user.id : 0;
+    const { content } = req.body;
+    const sent = await messageService.sendMessage(adminId, id, content);
+    // Log action (use secureLog)
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('SEND_MESSAGE', 'message', id, { content: String(content).slice(0, 200) });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(adminId, 'SEND_MESSAGE', 'message', id, { content: String(content).slice(0, 200) });
+    }
+    res.json({ message: 'Sent', id: sent.id, created_at: sent.created_at });
+  } catch (e) {
+    console.error('Send message error', e);
+    res.status(500).json({ message: 'Failed to send message' });
   }
 });
 

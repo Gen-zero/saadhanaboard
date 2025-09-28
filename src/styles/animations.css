@@ -329,3 +329,57 @@
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;
 }
+
+/* Library-specific mystical float */
+@keyframes library-float {
+  0% { transform: translateY(0) rotate(0deg) translateX(0); }
+  25% { transform: translateY(-8px) rotate(6deg) translateX(-4px); }
+  50% { transform: translateY(-16px) rotate(-6deg) translateX(4px); }
+  75% { transform: translateY(-8px) rotate(3deg) translateX(-2px); }
+  100% { transform: translateY(0) rotate(0deg) translateX(0); }
+}
+
+.library-float {
+  animation: library-float 7s ease-in-out infinite;
+}
+
+/* Sacred reveal for parchment & library cards */
+@keyframes sacred-reveal {
+  0% { opacity: 0; transform: translateY(12px) scale(0.98); filter: blur(3px); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.sacred-reveal {
+  animation: sacred-reveal 600ms cubic-bezier(.2,.9,.3,1) forwards;
+}
+
+/* Selection pulse for cosmic selection */
+@keyframes cosmic-select {
+  0% { transform: scale(0.98); box-shadow: 0 0 0 rgba(255,255,255,0); }
+  50% { transform: scale(1.02); box-shadow: 0 6px 20px rgba(255,200,100,0.12); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,255,255,0); }
+}
+
+.cosmic-select {
+  animation: cosmic-select 420ms ease-out forwards;
+}
+
+/* Mystical drift for particles */
+@keyframes mystical-drift {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0.6; }
+  50% { transform: translateY(-20px) translateX(8px) scale(1.05); opacity: 1; }
+  100% { transform: translateY(-40px) translateX(-4px) scale(0.95); opacity: 0.4; }
+}
+
+.mystical-drift {
+  animation: mystical-drift 12s linear infinite;
+}
+
+/* Library pulse variations */
+@keyframes library-pulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+.library-pulse { animation: library-pulse 3s ease-in-out infinite; }

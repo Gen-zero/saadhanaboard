@@ -81,6 +81,26 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ settings, children }) => 
       const languageCode = languageMap[settings.language] || 'en';
       i18n.changeLanguage(languageCode);
     }
+    // Apply theme color variables if provided
+    // Expect settings.appearance?.themeColors or settings.themeColors to be an object with fields
+    const colors = (settings as any)?.appearance?.themeColors || (settings as any)?.themeColors;
+    if (colors) {
+      const root = document.documentElement;
+      const vars: Record<string, string> = {
+        '--color-primary': colors.primary || '#8B2A94',
+        '--color-secondary': colors.secondary || '#4A1547',
+        '--color-accent': colors.accent || '#E91E63',
+        '--color-border': colors.border || '#e5e7eb',
+        '--color-success': colors.success || '#16a34a',
+        '--color-warning': colors.warning || '#f59e0b',
+        '--color-error': colors.error || '#ef4444',
+        '--color-info': colors.info || '#3b82f6'
+      };
+
+      Object.entries(vars).forEach(([key, val]) => {
+        root.style.setProperty(key, val);
+      });
+    }
   }, [settings?.theme, settings?.appearance, settings?.language]);
 
   return <>{children}</>;

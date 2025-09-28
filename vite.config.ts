@@ -10,6 +10,14 @@ export default defineConfig({
     watch: {
       ignored: ["**/node_modules/**", "**/.git/**"],
     },
+    // Proxy API requests to backend during development
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3004',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
   plugins: [
     react(),
@@ -19,4 +27,6 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Ensure environment variables are properly loaded
+  envPrefix: 'VITE_',
 });

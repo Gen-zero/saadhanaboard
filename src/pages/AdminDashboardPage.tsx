@@ -1,68 +1,89 @@
 import { useEffect, useState } from 'react';
+import type { DashboardSnapshot, ProgressStats, WeeklyEntry } from '@/types/admin-dashboard';
+import type { SystemHealth } from '@/types/system';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { adminApi } from '@/services/adminApi';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 import { Users, Activity, BookOpen, Palette, UserCheck, TrendingUp } from 'lucide-react';
+import { useRealTimeDashboard } from '@/hooks/useRealTimeDashboard';
+import RealTimeMetricsCard from '@/components/admin/RealTimeMetricsCard';
+import SpiritualProgressChart from '@/components/admin/SpiritualProgressChart';
+import SystemHealthMonitor from '@/components/admin/SystemHealthMonitor';
+import UserEngagementAnalytics from '@/components/admin/UserEngagementAnalytics';
 
-interface DashboardStats {
-  totalUsers: number;
-  activeUsers: number;
-  activeSadhanas: number;
-  completedSadhanas: number;
-  uploadedBooks: number;
-  currentThemes: number;
-  recentLogins: number;
-  todaysSadhanas: number;
-  weeklyLogins: Array<{ date: string; logins: number }>;
-  weeklySadhanaCompletions: Array<{ date: string; completions: number }>;
-}
 
 const AdminDashboardPage = () => {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { stats, error, connection } = useRealTimeDashboard();
+  const [loading] = useState(false);
+  const [usingHttpFallback, setUsingHttpFallback] = useState(false);
+  const [httpStats, setHttpStats] = useState<DashboardSnapshot | null>(null);
 
+  // if stats is null after N seconds or error set, fallback to HTTP
   useEffect(() => {
-    const loadStats = async () => {
-      try {
-        const data = await adminApi.stats();
-        setStats(data);
-      } catch (error) {
-        console.error('Failed to load stats:', error);
-        setStats({
-          totalUsers: 0,
-          activeUsers: 0,
-          activeSadhanas: 0,
-          completedSadhanas: 0,
-          uploadedBooks: 0,
-          currentThemes: 0,
-          recentLogins: 0,
-          todaysSadhanas: 0,
-          weeklyLogins: [],
-          weeklySadhanaCompletions: []
-        });
-      } finally {
-        setLoading(false);
+    let cancelled = false;
+    const FALLBACK_MS = 6000; // N seconds
+    const timer = setTimeout(async () => {
+      if (cancelled) return;
+      if (!stats || error || connection === 'disconnected') {
+        try {
+          const r = await adminApi.stats();
+          const progress = await adminApi.getProgressStats().catch(() => null);
+          const health = await adminApi.getHealthStats().catch(() => null);
+          setUsingHttpFallback(true);
+
+          const fallbackHealth: SystemHealth = {
+            status: 'error',
+            timestamp: new Date().toISOString(),
+            error: 'Health unavailable',
+          };
+
+          const normalized: DashboardSnapshot = {
+            totalUsers: r.totalUsers,
+            activeUsers: r.activeUsers,
+            activeSadhanas: r.activeSadhanas,
+            completedSadhanas: r.completedSadhanas,
+            uploadedBooks: r.uploadedBooks,
+            currentThemes: r.currentThemes,
+            recentLogins: r.recentLogins,
+            todaysSadhanas: r.todaysSadhanas,
+            weeklyLogins: progress?.weeklyLogins ?? r.weeklyLogins ?? [],
+            weeklySadhanaCompletions: progress?.weeklySadhanaCompletions ?? r.weeklySadhanaCompletions ?? [],
+            averagePracticeMinutes: (progress as any)?.averagePracticeMinutes ?? 0,
+            topSessions: (progress as any)?.topSessions ?? [],
+            systemHealth: (health && health.systemHealth) ? health.systemHealth : fallbackHealth,
+          };
+
+          setHttpStats(normalized);
+        } catch (e) {
+          // keep using socket state; show banner
+          setUsingHttpFallback(true);
+        }
       }
-    };
-    
-    loadStats();
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(loadStats, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    }, FALLBACK_MS);
+
+    return () => { cancelled = true; clearTimeout(timer); };
+  }, [stats, error, connection]);
 
   // Prepare chart data
-  const formatChartData = (data: Array<{ date: string; logins?: number; completions?: number }>, key: string) => {
-    return data.map((item, index) => ({
-      day: `D${index + 1}`,
-      [key]: item[key as keyof typeof item] || 0,
-      date: new Date(item.date).toLocaleDateString()
-    }));
+  const mergeWeekly = (logins: WeeklyEntry[] = [], completions: WeeklyEntry[] = []) => {
+    // build a map by date to merge values
+    const m = new Map<string, { date: string; logins?: number; completions?: number }>();
+    (logins || []).forEach(l => {
+      m.set(l.date, { date: l.date, logins: l.logins ?? 0, completions: 0 });
+    });
+    (completions || []).forEach(c => {
+      const existing = m.get(c.date);
+      if (existing) existing.completions = c.completions ?? 0;
+      else m.set(c.date, { date: c.date, logins: 0, completions: c.completions ?? 0 });
+    });
+    // sort by date ascending
+    const arr = Array.from(m.values()).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    return arr.map((it, i) => ({ day: `D${i + 1}`, date: new Date(it.date).toLocaleDateString(), logins: it.logins, completions: it.completions }));
   };
 
-  const loginData = stats ? formatChartData(stats.weeklyLogins, 'logins') : [];
-  const completionData = stats ? formatChartData(stats.weeklySadhanaCompletions, 'completions') : [];
+  const effective = (stats as DashboardSnapshot | null) || httpStats || null;
+  const mergedChartData = effective ? mergeWeekly(effective.weeklyLogins || [], effective.weeklySadhanaCompletions || []) : [];
 
   if (loading) {
     return (
@@ -81,110 +102,21 @@ const AdminDashboardPage = () => {
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
-        <Card className="bg-background/60 backdrop-blur-md border-purple-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalUsers ?? '—'}</div>
-            <p className="text-xs text-muted-foreground">All registered users</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-background/60 backdrop-blur-md border-purple-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.activeUsers ?? '—'}</div>
-            <p className="text-xs text-muted-foreground">Currently active</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-background/60 backdrop-blur-md border-purple-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Sadhanas</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.activeSadhanas ?? '—'}</div>
-            <p className="text-xs text-muted-foreground">In progress</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-background/60 backdrop-blur-md border-purple-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.completedSadhanas ?? '—'}</div>
-            <p className="text-xs text-muted-foreground">Finished sadhanas</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-background/60 backdrop-blur-md border-purple-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Books</CardTitle>
-            <BookOpen className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.uploadedBooks ?? '—'}</div>
-            <p className="text-xs text-muted-foreground">Total uploaded</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-background/60 backdrop-blur-md border-purple-500/20">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Themes</CardTitle>
-            <Palette className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats?.currentThemes ?? '—'}</div>
-            <p className="text-xs text-muted-foreground">Available themes</p>
-          </CardContent>
-        </Card>
+      {usingHttpFallback && (
+        <div className="p-3 rounded-md bg-yellow-100 text-yellow-800 border border-yellow-200">
+          Running in HTTP fallback mode — real-time socket is unavailable. Data updates will be polled by the client.
+        </div>
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <RealTimeMetricsCard stats={effective} />
+  <SystemHealthMonitor health={effective?.systemHealth ?? null} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-background/60 backdrop-blur-md border-purple-500/20">
-          <CardHeader>
-            <CardTitle>Weekly Logins</CardTitle>
-            <p className="text-sm text-muted-foreground">User login activity over the past 7 days</p>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={{ logins: { label: 'Logins', color: 'hsl(262,83%,58%)' } }}>
-              <BarChart data={loginData}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
-                <Bar dataKey="logins" fill="var(--color-logins)" radius={6} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-background/60 backdrop-blur-md border-purple-500/20">
-          <CardHeader>
-            <CardTitle>Sadhana Completions</CardTitle>
-            <p className="text-sm text-muted-foreground">Completed sadhanas over the past 7 days</p>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={{ completions: { label: 'Completions', color: 'hsl(292,83%,58%)' } }}>
-              <LineChart data={completionData}>
-                <CartesianGrid vertical={false} />
-                <XAxis dataKey="day" tickLine={false} axisLine={false} />
-                <YAxis allowDecimals={false} tickLine={false} axisLine={false} />
-                <Line dataKey="completions" stroke="var(--color-completions)" strokeWidth={2} dot={false} />
-                <ChartTooltip content={<ChartTooltipContent />} />
-              </LineChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+  <SpiritualProgressChart data={mergedChartData} />
+        <div className="space-y-6">
+          <UserEngagementAnalytics data={effective} />
+        </div>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -195,11 +127,11 @@ const AdminDashboardPage = () => {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-sm">Recent Logins (24h)</span>
-              <span className="text-lg font-semibold">{stats?.recentLogins ?? 0}</span>
+              <span className="text-lg font-semibold">{effective?.recentLogins ?? 0}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm">New Sadhanas Today</span>
-              <span className="text-lg font-semibold">{stats?.todaysSadhanas ?? 0}</span>
+              <span className="text-lg font-semibold">{effective?.todaysSadhanas ?? 0}</span>
             </div>
           </CardContent>
         </Card>

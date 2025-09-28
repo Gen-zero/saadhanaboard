@@ -263,3 +263,43 @@ body.shiva-theme::before {
     transform: translateX(200%) skewX(-15deg);
   }
 }
+
+/* Cosmic Library specific styles */
+.cosmic-library-showcase {
+  border: 1px solid rgba(255,215,0,0.06);
+  background-image: linear-gradient(180deg, rgba(10, 8, 20, 0.25), rgba(5, 3, 10, 0.15));
+  backdrop-filter: blur(8px) saturate(120%);
+}
+
+.floating-book {
+  animation: library-float 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+.floating-practice {
+  animation: mystical-drift 10s linear infinite;
+}
+
+.sacred-geometry-bg {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 10% 20%, rgba(255,215,0,0.02), transparent 8%),
+                    radial-gradient(circle at 80% 70%, rgba(138,43,226,0.02), transparent 8%),
+                    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.01), transparent 6%);
+  opacity: 0.7;
+  filter: blur(24px);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.library-glow {
+  animation: glow-primary 3.2s ease-in-out infinite;
+}
+
+.mystical-hover {
+  transition: transform 300ms ease, box-shadow 300ms ease, opacity 300ms ease;
+}
+
+.cosmic-transition {
+  transition: transform 420ms cubic-bezier(.2,.9,.3,1), opacity 420ms ease;
+}

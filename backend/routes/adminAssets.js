@@ -50,25 +50,27 @@ const upload = multer({
 // Get assets with pagination and filtering
 router.get('/', adminAuthenticate, (req, res) => {
   const { type = 'all', limit = 20, offset = 0, search = '' } = req.query;
-  let list = readJson(STORE, []);
-  
+  const data = readJson(STORE, {});
+  // Support both array and object shapes: { assets: [...], ... }
+  let list = Array.isArray(data) ? data : (data.assets || []);
+
   // Filter by type
   if (type !== 'all') {
     list = list.filter(asset => asset.type === type);
   }
-  
+
   // Filter by search term
   if (search) {
     const searchLower = search.toLowerCase();
     list = list.filter(asset => 
-      asset.title.toLowerCase().includes(searchLower) ||
-      asset.type.toLowerCase().includes(searchLower)
+      (asset.title || '').toString().toLowerCase().includes(searchLower) ||
+      (asset.type || '').toString().toLowerCase().includes(searchLower)
     );
   }
-  
+
   const total = list.length;
   const paginatedList = list.slice(Number(offset), Number(offset) + Number(limit));
-  
+
   res.json({ 
     assets: paginatedList,
     total,
@@ -77,10 +79,21 @@ router.get('/', adminAuthenticate, (req, res) => {
   });
 });
 
+// Get single asset by id
+router.get('/:id', adminAuthenticate, (req, res) => {
+  const data = readJson(STORE, {});
+  const list = Array.isArray(data) ? data : (data.assets || []);
+  const id = Number(req.params.id);
+  const asset = list.find(a => a.id === id);
+  if (!asset) return res.status(404).json({ error: 'Asset not found' });
+  res.json({ asset });
+});
+
 // Upload asset with enhanced metadata
 router.post('/', adminAuthenticate, upload.single('file'), async (req, res) => {
   try {
-    const list = readJson(STORE, []);
+    const data = readJson(STORE, {});
+    const list = Array.isArray(data) ? data : (data.assets || []);
     const id = Date.now();
     const { title = '', type = 'image', description = '', tags = '' } = req.body;
     
@@ -108,14 +121,28 @@ router.post('/', adminAuthenticate, upload.single('file'), async (req, res) => {
     };
     
     list.unshift(item);
-    writeJson(STORE, list);
+    // persist preserving wrapper
+    if (Array.isArray(data)) {
+      writeJson(STORE, list);
+    } else {
+      data.assets = list;
+      writeJson(STORE, data);
+    }
     
-    // Log asset upload
-    await req.logAdminAction(req.user.id, 'UPLOAD_ASSET', 'asset', id, {
-      title: item.title,
-      type: item.type,
-      fileSize: item.fileSize
-    });
+    // Log asset upload (use secureLog to auto-inject IP/UA/correlation)
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('UPLOAD_ASSET', 'asset', id, {
+        title: item.title,
+        type: item.type,
+        fileSize: item.fileSize
+      });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'UPLOAD_ASSET', 'asset', id, {
+        title: item.title,
+        type: item.type,
+        fileSize: item.fileSize
+      });
+    }
     
     res.json({ asset: item });
   } catch (error) {
@@ -127,7 +154,8 @@ router.post('/', adminAuthenticate, upload.single('file'), async (req, res) => {
 // Update asset metadata
 router.patch('/:id', adminAuthenticate, async (req, res) => {
   try {
-    const list = readJson(STORE, []);
+    const data = readJson(STORE, {});
+    const list = Array.isArray(data) ? data : (data.assets || []);
     const id = Number(req.params.id);
     const idx = list.findIndex(a => a.id === id);
     
@@ -143,13 +171,25 @@ router.patch('/:id', adminAuthenticate, async (req, res) => {
       list[idx].tags = req.body.tags.split(',').map(tag => tag.trim()).filter(Boolean);
     }
     
-    writeJson(STORE, list);
+    if (Array.isArray(data)) {
+      writeJson(STORE, list);
+    } else {
+      data.assets = list;
+      writeJson(STORE, data);
+    }
     
     // Log asset update
-    await req.logAdminAction(req.user.id, 'UPDATE_ASSET', 'asset', id, {
-      changes: req.body,
-      original: originalAsset
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('UPDATE_ASSET', 'asset', id, {
+        changes: req.body,
+        original: originalAsset
+      });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'UPDATE_ASSET', 'asset', id, {
+        changes: req.body,
+        original: originalAsset
+      });
+    }
     
     res.json({ asset: list[idx] });
   } catch (error) {
@@ -161,7 +201,8 @@ router.patch('/:id', adminAuthenticate, async (req, res) => {
 // Delete asset
 router.delete('/:id', adminAuthenticate, async (req, res) => {
   try {
-    const list = readJson(STORE, []);
+    const data = readJson(STORE, {});
+    const list = Array.isArray(data) ? data : (data.assets || []);
     const id = Number(req.params.id);
     const asset = list.find(a => a.id === id);
     
@@ -170,7 +211,12 @@ router.delete('/:id', adminAuthenticate, async (req, res) => {
     }
     
     const filtered = list.filter(a => a.id !== id);
-    writeJson(STORE, filtered);
+    if (Array.isArray(data)) {
+      writeJson(STORE, filtered);
+    } else {
+      data.assets = filtered;
+      writeJson(STORE, data);
+    }
     
     // Optionally delete the actual file
     if (asset.fileName) {
@@ -182,10 +228,17 @@ router.delete('/:id', adminAuthenticate, async (req, res) => {
     }
     
     // Log asset deletion
-    await req.logAdminAction(req.user.id, 'DELETE_ASSET', 'asset', id, {
-      title: asset.title,
-      type: asset.type
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('DELETE_ASSET', 'asset', id, {
+        title: asset.title,
+        type: asset.type
+      });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'DELETE_ASSET', 'asset', id, {
+        title: asset.title,
+        type: asset.type
+      });
+    }
     
     res.json({ message: 'Asset deleted successfully' });
   } catch (error) {
@@ -196,7 +249,8 @@ router.delete('/:id', adminAuthenticate, async (req, res) => {
 
 // Get asset statistics
 router.get('/stats', adminAuthenticate, (req, res) => {
-  const list = readJson(STORE, []);
+  const data = readJson(STORE, {});
+  const list = Array.isArray(data) ? data : (data.assets || []);
   
   const stats = {
     total: list.length,

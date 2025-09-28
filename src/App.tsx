@@ -20,8 +20,11 @@ import AdminUsersPage from "./pages/AdminUsersPage";
 import AdminLogsPage from "./pages/AdminLogsPage";
 import AdminAssetsPage from "./pages/AdminAssetsPage";
 import AdminThemesPage from "./pages/AdminThemesPage";
+import ThemePreviewPage from "./pages/ThemePreviewPage";
 import AdminTemplatesPage from "./pages/AdminTemplatesPage";
+import AdminContentPage from "./pages/AdminContentPage";
 import AdminSettingsReportsPage from "./pages/AdminSettingsReportsPage";
+import AdminSystemPage from "./pages/AdminSystemPage";
 import ExperimentPage from "./pages/ExperimentPage";
 import MysteryLandingPage from "./pages/MysteryLandingPage";
 import AboutPage from "./pages/AboutPage";
@@ -197,10 +200,10 @@ const AppRoutes = () => {
       <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboardPage />} />
         <Route path="users" element={<AdminUsersPage />} />
+        <Route path="system" element={<AdminSystemPage />} />
         <Route path="logs" element={<AdminLogsPage />} />
-        <Route path="assets" element={<AdminAssetsPage />} />
-        <Route path="themes" element={<AdminThemesPage />} />
-        <Route path="templates" element={<AdminTemplatesPage />} />
+        <Route path="content" element={<AdminContentPage />} />
+        {/* legacy: assets/themes/templates routes are deprecated in favor of /admin/content */}
         <Route path="settings" element={<AdminSettingsReportsPage />} />
       </Route>
       <Route path="/dashboard" element={<OnboardingRoute><DashboardPage /></OnboardingRoute>} />

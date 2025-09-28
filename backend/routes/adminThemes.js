@@ -44,7 +44,12 @@ router.post('/', adminAuthenticate, async (req, res) => {
       colors: {
         primary: colors.primary || '#8B2A94',
         secondary: colors.secondary || '#4A1547',
-        accent: colors.accent || '#E91E63'
+        accent: colors.accent || '#E91E63',
+        border: colors.border || '#e5e7eb',
+        success: colors.success || '#16a34a',
+        warning: colors.warning || '#f59e0b',
+        error: colors.error || '#ef4444',
+        info: colors.info || '#3b82f6'
       },
       created_at: new Date().toISOString(),
       created_by: req.user.id
@@ -54,10 +59,11 @@ router.post('/', adminAuthenticate, async (req, res) => {
     writeJson(STORE, list);
     
     // Log theme creation
-    await req.logAdminAction(req.user.id, 'CREATE_THEME', 'theme', item.id, {
-      name: item.name,
-      deity: item.deity
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('CREATE_THEME', 'theme', item.id, { name: item.name, deity: item.deity });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'CREATE_THEME', 'theme', item.id, { name: item.name, deity: item.deity });
+    }
     
     res.json({ theme: item });
   } catch (error) {
@@ -83,10 +89,11 @@ router.patch('/:id', adminAuthenticate, async (req, res) => {
     writeJson(STORE, list);
     
     // Log theme update
-    await req.logAdminAction(req.user.id, 'UPDATE_THEME', 'theme', id, {
-      changes: req.body,
-      original: originalTheme
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('UPDATE_THEME', 'theme', id, { changes: req.body, original: originalTheme });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'UPDATE_THEME', 'theme', id, { changes: req.body, original: originalTheme });
+    }
     
     res.json({ theme: list[idx] });
   } catch (error) {
@@ -110,10 +117,11 @@ router.delete('/:id', adminAuthenticate, async (req, res) => {
     writeJson(STORE, filtered);
     
     // Log theme deletion
-    await req.logAdminAction(req.user.id, 'DELETE_THEME', 'theme', id, {
-      name: theme.name,
-      deity: theme.deity
-    });
+    if (typeof req.secureLog === 'function') {
+      await req.secureLog('DELETE_THEME', 'theme', id, { name: theme.name, deity: theme.deity });
+    } else if (typeof req.logAdminAction === 'function') {
+      await req.logAdminAction(req.user.id, 'DELETE_THEME', 'theme', id, { name: theme.name, deity: theme.deity });
+    }
     
     res.json({ message: 'Theme deleted successfully' });
   } catch (error) {
@@ -131,18 +139,18 @@ router.get('/:id/preview', adminAuthenticate, (req, res) => {
     return res.status(404).json({ error: 'Theme not found' });
   }
   
-  res.json({ 
-    theme,
-    preview: {
-      css: `
-        :root {
-          --primary: ${theme.colors.primary};
-          --secondary: ${theme.colors.secondary};
-          --accent: ${theme.colors.accent};
-        }
-      `
-    }
-  });
+  const css = `:root {
+    --primary: ${theme.colors.primary};
+    --secondary: ${theme.colors.secondary};
+    --accent: ${theme.colors.accent};
+    --border: ${theme.colors.border};
+    --success: ${theme.colors.success};
+    --warning: ${theme.colors.warning};
+    --error: ${theme.colors.error};
+    --info: ${theme.colors.info};
+  }`;
+
+  res.json({ theme, preview: { css } });
 });
 
 module.exports = router;

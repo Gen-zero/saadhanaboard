@@ -22,8 +22,8 @@ function ensureDir(dir) {
 
 async function moveAndOptimize() {
   if (!fs.existsSync(srcPath)) {
-    console.error('Source file not found:', srcPath);
-    process.exitCode = 2;
+    console.warn('Source file not found:', srcPath);
+    console.log('Skipping asset move operation');
     return;
   }
 
