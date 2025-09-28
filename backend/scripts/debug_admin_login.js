@@ -3,7 +3,8 @@
  * Comprehensive debug utility to test the admin login stack end-to-end.
  * Usage: node backend/scripts/debug_admin_login.js
  */
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 const db = require('../config/db');
 const Admin = require('../models/Admin');
 const adminAuthService = require('../services/adminAuthService');
@@ -11,6 +12,16 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 let fetch = global.fetch;
 const util = require('util');
+
+function showPoolStats() {
+  try {
+    console.log('[POOL] totalCount:', db.totalCount());
+    console.log('[POOL] idleCount :', db.idleCount());
+    console.log('[POOL] waitingCount :', db.waitingCount());
+  } catch (e) {
+    // ignore
+  }
+}
 
 async function ensureFetch() {
   if (fetch) return fetch;
@@ -45,6 +56,20 @@ async function run() {
     const hasTable = await tableExists('admin_details');
     console.log('[DB] admin_details table:', hasTable ? 'FOUND' : 'MISSING');
 
+    // show pool stats
+    showPoolStats();
+
+    // 2b) if present show basic schema columns
+    if (hasTable) {
+      try {
+        const cols = await db.query(`SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'admin_details' ORDER BY ordinal_position`);
+        console.log('[DB] admin_details columns:');
+        cols.rows.forEach(r => console.log('  -', r.column_name, r.data_type));
+      } catch (e) {
+        console.warn('[DB] failed to list columns:', e.message);
+      }
+    }
+
     // 3) check demo user
     const demoUser = 'KaliVaibhav';
     const demoPass = 'Subham@98';
@@ -54,10 +79,15 @@ async function run() {
       console.log('[DB] demo account:', adminRecord ? `FOUND (id=${adminRecord.id})` : 'NOT FOUND');
     }
 
-    // 4) password compare if found
+    // 4) password compare if found + lock status
     if (adminRecord) {
       const ok = await bcrypt.compare(demoPass, adminRecord.password_hash);
       console.log('[SEC] demo password match:', ok ? 'YES' : 'NO');
+      console.log('[SEC] account locked_until:', adminRecord.locked_until, 'login_attempts:', adminRecord.login_attempts);
+      if (adminRecord.locked_until && new Date(adminRecord.locked_until) > new Date()) {
+        const rem = Math.ceil((new Date(adminRecord.locked_until) - new Date()) / 60000);
+        console.log(`[SEC] account is LOCKED - remaining minutes: ${rem}`);
+      }
     }
 
     // 5) JWT signing test
@@ -76,7 +106,12 @@ async function run() {
         const { token, admin } = await adminAuthService.login({ usernameOrEmail: demoUser, password: demoPass });
         console.log('[SERVICE] direct login: OK, token length=', token ? token.length : 0);
       } catch (e) {
-        console.error('[SERVICE] direct login: FAILED -', e.message || e);
+        // if account locked provide details
+        if (e && e.message === 'account_locked') {
+          console.error('[SERVICE] direct login: ACCOUNT LOCKED - details:', e.details || e.message);
+        } else {
+          console.error('[SERVICE] direct login: FAILED -', e.message || e);
+        }
       }
     }
 
@@ -103,6 +138,19 @@ async function run() {
     console.log('[ENV] JWT_SECRET set:', !!process.env.JWT_SECRET);
     console.log('[ENV] DATABASE_URL set:', !!process.env.DATABASE_URL);
     console.log('[ENV] CORS_ORIGIN / CORS_ORIGINS:', process.env.CORS_ORIGIN || process.env.CORS_ORIGINS);
+
+    // optional unlock flag
+    const args = process.argv.slice(2);
+    const wantUnlock = args.includes('--unlock');
+    if (wantUnlock && adminRecord) {
+      console.log('[DEBUG] --unlock flag detected, attempting to unlock demo account...');
+      try {
+        const unlocked = await adminAuthService.unlockAccount(demoUser);
+        console.log('[DEBUG] unlock result:', unlocked ? `unlocked id=${unlocked.id}` : 'failed');
+      } catch (e) {
+        console.error('[DEBUG] unlock failed:', e && e.message ? e.message : e);
+      }
+    }
 
     console.log('== Debug complete ==');
     process.exit(0);

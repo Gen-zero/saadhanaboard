@@ -1,42 +1,37 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import '@/styles/admin-login.css';
-import { Shield, Key } from 'lucide-react';
-import { adminApi } from '@/services/adminApi';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import '@/styles/admin-login.css'
+import { Shield, Key } from 'lucide-react'
+import { adminApi } from '@/services/adminApi'
 
 const schema = z.object({
   username: z.string().min(3, 'Enter a valid username'),
-  password: z.string().min(6, 'Password must be at least 6 characters')
-});
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+})
 
-type FormData = z.infer<typeof schema>;
+type FormData = z.infer<typeof schema>
 
 const AdminLoginForm: React.FC = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) })
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const onSubmit = async (data: FormData) => {
-    setLoading(true);
-    setError(null);
-    console.log('Attempting login with:', data);
+    setLoading(true)
+    setError(null)
     try {
-      // call admin API for authentication and only redirect on success
-      const result = await adminApi.login(data.username, data.password);
-      console.log('Login result:', result);
-      // on success navigate to admin
-      window.location.href = '/admin';
+      await adminApi.login(data.username, data.password)
+      window.location.href = '/admin'
     } catch (e: any) {
-      console.error('Login error:', e);
-      setError(e?.message || 'Login failed');
+      setError(e?.message || 'Login failed')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="admin-login-form space-y-4 p-6">
@@ -66,7 +61,7 @@ const AdminLoginForm: React.FC = () => {
         </Button>
       </div>
     </form>
-  );
-};
+  )
+}
 
-export default AdminLoginForm;
+export default AdminLoginForm

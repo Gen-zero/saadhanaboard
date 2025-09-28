@@ -15,6 +15,9 @@ const adminAuthController = require('../controllers/adminAuthController');
 // Mount the admin auth controller login handler directly so it uses admin_details
 router.post('/login', adminAuthController.login);
 
+// account status endpoint (requires admin authentication)
+router.get('/account-status', adminAuthenticate, adminAuthController.accountStatus);
+
 router.post('/logout', async (req, res) => {
   try {
     // Log logout action

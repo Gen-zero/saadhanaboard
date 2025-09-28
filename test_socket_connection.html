@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Socket.io Client Test</title>
+  <style>body{font-family:system-ui,Segoe UI,Roboto,Arial;background:#f7f7fb;padding:24px}button{margin-right:8px}</style>
+</head>
+<body>
+  <h1>Socket.io Client Test</h1>
+  <div id="info"></div>
+  <div style="margin-top:12px">
+    <button id="connect">Connect</button>
+    <button id="disconnect">Disconnect</button>
+    <button id="emit">Emit test event</button>
+  </div>
+  <pre id="out" style="margin-top:12px;background:#fff;padding:12px;border-radius:6px;max-height:400px;overflow:auto"></pre>
+  <script type="module">
+    // Use the Socket.IO ESM build from CDN so this test page works without local bundling
+    import { io } from 'https://cdn.socket.io/4.7.1/socket.io.esm.min.js';
+    const out = document.getElementById('out');
+    const info = document.getElementById('info');
+    function log(...args){ out.textContent += '\n' + args.map(a=> typeof a === 'object' ? JSON.stringify(a,null,2) : String(a)).join(' '); out.scrollTop = out.scrollHeight; }
+  // By default try the backend server port (3004). If your backend runs elsewhere, update the port below.
+  const base = (function(){ try { return window.location.origin.replace(/:\d+$/, ':3004'); } catch(e){ return 'http://localhost:3004'; }})();
+  let socket = null;
+    document.getElementById('connect').addEventListener('click', ()=>{
+      log('Connecting to', base);
+      socket = io(base, { withCredentials: true, path: '/socket.io' });
+      socket.on('connect', ()=> log('connected', socket.id));
+      socket.on('disconnect', ()=> log('disconnected'));
+      socket.on('dashboard:stats:init', d=> log('init', d));
+      socket.on('dashboard:stats:update', d=> log('update', d));
+      socket.on('connect_error', e=> log('connect_error', e));
+    });
+    document.getElementById('disconnect').addEventListener('click', ()=>{ if(socket) { socket.disconnect(); socket = null; log('manually disconnected'); } });
+    document.getElementById('emit').addEventListener('click', ()=>{ if(socket) socket.emit('test:echo', { ts: Date.now() }); else log('not connected'); });
+  </script>
+</body>
+</html>

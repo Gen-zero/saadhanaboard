@@ -1,30 +1,54 @@
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { NavLink, Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { adminApi } from '@/services/adminApi';
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Shield, Users, LineChart, Image as ImageIcon, Palette, ScrollText, Activity } from 'lucide-react';
+import { BookOpen, Shield, Users, LineChart, Image as ImageIcon, Activity } from 'lucide-react';
 
-const AdminLayout = () => {
-  const [loading, setLoading] = useState(true);
-  const [isAuthed, setIsAuthed] = useState(false);
+const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
-    adminApi.me().then(() => {
-      setIsAuthed(true);
-    }).catch(() => {
-      navigate('/admin/login');
-    }).finally(() => setLoading(false));
-  }, [navigate]);
+    let mounted = true;
+    const load = async () => {
+      try {
+        const resp = await adminApi.me();
+        if (!mounted) return;
+        setUser(resp.user || resp);
+      } catch (e: any) {
+        // If unauthorized, redirect to login preserving returnTo
+        navigate(`/admin/login?returnTo=${encodeURIComponent(location.pathname)}`);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    load();
+    return () => { mounted = false; };
+  }, [navigate, location.pathname]);
 
-  const logout = async () => {
-    await adminApi.logout();
-    navigate('/admin/login');
+  const handleLogout = async () => {
+    try {
+      await adminApi.logout();
+    } finally {
+      window.location.href = '/admin/login';
+    }
   };
 
-  if (loading) return <div className="p-8">Loading...</div>;
-  if (!isAuthed) return null;
+  if (loading) return <div className="h-screen flex items-center justify-center"><div className="spinner" /></div>;
+
+  if (error) return (
+    <div className="container mx-auto p-6">
+      <div className="text-red-600">{error}</div>
+      <div className="mt-4">
+        <Button onClick={() => { setError(null); setLoading(true); window.location.reload(); }}>Retry</Button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen grid grid-cols-1 md:grid-cols-[260px_1fr]">
@@ -46,7 +70,6 @@ const AdminLayout = () => {
           <NavLink to="/admin/system" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
             <Activity className="w-4 h-4" /> System
           </NavLink>
-          {/* Legacy pages (Assets/Themes/Templates) are intentionally de-emphasized in the sidebar to avoid duplication. They remain reachable directly if needed. */}
           <NavLink to="/admin/logs" className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md ${isActive ? 'bg-purple-500/20 text-purple-300' : 'hover:bg-white/5'}`}>
             <Shield className="w-4 h-4" /> Audit Logs
           </NavLink>
@@ -55,7 +78,7 @@ const AdminLayout = () => {
           </NavLink>
         </nav>
         <div className="mt-6">
-          <Button variant="outline" className="w-full" onClick={logout}>Logout</Button>
+          <Button variant="outline" className="w-full" onClick={() => setShowLogoutConfirm(true)}>Logout</Button>
         </div>
       </aside>
       <main className="p-4 md:p-8">
@@ -63,6 +86,18 @@ const AdminLayout = () => {
           <Outlet />
         </motion.div>
       </main>
+
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow">
+            <div className="mb-4">Are you sure you want to logout?</div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="secondary" onClick={() => setShowLogoutConfirm(false)}>Cancel</Button>
+              <Button onClick={handleLogout}>Logout</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

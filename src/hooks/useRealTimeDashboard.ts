@@ -11,12 +11,38 @@ export function useRealTimeDashboard(): { stats: DashboardSnapshot | null; error
 
   useEffect(() => {
     let mounted = true;
-    const onInit = (data: DashboardSnapshot) => { if (mounted) { setStats(data); setConnectedState('connected'); } };
-    const onUpdate = (data: DashboardSnapshot) => { if (mounted) setStats(data); };
+    let retryCount = 0;
+    let backoffTimer: any = null;
+    const onInit = (data: DashboardSnapshot) => { if (mounted) { setStats(data); setConnectedState('connected'); setError(null); } };
+    const onUpdate = (data: DashboardSnapshot) => { if (mounted) { setStats(data); setError(null); } };
     const onError = (err: unknown) => { if (mounted) { setError(err); setConnectedState('disconnected'); } };
 
-    const socket = adminApi.connectDashboardStream(onInit, onUpdate, onError);
-    socketRef.current = socket as Socket;
+    const connect = () => {
+      try {
+        setConnectedState('connecting');
+        const socket = adminApi.connectDashboardStream(onInit, onUpdate, onError);
+        socketRef.current = socket as Socket;
+        // clear any previous error/fallback state on successful connection
+        if (mounted) {
+          setError(null);
+          setConnectedState('connected');
+        }
+        // reset retry count on success
+        retryCount = 0;
+        return socket;
+      } catch (e) {
+        console.error('Real-time connect failed:', e);
+        setError(e);
+        setConnectedState('disconnected');
+        // schedule retry with exponential backoff
+        retryCount += 1;
+        const delay = Math.min(30000, Math.pow(2, retryCount) * 1000);
+        backoffTimer = setTimeout(() => { if (mounted) connect(); }, delay);
+        return null;
+      }
+    };
+
+    const socket = connect();
 
     // handle reconnection lifecycle events if socket supports them
     if (socket && typeof socket.on === 'function') {
@@ -30,6 +56,7 @@ export function useRealTimeDashboard(): { stats: DashboardSnapshot | null; error
     return () => {
       mounted = false;
       try { adminApi.disconnectDashboardStream(); } catch (e) { /* ignore */ }
+      if (backoffTimer) clearTimeout(backoffTimer);
       socketRef.current = null;
     };
   }, []);

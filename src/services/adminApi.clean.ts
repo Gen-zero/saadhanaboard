@@ -1,3 +1,4 @@
+import io from 'socket.io-client';
 const BASE_API = (import.meta.env.VITE_API_BASE_URL as string) || '/api';
 export const ADMIN_API_BASE = `${BASE_API}/admin`;
 const SOCKET_BASE = (import.meta.env.VITE_SOCKET_BASE_URL as string) ?? (typeof window !== 'undefined' ? window.location.origin : BASE_API);
@@ -214,9 +215,7 @@ export const adminApi = {
   // Real-time dashboard: socket connection management
   _socket: null as Socket | null,
   connectDashboardStream(onInit: (data: DashboardSnapshot) => void, onUpdate: (data: DashboardSnapshot) => void, onError?: (err: unknown) => void): Socket {
-    // lazy-load socket.io-client to avoid adding global import at top
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const io = require('socket.io-client');
+    // use top-level io import
     if (this._socket) {
       this._socket.disconnect();
       this._socket = null;
@@ -461,15 +460,13 @@ export const adminApi = {
 
   // BI socket stream
   connectBIStream(onKPIUpdate: (d:any)=>void, onExecutionStatus: (d:any)=>void, onInsight: (d:any)=>void, onError?: (err:unknown)=>void) {
-    // lazy require socket.io-client
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const io = require('socket.io-client');
+    // use top-level io import
     try {
       if (this._socket) {
         this._socket.disconnect();
         this._socket = null;
       }
-      const socket = io(SOCKET_BASE, { withCredentials: true, path: '/socket.io' });
+  const socket = io(SOCKET_BASE, { withCredentials: true, path: '/socket.io' });
       this._socket = socket as Socket;
       socket.on('connect', () => {
         try { socket.emit('bi:subscribe', { rooms: ['bi-kpis','bi-executions','bi-insights'] }); } catch (e) {}
@@ -478,7 +475,7 @@ export const adminApi = {
       socket.on('bi:execution-status', (payload: any) => { try { onExecutionStatus && onExecutionStatus(payload); } catch (e) { console.error(e); } });
       socket.on('bi:insight-generated', (payload: any) => { try { onInsight && onInsight(payload); } catch (e) { console.error(e); } });
       socket.on('error', (err: unknown) => { if (onError) onError(err); });
-      return socket;
+  return socket;
     } catch (e) {
       if (onError) onError(e);
       throw e;
@@ -524,46 +521,18 @@ export const adminApi = {
   connectSystemMetricsStream(onMetrics: (data: any) => void, onAlert: (data: any) => void, onError?: (err: unknown) => void) {
     // For Socket.IO approach
     try {
-      // lazy require socket.io-client
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const io = require('socket.io-client');
-      
       if (this._socket) {
         this._socket.disconnect();
         this._socket = null;
       }
-      
       const socket = io(SOCKET_BASE, { withCredentials: true, path: '/socket.io' });
       this._socket = socket as Socket;
-      
       socket.on('connect', () => {
-        try { 
-          socket.emit('system:subscribe', { rooms: ['system-metrics', 'system-alerts'] }); 
-        } catch (e) {
-          console.error('Failed to subscribe to system rooms', e);
-        }
+        try { socket.emit('system:subscribe', { rooms: ['system-metrics', 'system-alerts'] }); } catch (e) { console.error('Failed to subscribe to system rooms', e); }
       });
-      
-      socket.on('system:metrics', (payload: any) => { 
-        try { 
-          onMetrics && onMetrics(payload); 
-        } catch (e) { 
-          console.error(e); 
-        } 
-      });
-      
-      socket.on('system:alert', (payload: any) => { 
-        try { 
-          onAlert && onAlert(payload); 
-        } catch (e) { 
-          console.error(e); 
-        } 
-      });
-      
-      socket.on('error', (err: unknown) => { 
-        if (onError) onError(err); 
-      });
-      
+      socket.on('system:metrics', (payload: any) => { try { onMetrics && onMetrics(payload); } catch (e) { console.error(e); } });
+      socket.on('system:alert', (payload: any) => { try { onAlert && onAlert(payload); } catch (e) { console.error(e); } });
+      socket.on('error', (err: unknown) => { if (onError) onError(err); });
       return socket;
     } catch (e) {
       if (onError) onError(e);

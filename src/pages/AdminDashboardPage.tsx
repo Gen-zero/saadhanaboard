@@ -25,6 +25,7 @@ const AdminDashboardPage = () => {
     const FALLBACK_MS = 6000; // N seconds
     const timer = setTimeout(async () => {
       if (cancelled) return;
+      // If the socket is disconnected, or we have no stats yet, or an error occurred, attempt HTTP fallback
       if (!stats || error || connection === 'disconnected') {
         try {
           const r = await adminApi.stats();
@@ -59,6 +60,10 @@ const AdminDashboardPage = () => {
           // keep using socket state; show banner
           setUsingHttpFallback(true);
         }
+      } else {
+        // connection looks healthy — clear any HTTP fallback state
+        if (usingHttpFallback) setUsingHttpFallback(false);
+        if (httpStats) setHttpStats(null);
       }
     }, FALLBACK_MS);
 

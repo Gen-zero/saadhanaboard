@@ -24,6 +24,12 @@ const systemAlertService = require('./services/systemAlertService');
 // Load environment variables from backend/.env explicitly (avoid CWD issues)
 dotenv.config({ path: path.join(__dirname, '.env') });
 
+// Validate critical env vars early
+if (!process.env.JWT_SECRET) {
+  console.error('[FATAL] JWT_SECRET not set in backend/.env');
+  throw new Error('Missing JWT_SECRET');
+}
+
 // Warn if admin credentials are left as defaults to catch misconfiguration early
 const _adminUser = process.env.ADMIN_USERNAME || 'admin';
 const _adminPass = process.env.ADMIN_PASSWORD || 'password';
@@ -173,21 +179,23 @@ process.on('SIGINT', () => {
 try { app.use(require('compression')()); } catch (e) { /* best-effort if not installed */ }
 
 // Security headers (helmet) and CORS configuration for frontend origin
-try {
-  const helmet = require('helmet');
-  const connectSrc = ["'self'", process.env.CORS_ORIGIN || 'http://localhost:8080', 'http://localhost:5173'];
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        connectSrc,
+  try {
+    const helmet = require('helmet');
+    const rawOrigin = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || 'http://localhost:8080,http://localhost:5173';
+    const allowedOrigins = String(rawOrigin).split(',').map(s => s.trim()).filter(Boolean);
+    const connectSrc = ["'self'", ...allowedOrigins];
+    app.use(helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          connectSrc,
+        }
       }
-    }
-  }));
-} catch (e) { /* best-effort */ }
+    }));
+  } catch (e) { /* best-effort */ }
 
 // Build CORS origins list: support single origin or comma-separated list
-const rawOrigin = process.env.CORS_ORIGIN || process.env.CORS_ORIGINS || 'http://localhost:8080,http://localhost:5173';
+const rawOrigin = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || 'http://localhost:8080,http://localhost:5173';
 const allowedOrigins = Array.isArray(rawOrigin) ? rawOrigin : String(rawOrigin).split(',').map(s => s.trim()).filter(Boolean);
 const corsOptions = {
   origin: function(origin, callback) {
@@ -200,15 +208,21 @@ const corsOptions = {
   },
   credentials: true,
   optionsSuccessStatus: 200,
-  exposedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type', 'Authorization', 'Set-Cookie', 'X-Admin-Debug-Origin', 'X-Admin-Debug-CORS-Allow'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With', 'X-Requested-By'],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS']
 };
 
 app.use((req, res, next) => {
   // Simple debug logging for admin endpoints
   if (req.path && req.path.startsWith('/api/admin')) {
-    console.log('[ADMIN_REQ]', req.method, req.path, 'from', req.headers.origin || req.ip);
+    const origin = req.headers.origin || null;
+    console.log('[ADMIN_REQ]', req.method, req.path, 'from', origin || req.ip, 'headers=', JSON.stringify({ 'x-forwarded-for': req.headers['x-forwarded-for'] }));
+    // add debug headers for troubleshooting in dev
+    try {
+      res.setHeader('X-Admin-Debug-Origin', origin || 'none');
+      res.setHeader('X-Admin-Debug-CORS-Allow', allowedOrigins.join(','));
+    } catch (e) { /* ignore header set errors */ }
   }
   // Do not short-circuit OPTIONS here: let the `cors` middleware add the proper headers.
   next();

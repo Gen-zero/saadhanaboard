@@ -1,37 +1,214 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <title>Debug Admin Login</title>
-</head>
-<body>
-    <h1>Debug Admin Login</h1>
-    <button onclick="testLogin()">Test Login</button>
-    <div id="result"></div>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <title>Debug Admin Login — Diagnostics</title>
+        <style>
+            body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding: 18px; background:#f6f7fb }
+            h1 { margin: 0 0 8px 0 }
+            .grid { display: grid; grid-template-columns: 360px 1fr; gap: 12px; margin-top: 10px }
+            .card { border: 1px solid #ddd; padding: 12px; border-radius: 8px; background: #fff }
+            button { margin: 4px 6px 4px 0; padding: 8px 10px }
+            pre { background:#111; color:#eee; padding:10px; height: 420px; overflow:auto; border-radius:6px }
+            label { display:block; margin:6px 0 }
+            input[type=text], input[type=password] { width:100%; padding:6px }
+            .small { font-size: 12px; color:#666 }
+        </style>
+    </head>
+    <body>
+        <h1>Admin Login Debug / Diagnostics</h1>
+        <p class="small">This standalone page helps exercise admin login flows, inspect CORS, cookies, and test WebSocket connectivity. Open it directly in a browser.</p>
 
-    <script>
-        async function testLogin() {
-            const resultDiv = document.getElementById('result');
-            resultDiv.innerHTML = 'Testing...';
-            
-            try {
-                const response = await fetch('http://localhost:3004/api/admin/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify({
-                        username: 'KaliVaibhav',
-                        password: 'Subham@98'
-                    })
-                });
-                
-                const data = await response.json();
-                resultDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-            } catch (error) {
-                resultDiv.innerHTML = `<pre>Error: ${error.message}</pre>`;
+        <div class="grid">
+            <div class="card">
+                <h3>Environment / Configuration</h3>
+                <div id="env"></div>
+                <h3>Login Form</h3>
+                <form id="loginForm" onsubmit="return false;">
+                    <label>API Base URL
+                        <input id="apiBase" type="text" value="http://localhost:3004/api" />
+                    </label>
+                    <label>Socket URL
+                        <input id="socketUrl" type="text" value="http://localhost:3004" />
+                    </label>
+                    <label>Username
+                        <input id="username" type="text" value="admin" />
+                    </label>
+                    <label>Password
+                        <input id="password" type="password" value="password" />
+                    </label>
+                    <label><input id="useCredentials" type="checkbox" checked /> Include credentials (cookies)</label>
+                    <div>
+                        <button id="btnLogin">Login (normal)</button>
+                        <button id="btnLoginFail" type="button">Login (wrong password)</button>
+                        <button id="btnLoginBurst" type="button">Burst 5 wrong attempts</button>
+                        <button id="btnLogout" type="button">Logout</button>
+                    </div>
+                </form>
+
+                <h3>API Actions</h3>
+                <div>
+                    <button id="btnMe">GET /api/admin/me</button>
+                    <button id="btnCorsCheck">CORS Inspect (OPTIONS + GET)</button>
+                </div>
+
+                <h3>WebSocket</h3>
+                <div>
+                    <button id="btnWsConnect">Open WS</button>
+                    <button id="btnWsPing" disabled>Send ping</button>
+                    <button id="btnWsClose" disabled>Close WS</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Console / Request Log</h3>
+                <pre id="output">Ready. Use the controls on the left to run tests.
+</pre>
+                <h3>Quick Info</h3>
+                <div id="quick"></div>
+            </div>
+        </div>
+
+        <script>
+            const output = document.getElementById('output');
+            const envDiv = document.getElementById('env');
+            const quick = document.getElementById('quick');
+
+            function log(...args) {
+                const t = new Date().toISOString();
+                output.textContent += `[${t}] ` + args.map(a => (typeof a === 'string' ? a : JSON.stringify(a, null, 2))).join(' ') + '\n';
+                output.scrollTop = output.scrollHeight;
             }
-        }
-    </script>
-</body>
+
+            function showEnv() {
+                const info = {
+                    pageLocation: location.href,
+                    userAgent: navigator.userAgent,
+                    cookies: document.cookie || '(no cookies visible via document.cookie)',
+                    time: new Date().toString()
+                };
+                envDiv.innerHTML = Object.entries(info).map(([k,v]) => `<div><strong>${k}:</strong> <span class="small">${String(v)}</span></div>`).join('');
+                quick.innerHTML = `<div class="small">Last cookies: ${encodeURI(document.cookie || 'none')}</div>`;
+            }
+
+            showEnv();
+
+            async function fetchWithLog(url, opts = {}){
+                const { method='GET', headers={}, body, credentials } = opts;
+                log(`-> ${method} ${url}`);
+                log('  request headers:', headers);
+                if (body) log('  request body:', body);
+                try {
+                    const res = await fetch(url, { method, headers, body, credentials, mode: 'cors' });
+                    log(`<-- ${res.status} ${res.statusText}`);
+                    const text = await res.text();
+                    try { const j = JSON.parse(text); log('  response json:', j); } catch(e){ log('  response text:', text); }
+                    const hdrs = {};
+                    for (const pair of res.headers.entries()) hdrs[pair[0]] = pair[1];
+                    log('  response headers (client-readable):', hdrs);
+                    return { res, text };
+                } catch (err) {
+                    log('!! fetch error:', err.message || err);
+                    throw err;
+                }
+            }
+
+            document.getElementById('btnLogin').addEventListener('click', async (e) => {
+                e.preventDefault();
+                const api = document.getElementById('apiBase').value.replace(/\/$/, '');
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const creds = document.getElementById('useCredentials').checked ? 'include' : 'omit';
+                await fetchWithLog(api + '/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password }),
+                    credentials: creds
+                }).catch(()=>{});
+                showEnv();
+            });
+
+            document.getElementById('btnLoginFail').addEventListener('click', async (e) => {
+                e.preventDefault();
+                const api = document.getElementById('apiBase').value.replace(/\/$/, '');
+                const username = document.getElementById('username').value;
+                const password = 'wrongpassword';
+                const creds = document.getElementById('useCredentials').checked ? 'include' : 'omit';
+                await fetchWithLog(api + '/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, password }), credentials: creds }).catch(()=>{});
+                showEnv();
+            });
+
+            document.getElementById('btnLoginBurst').addEventListener('click', async (e) => {
+                e.preventDefault();
+                const api = document.getElementById('apiBase').value.replace(/\/$/, '');
+                const username = document.getElementById('username').value;
+                const creds = document.getElementById('useCredentials').checked ? 'include' : 'omit';
+                for (let i=0;i<5;i++){
+                    log(`--- burst attempt ${i+1} ---`);
+                    try { await fetchWithLog(api + '/admin/login', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ username, password: 'bad' }), credentials: creds }); } catch(e){}
+                }
+                showEnv();
+            });
+
+            document.getElementById('btnLogout').addEventListener('click', async () => {
+                const api = document.getElementById('apiBase').value.replace(/\/$/, '');
+                await fetchWithLog(api + '/auth/logout', { method: 'POST', credentials: document.getElementById('useCredentials').checked ? 'include' : 'omit' }).catch(()=>{});
+                await fetchWithLog(api + '/admin/logout', { method: 'POST', credentials: document.getElementById('useCredentials').checked ? 'include' : 'omit' }).catch(()=>{});
+                showEnv();
+            });
+
+            document.getElementById('btnMe').addEventListener('click', async () => {
+                const api = document.getElementById('apiBase').value.replace(/\/$/, '');
+                await fetchWithLog(api + '/admin/me', { method: 'GET', credentials: document.getElementById('useCredentials').checked ? 'include' : 'omit' }).catch(()=>{});
+                showEnv();
+            });
+
+            document.getElementById('btnCorsCheck').addEventListener('click', async () => {
+                const api = document.getElementById('apiBase').value.replace(/\/$/, '');
+                const url = api + '/admin/me';
+                log('-> OPTIONS ' + url);
+                try {
+                    const optRes = await fetch(url, { method: 'OPTIONS', credentials: document.getElementById('useCredentials').checked ? 'include' : 'omit' });
+                    log('<-- OPTIONS', optRes.status, optRes.statusText);
+                    const h = {};
+                    for (const [k,v] of optRes.headers.entries()) h[k]=v;
+                    log('  options headers:', h);
+                } catch (e){ log('OPTIONS failed:', e.message) }
+                await fetchWithLog(url, { method: 'GET', credentials: document.getElementById('useCredentials').checked ? 'include' : 'omit' }).catch(()=>{});
+                showEnv();
+            });
+
+            let ws = null;
+            const btnWsConnect = document.getElementById('btnWsConnect');
+            const btnWsPing = document.getElementById('btnWsPing');
+            const btnWsClose = document.getElementById('btnWsClose');
+
+            btnWsConnect.addEventListener('click', () => {
+                if (ws) { log('WS already open'); return; }
+                const raw = document.getElementById('socketUrl').value;
+                const url = raw.replace(/\/$/, '');
+                try {
+                    log('Opening WS ->', url);
+                    ws = new WebSocket(url.replace(/^http/, 'ws'));
+                    ws.addEventListener('open', () => { log('WS open'); btnWsPing.disabled=false; btnWsClose.disabled=false; });
+                    ws.addEventListener('message', (ev) => { log('WS msg:', ev.data); });
+                    ws.addEventListener('close', (ev) => { log('WS closed', ev.code, ev.reason); ws=null; btnWsPing.disabled=true; btnWsClose.disabled=true; });
+                    ws.addEventListener('error', (ev) => { log('WS error', ev); });
+                } catch (e) { log('WS open error', e.message) }
+            });
+
+            btnWsPing.addEventListener('click', () => {
+                if (!ws) return log('WS not open');
+                const msg = JSON.stringify({ type:'ping', time: Date.now() });
+                log('WS send:', msg);
+                ws.send(msg);
+            });
+
+            btnWsClose.addEventListener('click', () => { if (!ws) return; ws.close(); });
+
+            setInterval(showEnv, 7500);
+        </script>
+    </body>
 </html>
+            </html>

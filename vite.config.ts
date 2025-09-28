@@ -16,7 +16,29 @@ export default defineConfig({
         target: 'http://localhost:3004',
         changeOrigin: true,
         secure: false,
+        ws: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api'),
+        configure: (proxy, options) => {
+          if (process.env.VITE_DEV_MODE === 'true') {
+            proxy.on('proxyReq', (proxyReq, req, res) => {
+              console.log('[proxy] proxyReq to', proxyReq.path);
+            });
+          }
+        },
+        headers: {
+          'X-Forwarded-For': '127.0.0.1',
+          'X-Forwarded-Proto': 'http',
+          'X-Real-IP': '127.0.0.1'
+        },
+        timeout: 120000
       },
+      '/socket.io': {
+        target: 'http://localhost:3004',
+        ws: true,
+        changeOrigin: true,
+        secure: false,
+        timeout: 120000
+      }
     },
   },
   plugins: [

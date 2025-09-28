@@ -4,7 +4,10 @@ const db = require('../config/db');
 const logAnalytics = require('../services/logAnalyticsService');
 const alertService = require('../services/alertService');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_change_me';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error('Missing required environment variable JWT_SECRET for adminAuth middleware');
+}
 const ADMIN_COOKIE = 'admin_token';
 
 function parseCookie(header) {
@@ -77,15 +80,27 @@ async function logAdminAction(userId, action, targetType = null, targetId = null
 const adminAuthenticate = (req, res, next) => {
   try {
     const cookies = req.cookies || parseCookie(req.headers.cookie || '');
-    const token = cookies[ADMIN_COOKIE];
+    // Authorization header has priority
+    let token = null;
+    const authHeader = req.headers && (req.headers.authorization || req.headers.Authorization);
+    if (authHeader && typeof authHeader === 'string' && authHeader.toLowerCase().startsWith('bearer ')) {
+      token = authHeader.split(' ')[1];
+    } else {
+      token = cookies[ADMIN_COOKIE];
+    }
     if (!token) {
       return res.status(401).json({ message: 'Authentication required' });
     }
     const decoded = jwt.verify(token, JWT_SECRET);
-    if (!decoded || decoded.role !== 'admin') {
+    // allow any role that marks admin intent, or explicit admin flag
+    const allowedAdminRoles = ['admin', 'super_admin', 'moderator'];
+    if (!decoded || !decoded.admin || (!decoded.role && !decoded.userId)) {
       return res.status(403).json({ message: 'Access denied' });
     }
-    req.user = { id: decoded.userId || 0, role: decoded.role, username: decoded.username };
+    if (decoded.role && !allowedAdminRoles.includes(decoded.role) && !decoded.admin) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+    req.user = { id: decoded.userId || 0, role: decoded.role || 'admin', username: decoded.username || null };
     // Attach both the raw logger and a request-bound secure logger that auto-injects context
     req.logAdminAction = logAdminAction;
     req.secureLog = (action, targetType = null, targetId = null, details = null, opts = {}) => {
@@ -115,7 +130,7 @@ const adminAuthenticate = (req, res, next) => {
     };
     
     // Refresh inactivity window by re-issuing cookie with new expiry
-    const refreshed = jwt.sign({ username: decoded.username, role: 'admin', userId: decoded.userId || 0 }, JWT_SECRET, { expiresIn: '1h' });
+    const refreshed = jwt.sign({ userId: req.user.id, username: req.user.username, role: req.user.role, admin: true }, JWT_SECRET, { expiresIn: '1h' });
     if (typeof res.cookie === 'function') {
       setAdminCookie(res, refreshed);
     }

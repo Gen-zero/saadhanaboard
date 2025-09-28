@@ -18,10 +18,13 @@ async function adminRequest<T>(path: string, init: RequestInit = {}, asText = fa
   });
 
   if (!res.ok) {
-    // Try to read JSON error, fall back to text
+    // Try to read JSON error, fall back to text. Attach status for callers.
     const data = await res.json().catch(() => null);
     const text = data ? (data.message || data.error || JSON.stringify(data)) : await res.text().catch(() => `HTTP ${res.status}`);
-    throw new Error(text || `HTTP ${res.status}`);
+    const err: any = new Error(text || `HTTP ${res.status}`);
+    err.status = res.status;
+    err.body = data || text;
+    throw err;
   }
 
   if (asText) {
@@ -44,8 +47,36 @@ async function adminRequest<T>(path: string, init: RequestInit = {}, asText = fa
 import type { DashboardSnapshot, ProgressStats, HealthStats } from '@/types/admin-dashboard';
 import type { CommunityPost, CommunityComment, CommunityReport, CommunityEvent, MentorshipPair, SpiritualMilestone, ActivityStreamEntry, Paginated, GetActivityParams } from '@/types/community';
 import type { Socket } from 'socket.io-client';
+import io from 'socket.io-client';
 
 export const adminApi = {
+  // Helper: detect auth errors by status
+  isAuthError(err: any) {
+    return err && (err.status === 401 || err.status === 403 || (typeof err.message === 'string' && /unauthori|unauth/i.test(err.message)));
+  },
+  // Token refresh stub: backend must expose /refresh for rotating cookies; this is a best-effort call
+  async refreshToken() {
+    try {
+      return await adminRequest<{ ok: boolean }>(`/refresh`, { method: 'POST' });
+    } catch (e) {
+      // swallow to allow callers to handle a failed refresh
+      return null;
+    }
+  },
+  // Ensure authenticated: try once, attempt a refresh if auth error, then retry original call via `fn`
+  async ensureAuthenticated<T>(fn: () => Promise<T>) {
+    try {
+      return await fn();
+    } catch (e: any) {
+      if (this.isAuthError(e)) {
+        const refreshed = await this.refreshToken();
+        if (refreshed) {
+          return await fn();
+        }
+      }
+      throw e;
+    }
+  },
   async login(username: string, password: string) {
     return adminRequest<{ message: string }>('/login', {
       method: 'POST',
@@ -214,9 +245,6 @@ export const adminApi = {
   // Real-time dashboard: socket connection management
   _socket: null as Socket | null,
   connectDashboardStream(onInit: (data: DashboardSnapshot) => void, onUpdate: (data: DashboardSnapshot) => void, onError?: (err: unknown) => void): Socket {
-    // lazy-load socket.io-client to avoid adding global import at top
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const io = require('socket.io-client');
     if (this._socket) {
       this._socket.disconnect();
       this._socket = null;
@@ -224,7 +252,7 @@ export const adminApi = {
     // connect, cookies are sent automatically by the browser
     const base = SOCKET_BASE;
     const socket = io(base, { withCredentials: true, path: '/socket.io' });
-  this._socket = socket as Socket;
+    this._socket = socket as Socket;
     socket.on('connect', () => {
       // connected
     });
@@ -461,9 +489,7 @@ export const adminApi = {
 
   // BI socket stream
   connectBIStream(onKPIUpdate: (d:any)=>void, onExecutionStatus: (d:any)=>void, onInsight: (d:any)=>void, onError?: (err:unknown)=>void) {
-    // lazy require socket.io-client
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const io = require('socket.io-client');
+    // use the ES-imported socket.io client (imported at top of this module)
     try {
       if (this._socket) {
         this._socket.disconnect();
@@ -524,10 +550,7 @@ export const adminApi = {
   connectSystemMetricsStream(onMetrics: (data: any) => void, onAlert: (data: any) => void, onError?: (err: unknown) => void) {
     // For Socket.IO approach
     try {
-      // lazy require socket.io-client
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const io = require('socket.io-client');
-      
+      // use the ES-imported socket.io client (imported at top of this module)
       if (this._socket) {
         this._socket.disconnect();
         this._socket = null;

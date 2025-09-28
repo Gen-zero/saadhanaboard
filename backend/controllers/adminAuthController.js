@@ -23,19 +23,38 @@ const login = async (req, res) => {
     const { token, admin } = await adminAuthService.login({ usernameOrEmail, password });
     // set cookie for legacy admin cookie-based auth
     try { setAdminCookie(res, token); } catch (e) { /* best-effort */ }
-    // respond legacy-compatible
+    // respond with token and admin info
     console.log('[ADMIN LOGIN] success:', { id: admin.id, username: admin.username });
-    return res.json({ message: 'Login successful', admin: { id: admin.id, username: admin.username, email: admin.email, role: admin.role } });
+    return res.json({ message: 'Login successful', token, admin: { id: admin.id, username: admin.username, email: admin.email, role: admin.role } });
   } catch (err) {
     console.warn('[ADMIN LOGIN] failure:', err && err.message ? err.message : err);
     if (['invalid_credentials', 'account_inactive', 'account_locked'].includes(err.message)) {
+      // if account_locked include details about remaining time if available
+      if (err.message === 'account_locked' && err.details) {
+        return res.status(401).json({ error: err.message, details: err.details });
+      }
       return res.status(401).json({ error: err.message });
     }
-    res.status(500).json({ error: 'server_error', details: err.message });
+    res.status(500).json({ error: 'server_error' });
+  }
+};
+
+// authenticated route to check account status for a username/email
+const accountStatus = async (req, res) => {
+  try {
+    const identifier = req.query.username || req.query.email || (req.body && req.body.username) || null;
+    if (!identifier) return res.status(400).json({ error: 'missing_identifier' });
+    const info = await adminAuthService.getAccountStatus(identifier);
+    if (!info) return res.status(404).json({ error: 'not_found' });
+    return res.json({ account: info });
+  } catch (e) {
+    console.error('accountStatus error:', e);
+    return res.status(500).json({ error: 'server_error' });
   }
 };
 
 module.exports = {
   register,
   login,
+  accountStatus,
 };
