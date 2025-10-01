@@ -12,9 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { Palette } from 'lucide-react';
 import { SettingsType } from './SettingsTypes';
-
-// Import the Skull and Bone GIF for Mahakali theme
-import SkullBoneGif from '@/../icons/Skull and Bone Turnaround.gif';
+import { listThemes, themeUtils } from '@/themes';
 
 interface AppearanceSettingsProps {
   settings: SettingsType;
@@ -54,96 +52,27 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
               onValueChange={(value) => updateSettings(['appearance', 'colorScheme'], value)}
               className="grid grid-cols-2 sm:grid-cols-5 gap-2"
             >
-              <div>
-                <RadioGroupItem value="default" id="scheme-default" className="sr-only" />
-                <Label
-                  htmlFor="scheme-default"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-primary to-purple-600"></div>
-                  <span className="mt-2">Default</span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="earth" id="scheme-earth" className="sr-only" />
-                <Label
-                  htmlFor="scheme-earth"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-amber-700 to-green-700"></div>
-                  <span className="mt-2">Krishna</span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="water" id="scheme-water" className="sr-only" />
-                <Label
-                  htmlFor="scheme-water"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-blue-600 to-teal-500"></div>
-                  <span className="mt-2">Vishnu</span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="fire" id="scheme-fire" className="sr-only" />
-                <Label
-                  htmlFor="scheme-fire"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-red-600 to-yellow-500"></div>
-                  <span className="mt-2">Maa Durga</span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="shiva" id="scheme-shiva" className="sr-only" />
-                <Label
-                  htmlFor="scheme-shiva"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-blue-900 to-indigo-900"></div>
-                  <span className="mt-2">Shiva</span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="bhairava" id="scheme-bhairava" className="sr-only" />
-                <Label
-                  htmlFor="scheme-bhairava"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-red-900 to-red-700"></div>
-                  <span className="mt-2">Bhairava</span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="serenity" id="scheme-serenity" className="sr-only" />
-                <Label
-                  htmlFor="scheme-serenity"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-blue-300 to-teal-300"></div>
-                  <span className="mt-2">Serenity</span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="ganesha" id="scheme-ganesha" className="sr-only" />
-                <Label
-                  htmlFor="scheme-ganesha"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <div className="rounded-full w-8 h-8 bg-gradient-to-r from-purple-600 to-amber-500"></div>
-                  <span className="mt-2">Ganesha</span>
-                </Label>
-              </div>
-              <div>
-                <RadioGroupItem value="mahakali" id="scheme-mahakali" className="sr-only" />
-                <Label
-                  htmlFor="scheme-mahakali"
-                  className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                >
-                  <img src={SkullBoneGif} alt="Mahakali" className="rounded-full w-14 h-14" />
-                  <span className="mt-2">Mahakali</span>
-                </Label>
-              </div>
+              {[
+                { metadata: { id: 'default', name: 'Default', description: 'Default' } },
+                ...listThemes({ category: undefined }).filter(t => t.metadata.category === 'color-scheme' || t.metadata.category === 'hybrid' || t.metadata.isLandingPage)
+              ].map((theme) => {
+                const id = (theme as any).metadata.id;
+                const label = (theme as any).metadata.name || id;
+                return (
+                  <div key={id}>
+                    <RadioGroupItem value={id} id={`scheme-${id}`} className="sr-only" />
+                    <Label
+                      htmlFor={`scheme-${id}`}
+                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                    >
+                      <div className="rounded-full w-8 h-8">
+                        {themeUtils.renderThemeIcon(theme as any, 'w-8 h-8 rounded-full')}
+                      </div>
+                      <span className="mt-2">{label}</span>
+                    </Label>
+                  </div>
+                );
+              })}
             </RadioGroup>
           </div>
 

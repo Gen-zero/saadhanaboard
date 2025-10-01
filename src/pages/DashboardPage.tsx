@@ -17,11 +17,15 @@ import {
   Coins,
   ShoppingCart
 } from "lucide-react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProfileData } from "@/hooks/useProfileData";
 import { useSadhanaData } from "@/hooks/useSadhanaData";
 import { useSaadhanas } from "@/hooks/useSaadhanas";
 import { useUserProgression } from "@/hooks/useUserProgression";
+import { useAuth } from '@/lib/auth-context';
+import { useUserAnalytics } from '@/hooks/useUserAnalytics';
+import PracticeTrendsChart from '@/components/analytics/PracticeTrendsChart';
 import DailyQuest from "@/components/DailyQuest";
 import MoodCheckin from "@/components/MoodCheckin";
 
@@ -31,6 +35,14 @@ const DashboardPage = () => {
   const { sadhanaState, sadhanaData, daysCompleted, daysRemaining, progress } = useSadhanaData();
   const { groupedSaadhanas } = useSaadhanas();
   const { progression } = useUserProgression();
+  const { user } = useAuth();
+  const { practiceTrends, fetchPracticeTrends, loading: analyticsLoading, error: analyticsError } = useUserAnalytics(user?.id || '');
+
+  // Fetch a short-range practice trend for the dashboard preview (last 14 days)
+  useEffect(() => {
+    if (!user?.id) return;
+    fetchPracticeTrends('14d').catch(() => {});
+  }, [user?.id, fetchPracticeTrends]);
 
   // Get today's date in a readable format
   const today = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -480,6 +492,22 @@ const DashboardPage = () => {
             </Card>
           </div>
         </div>
+
+        {/* Analytics Preview Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Your Recent Practice (Preview)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {analyticsLoading ? (
+              <div className="text-center text-sm text-muted-foreground py-6">Loading analytics...</div>
+            ) : analyticsError ? (
+              <div className="text-center text-sm text-destructive py-6">Unable to load analytics</div>
+            ) : (
+              <PracticeTrendsChart data={practiceTrends?.trends?.slice(-14) || []} />
+            )}
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

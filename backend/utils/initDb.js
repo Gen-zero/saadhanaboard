@@ -109,6 +109,91 @@ CREATE TABLE IF NOT EXISTS waitlist (
 
 CREATE INDEX IF NOT EXISTS idx_waitlist_email ON waitlist(email);
 CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist(status);
+
+-- CMS tables (themes, assets, templates, versioning, audit)
+CREATE TABLE IF NOT EXISTS cms_assets (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  type TEXT,
+  file_path TEXT,
+  file_size INTEGER,
+  mime_type TEXT,
+  metadata JSONB DEFAULT '{}'::jsonb,
+  tags TEXT[] DEFAULT '{}',
+  category_id INTEGER,
+  status TEXT DEFAULT 'draft',
+  created_by UUID,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS cms_asset_variants (
+  id SERIAL PRIMARY KEY,
+  asset_id INTEGER REFERENCES cms_assets(id) ON DELETE CASCADE,
+  variant_type TEXT,
+  file_path TEXT,
+  file_size INTEGER,
+  metadata JSONB DEFAULT '{}'::jsonb
+);
+
+CREATE TABLE IF NOT EXISTS cms_themes (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  deity TEXT,
+  description TEXT,
+  color_palette JSONB DEFAULT '{}'::jsonb,
+  css_variables JSONB DEFAULT '{}'::jsonb,
+  preview_image TEXT,
+  status TEXT DEFAULT 'draft',
+  version INTEGER DEFAULT 1,
+  created_by UUID,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  registry_id VARCHAR -- registry theme id (string) to link to frontend registry
+);
+
+CREATE TABLE IF NOT EXISTS cms_templates (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  type TEXT,
+  difficulty_level TEXT,
+  duration_minutes INTEGER,
+  instructions JSONB DEFAULT '[]'::jsonb,
+  components JSONB DEFAULT '[]'::jsonb,
+  tags TEXT[] DEFAULT '{}',
+  category_id INTEGER,
+  status TEXT DEFAULT 'draft',
+  version INTEGER DEFAULT 1,
+  created_by UUID,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS cms_version_history (
+  id SERIAL PRIMARY KEY,
+  content_type TEXT NOT NULL,
+  content_id INTEGER NOT NULL,
+  version INTEGER NOT NULL,
+  payload JSONB DEFAULT '{}'::jsonb,
+  created_by UUID,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS cms_audit_trail (
+  id SERIAL PRIMARY KEY,
+  admin_id UUID,
+  action TEXT,
+  content_type TEXT,
+  content_id INTEGER,
+  meta JSONB DEFAULT '{}'::jsonb,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_cms_themes_registry_id ON cms_themes(registry_id);
+CREATE INDEX IF NOT EXISTS idx_cms_assets_created_by ON cms_assets(created_by);
+
 `;
 
 async function initDatabase() {

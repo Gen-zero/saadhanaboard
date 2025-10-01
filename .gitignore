@@ -31,3 +31,43 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# --------------------------------------------------------------------
+# Theme assets and icon workflow
+#
+# Theme icon files are maintained in the top-level `icons/` directory
+# and copied into each theme's `src/themes/<theme>/assets/` folder
+# by the build/dev script (scripts/copy-theme-icons.cjs).
+#
+# Important:
+# - Both the source icons (icons/) and the copied assets (src/themes/*/assets/)
+#   SHOULD be tracked in git so contributors and CI do not need to re-run
+#   the copy step after cloning.
+# - A small number of intentionally duplicated/intermediate files may be
+#   ignored above (see Mahakali entries). Keep those specific ignores if
+#   they are meant to suppress problematic duplicates.
+# --------------------------------------------------------------------
+
+# Ensure the source icons directory is tracked (except intentionally ignored files)
+!icons/
+!icons/*.png
+!icons/*.gif
+!icons/*.jpg
+!icons/*.jpeg
+!icons/*.webp
+
+# Ignore temporary/cache files inside theme directories (do not commit build caches)
+src/themes/**/.cache/
+src/themes/**/.cache/**
+src/themes/**/*.tmp
+src/themes/**/.tmp
+
+# Ensure theme asset README files and image/icon files are tracked so copied icons remain in the repo
+!src/themes/*/assets/README.md
+!src/themes/*/assets/*.png
+!src/themes/*/assets/*.gif
+!src/themes/*/assets/*.jpg
+!src/themes/*/assets/*.jpeg
+!src/themes/*/assets/*.webp
+
+# End of theme assets rules

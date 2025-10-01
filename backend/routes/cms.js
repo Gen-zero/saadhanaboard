@@ -76,14 +76,17 @@ router.get('/assets/:id', adminAuthenticate, async (req, res) => {
   }
 });
 
-// Basic theme CRUD
+// Basic theme creation - allow creating CMS theme records but validate referenced registry id when supplied
 router.post('/themes', adminAuthenticate, async (req, res) => {
   try {
     const theme = req.body;
+    // Require registry_id and validate via service
     const created = await cmsService.createTheme(theme);
     res.json({ theme: created });
   } catch (e) {
     console.error('create theme error', e);
+    if (/Missing registry_id/.test(String(e.message || ''))) return res.status(400).json({ message: 'Missing registry_id' });
+    if (/Unknown theme id/.test(String(e.message || ''))) return res.status(400).json({ message: 'Unknown theme id' });
     res.status(500).json({ message: 'Failed to create theme' });
   }
 });

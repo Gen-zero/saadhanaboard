@@ -71,7 +71,9 @@ export const useAuth = () => {
       return { error: null };
     } catch (error: any) {
       console.error('Signup error:', error);
-      return { error };
+      const message = error?.message || 'Registration failed';
+      toast({ title: 'Registration failed', description: message, variant: 'destructive' });
+      return { error: message };
     } finally {
       setIsLoading(false);
     }
@@ -92,7 +94,9 @@ export const useAuth = () => {
       return { error: null };
     } catch (error: any) {
       console.error('Signin error:', error);
-      return { error };
+      const message = error?.message || 'Sign in failed';
+      toast({ title: 'Sign in failed', description: message, variant: 'destructive' });
+      return { error: message };
     } finally {
       setIsLoading(false);
     }

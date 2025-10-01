@@ -5,17 +5,14 @@ import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from 'react-i18next';
 import EnhancedDeityIcon from './EnhancedDeityIcon';
 import { Leaf, Zap, User, ChevronRight, LogOut, LogIn } from 'lucide-react';
-import { 
-  BookHeart, 
-  CheckSquare, 
-  ShoppingCart, 
+import {
+  BookHeart,
+  CheckSquare,
+  ShoppingCart,
   Settings,
   Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-
-// Import the Skull and Bone GIF for Mahakali theme
-import SkullBoneGif from '@/../icons/Skull and Bone Turnaround.gif';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -30,39 +27,34 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { settings, isLoading } = useSettings();
   const { t } = useTranslation();
 
-  // Hindu mantras for ambient display (local array instead of import)
+  // Mantras to show in the small top marquee
   const hinduMantras = [
-    "ॐ गं गणपतये नमः",
-    "ॐ नमः शिवाय",
-    "ॐ नमो भगवते वासुदेवाय",
-    "ॐ श्रीं महालक्ष्म्यै नमः",
-    "ॐ ह्रीं क्लीं चामुण्डायै विच्चे",
-    "ॐ तारे तुत्तारे तुरे स्वाहा",
-    "ॐ सर्वे भवन्तु सुखिनः",
-    "ॐ भूर्भुवः स्वः",
-    "ॐ तत्सत्वितुर्वरेण्यं",
-    "ॐ शांतिः शांतिः शांतिः",
-    "ॐ नमो नारायणाय",
-    "ॐ नमः शिवाय शंभवे च विष्णवे देवाय च ध्रुवाय च",
-    "ॐ ह्रीं दुर्गायै नमः",
-    "ॐ ऐं सरस्वत्यै नमः",
-    "ॐ ह्रीं श्रीं क्लीं त्रिभुवन महालक्ष्म्यै अस्मि",
-    "ॐ गुरुर्ब्रह्मा गुरुर्विष्णुः गुरुर्देवो महेश्वरः",
-    "ॐ सह नाववतु सह नौ भुनक्तु",
-    "ॐ पूर्णमदः पूर्णमिदं पूर्णात्पूर्णमुदच्यते",
-    "ॐ असतो मा सद्गमय तमसो मा ज्योतिर्गमय",
-    "ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम्",
-    "ॐ वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ",
-    "ॐ मणिपद्मे हूं",
-    "ॐ अहं ब्रह्मास्मि",
-    "ॐ तत्त्वमसि",
-    "ॐ सर्वं खल्विदं ब्रह्म",
-    "ॐ ईशावास्यमिदं सर्वम्",
-    "ॐ यतो वा इमानि भूतानि जायन्ते",
-    "ॐ हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे",
-    "ॐ राम राम राम राम राम राम रामेति",
-    "ॐ जय गणेश जय गणेश जय गणेश देवा",
-    "ॐ भद्रं कर्णेभिः शृणुयाम देवाः"
+    'ॐ तारे तुत्तारे तुरे स्वाहा',
+    'ॐ सर्वे भवन्तु सुखिनः',
+    'ॐ भूर्भुवः स्वः',
+    'ॐ तत्सत्वितुर्वरेण्यं',
+    'ॐ शांतिः शांतिः शांतिः',
+    'ॐ नमो नारायणाय',
+    'ॐ नमः शिवाय शंभवे च विष्णवे देवाय च ध्रुवाय च',
+    'ॐ ह्रीं दुर्गायै नमः',
+    'ॐ ऐं सरस्वत्यै नमः',
+    'ॐ ह्रीं श्रीं क्लीं त्रिभुवन महालक्ष्म्यै अस्मि',
+    'ॐ गुरुर्ब्रह्मा गुरुर्विष्णुः गुरुर्देवो महेश्वरः',
+    'ॐ सह नाववतु सह नौ भुनक्तु',
+    'ॐ पूर्णमदः पूर्णमिदं पूर्णात्पूर्णमुदच्यते',
+    'ॐ असतो मा सद्गमय तमसो मा ज्योतिर्गमय',
+    'ॐ त्र्यम्बकं यजामहे सुगन्धिं पुष्टिवर्धनम्',
+    'ॐ वक्रतुण्ड महाकाय सूर्यकोटि समप्रभ',
+    'ॐ मणिपद्मे हूं',
+    'ॐ अहं ब्रह्मास्मि',
+    'ॐ तत्त्वमसि',
+    'ॐ सर्वं खल्विदं ब्रह्म',
+    'ॐ ईशावास्यमिदं सर्वम्',
+    'ॐ यतो वा इमानि भूतानि जायन्ते',
+    'ॐ हरे कृष्ण हरे कृष्ण कृष्ण कृष्ण हरे हरे',
+    'ॐ राम राम राम राम राम राम रामेति',
+    'ॐ जय गणेश जय गणेश जय गणेश देवा',
+    'ॐ भद्रं कर्णेभिः शृणुयाम देवाः'
   ];
 
   // Cycle through mantras
@@ -72,12 +64,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }, 10000); // Change mantra every 10 seconds
 
     return () => clearInterval(interval);
-  }, []);
-
-  // Play ambient sound on mount
-  useEffect(() => {
-    // Play ambient sound when component mounts
-    // Note: This might be blocked by browser autoplay policies
   }, []);
 
   // Don't render anything if settings are still loading
@@ -91,42 +77,43 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   // Map themes to deity icons and names
   const themeData = {
-    default: { 
+    default: {
       icon: <Zap className="h-16 w-16 text-purple-400" />,
-      name: "Cosmic Energy",
-      element: "Ether"
+      name: 'Cosmic Energy',
+      element: 'Ether'
     },
-    earth: { 
+    earth: {
       icon: <EnhancedDeityIcon src="/icons/Bhagwan_Krishna.png" alt="Krishna" className="bg-transparent" size="xl" />,
-      name: "Lord Krishna",
-      element: "Earth"
+      name: 'Lord Krishna',
+      element: 'Earth'
     },
-    water: { 
+    water: {
       icon: <EnhancedDeityIcon src="/icons/Bhagwan_Vishnu.png" alt="Vishnu" className="bg-transparent" size="xl" />,
-      name: "Lord Vishnu",
-      element: "Water"
+      name: 'Lord Vishnu',
+      element: 'Water'
     },
-    fire: { 
+    fire: {
       icon: <EnhancedDeityIcon src="/icons/Maa_Durga_icon.png" alt="Durga" className="bg-transparent" size="xl" />,
-      name: "Maa Durga",
-      element: "Fire"
+      name: 'Maa Durga',
+      element: 'Fire'
     },
-    shiva: { 
+    shiva: {
       icon: <EnhancedDeityIcon src="/icons/Bhagwan_Shiva_icon.png" alt="Shiva" className="bg-transparent" size="xl" />,
-      name: "Lord Shiva",
-      element: "Air"
+      name: 'Lord Shiva',
+      element: 'Air'
     },
-    bhairava: { 
+    bhairava: {
       icon: <EnhancedDeityIcon src="/icons/Bhairava.png" alt="Bhairava" className="bg-transparent" size="xl" />,
-      name: "Lord Bhairava",
-      element: "Fire"
+      name: 'Lord Bhairava',
+      element: 'Fire'
     },
     mahakali: {
-      icon: <img src={SkullBoneGif} alt="Mahakali" className="h-28 w-28" />,
-      name: "Maa Mahakali",
-      element: "Fire"
+      // Use a graceful fallback icon for Mahakali to avoid broken imports
+      icon: <Zap className="h-16 w-16 text-red-400" />,
+      name: 'Maa Mahakali',
+      element: 'Fire'
     }
-  };
+  } as const;
 
   // Updated navigation items - removed Dashboard and using translations
   const navItems = [
@@ -218,7 +205,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Fixed sidebar - always visible and fixed in place */}
       <div
         className={`fixed inset-y-0 left-0 z-50 h-screen sidebar-seamless border-r border-purple-500/10`}
-        style={{ width: '256px' }}
+        style={{ width: '360px' }}
       >
         <div className="h-full flex flex-col relative">
           {/* Ambient mantra display */}
@@ -228,22 +215,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 border-b border-purple-500/10 pt-10">
+          <div className="flex items-center justify-between p-6 border-b border-purple-500/10 pt-12 sidebar-header-wide">
             <div className="flex items-center gap-3">
               <div className="relative group">
-                <img
-                  src="/lovable-uploads/sadhanaboard_logo.png"
-                  alt="Saadhana Board Logo"
-                  className="h-16 w-16 cursor-pointer transition-all duration-500 hover:scale-110 border-2 border-purple-500/30 rounded-full shadow-lg shadow-purple-500/20 group-hover:shadow-xl group-hover:shadow-purple-500/40"
-                  onClick={() => {
-                    navigate('/');
-                  }}
-                />
+                <div className="h-20 w-20 rounded-full overflow-hidden flex items-center justify-center bg-transparent logo-wrapper">
+                  <img
+                    src="/lovable-uploads/sadhanaboard_logo.png"
+                    alt="Saadhana Board Logo"
+                    className="h-full w-full object-contain cursor-pointer transition-all duration-500 hover:scale-105 logo-enhanced"
+                    onClick={() => {
+                      navigate('/');
+                    }}
+                  />
+                </div>
                 {/* Glow effect on hover */}
-                <div className="absolute inset-0 rounded-full bg-purple-500/20 blur-xl scale-125 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10"></div>
+                <div className="absolute inset-0 rounded-full bg-purple-500/20 blur-2xl scale-125 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10 logo-glow-effect"></div>
               </div>
               <h1 
-                className="text-2xl font-bold text-sidebar-foreground cursor-pointer transition-all duration-300 hover:text-purple-300 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400"
+                className="text-3xl font-bold cursor-pointer transition-all duration-300 hover:text-purple-300 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400"
                 onClick={() => {
                   navigate('/');
                 }}
@@ -271,30 +260,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </>
           </div>
           
-          <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-            {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                className={`flex items-center rounded-lg transition-all duration-300 ${
-                  isActive(item.path)
-                    ? 'bg-purple-500/20 text-foreground border border-purple-500/20 scale-[1.02] shadow-md'
-                    : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground border border-transparent hover:border-purple-500/20 hover:scale-[1.01]'
-                } p-3 group`}
-                onClick={() => {}}
-              >
-                <item.icon 
-                  size={24} 
-                  className={`transition-transform duration-300 ${
-                    isActive(item.path) ? 'text-purple-400' : 'group-hover:text-purple-400'
-                  }`} 
-                />
-                <span className="ml-3">{item.name}</span>
-                {isActive(item.path) && (
-                  <ChevronRight size={16} className="ml-auto text-purple-400" />
-                )}
-              </Link>
-            ))}
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto sidebar-scrollbar">
+            {navItems.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${active ? 'nav-item-active' : 'nav-item-inactive'}`}
+                >
+                  <span className={`flex items-center justify-center w-9 h-9 rounded-lg nav-icon ${active ? 'nav-icon-active' : ''}`}>
+                    <item.icon size={18} className={`${active ? 'text-purple-400' : 'text-muted-foreground group-hover:text-purple-400'}`} />
+                  </span>
+                  <span className="ml-2 truncate">{item.name}</span>
+                  {active && <ChevronRight size={14} className="ml-auto text-purple-300" />}
+                </Link>
+              );
+            })}
           </nav>
           <div className="p-4 border-t border-purple-500/10">
             <div className="flex flex-col space-y-2">
@@ -311,7 +293,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         ? 'bg-purple-500/20 text-foreground border border-purple-500/20 scale-[1.02] shadow-md'
                         : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground border border-transparent hover:border-purple-500/20 hover:scale-[1.01]'
                     } p-3 justify-start group`}
-                    onClick={() => {}}
                   >
                     <User 
                       size={16} 
@@ -373,7 +354,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main content - adjusted to account for fixed sidebar */}
       <main 
         className="flex-1 transition-all duration-300"
-        style={{ marginLeft: '256px' }}
+        style={{ marginLeft: '360px' }}
       >
         {children}
       </main>

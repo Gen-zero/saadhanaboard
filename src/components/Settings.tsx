@@ -13,6 +13,7 @@ import AccessibilitySettings from './settings/AccessibilitySettings';
 import ProfileSettings from './settings/ProfileSettings';
 import AdvancedSettings from './settings/AdvancedSettings';
 import { useTranslation } from 'react-i18next';
+import { Settings as SettingsIcon, Palette, Clock, ShieldCheck, Bell, Eye, User, SlidersHorizontal } from 'lucide-react';
 
 // Spiritual particle component for animations
 const SpiritualParticle = ({ delay, size = "small" }: { delay: number; size?: "small" | "medium" | "large" }) => {
@@ -216,59 +217,83 @@ const Settings = () => {
               <nav className="space-y-1">
                 <Button
                   variant={activeSection === 'general' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
+                  className="w-full justify-start gap-2"
                   onClick={() => setActiveSection('general')}
                 >
-                  {t('general')}
+                  <div className="flex items-center gap-2">
+                    <SettingsIcon className="h-4 w-4" />
+                    <span>{t('general')}</span>
+                  </div>
                 </Button>
                 <Button
                   variant={activeSection === 'appearance' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
+                  className="w-full justify-start gap-2"
                   onClick={() => setActiveSection('appearance')}
                 >
-                  {t('appearance')}
+                  <div className="flex items-center gap-2">
+                    <Palette className="h-4 w-4" />
+                    <span>{t('appearance')}</span>
+                  </div>
                 </Button>
                 <Button
                   variant={activeSection === 'meditation' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
+                  className="w-full justify-start gap-2"
                   onClick={() => setActiveSection('meditation')}
                 >
-                  {t('meditation')}
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    <span>{t('meditation')}</span>
+                  </div>
                 </Button>
                 <Button
                   variant={activeSection === 'privacy' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
+                  className="w-full justify-start gap-2"
                   onClick={() => setActiveSection('privacy')}
                 >
-                  {t('privacy')}
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="h-4 w-4" />
+                    <span>{t('privacy')}</span>
+                  </div>
                 </Button>
                 <Button
                   variant={activeSection === 'notifications' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
+                  className="w-full justify-start gap-2"
                   onClick={() => setActiveSection('notifications')}
                 >
-                  {t('notifications')}
+                  <div className="flex items-center gap-2">
+                    <Bell className="h-4 w-4" />
+                    <span>{t('notifications')}</span>
+                  </div>
                 </Button>
                 <Button
                   variant={activeSection === 'accessibility' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
+                  className="w-full justify-start gap-2"
                   onClick={() => setActiveSection('accessibility')}
                 >
-                  {t('accessibility')}
+                  <div className="flex items-center gap-2">
+                    <Eye className="h-4 w-4" />
+                    <span>{t('accessibility')}</span>
+                  </div>
                 </Button>
                 <Button
                   variant={activeSection === 'profile' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
+                  className="w-full justify-start gap-2"
                   onClick={() => setActiveSection('profile')}
                 >
-                  {t('profile')}
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    <span>{t('profile')}</span>
+                  </div>
                 </Button>
                 <Button
                   variant={activeSection === 'advanced' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start"
+                  className="w-full justify-start gap-2"
                   onClick={() => setActiveSection('advanced')}
                 >
-                  {t('advanced')}
+                  <div className="flex items-center gap-2">
+                    <SlidersHorizontal className="h-4 w-4" />
+                    <span>{t('advanced')}</span>
+                  </div>
                 </Button>
               </nav>
 

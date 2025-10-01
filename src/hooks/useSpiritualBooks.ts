@@ -18,17 +18,25 @@ export interface SpiritualBook {
   updated_at: string;
 }
 
-export const useSpiritualBooks = (searchTerm?: string, selectedSubjects?: string[]) => {
+export const useSpiritualBooks = (filters?: Record<string, any>) => {
   const query = useQuery({
-    queryKey: ['spiritual-books', searchTerm, selectedSubjects],
-    queryFn: async (): Promise<SpiritualBook[]> => {
-      const data = await api.getBooks(searchTerm, selectedSubjects);
-      return data.books || [];
+    queryKey: ['spiritual-books', filters],
+    queryFn: async (): Promise<{ books: SpiritualBook[]; total: number; limit: number; offset: number }> => {
+      const data = await api.getBooks(filters || {});
+      return {
+        books: data.books || [],
+        total: data.total || 0,
+        limit: data.limit || (filters && filters.limit) || 20,
+        offset: data.offset || (filters && filters.offset) || 0
+      };
     },
   });
 
   return {
-    books: query.data || [],
+    books: query.data ? query.data.books : [],
+    total: query.data ? query.data.total : 0,
+    limit: query.data ? query.data.limit : (filters && filters.limit) || 20,
+    offset: query.data ? query.data.offset : (filters && filters.offset) || 0,
     isLoading: query.isLoading,
     error: query.error,
     refreshBooks: query.refetch

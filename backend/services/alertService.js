@@ -5,6 +5,98 @@ const logAnalytics = require('./logAnalyticsService');
 // In-memory suppression cache (simple placeholder)
 const recentAlerts = new Map();
 
+/**
+ * Evaluate a rule condition object against a log entry.
+ * Supports: matchAction, severity, ipRange, category, riskScoreThreshold,
+ * regexPattern, timeWindow, userRole and combinedConditions (AND/OR).
+ */
+function evaluateCondition(logEntry, conditions) {
+  if (!conditions || typeof conditions !== 'object') return false;
+
+  // Combined conditions (recursive)
+  if (conditions.combinedConditions) {
+    const cc = conditions.combinedConditions;
+    const sub = Array.isArray(cc.conditions) ? cc.conditions : [];
+    if (cc.operator === 'AND') return sub.every(c => evaluateCondition(logEntry, c));
+    if (cc.operator === 'OR') return sub.some(c => evaluateCondition(logEntry, c));
+    return false;
+  }
+
+  let matched = true;
+
+  try {
+    if (conditions.matchAction && logEntry.action) {
+      matched = matched && String(logEntry.action).toLowerCase().includes(String(conditions.matchAction).toLowerCase());
+    }
+
+    if (conditions.severity) {
+      const sev = Array.isArray(conditions.severity) ? conditions.severity : [conditions.severity];
+      matched = matched && sev.includes(logEntry.severity);
+    }
+
+    if (conditions.ipRange && logEntry.ip_address) {
+      const ranges = Array.isArray(conditions.ipRange) ? conditions.ipRange : [conditions.ipRange];
+      const ipMatched = ranges.some(range => {
+        if (typeof range !== 'string') return false;
+        if (range.includes('/')) {
+          // Basic CIDR-ish prefix check: compare first 3 octets for /24, or first 2 for /16
+          const [prefix, bits] = range.split('/');
+          const octetsPrefix = prefix.split('.');
+          const octetsIp = String(logEntry.ip_address).split('.');
+          if (!octetsPrefix.length || !octetsIp.length) return false;
+          if (Number(bits) >= 24) {
+            return octetsIp.slice(0, 3).join('.') === octetsPrefix.slice(0, 3).join('.');
+          }
+          if (Number(bits) >= 16) {
+            return octetsIp.slice(0, 2).join('.') === octetsPrefix.slice(0, 2).join('.');
+          }
+          return String(logEntry.ip_address).startsWith(prefix);
+        }
+        return String(logEntry.ip_address) === String(range);
+      });
+      matched = matched && ipMatched;
+    }
+
+    if (conditions.category) {
+      const cats = Array.isArray(conditions.category) ? conditions.category : [conditions.category];
+      matched = matched && cats.includes(logEntry.category);
+    }
+
+    if (typeof conditions.riskScoreThreshold !== 'undefined') {
+      const score = Number(logEntry.risk_score || 0);
+      matched = matched && (score >= Number(conditions.riskScoreThreshold));
+    }
+
+    if (conditions.regexPattern && conditions.regexPattern.field && conditions.regexPattern.pattern) {
+      try {
+        const field = conditions.regexPattern.field;
+        const pattern = new RegExp(conditions.regexPattern.pattern, 'i');
+        matched = matched && pattern.test(String(logEntry[field] || ''));
+      } catch (e) {
+        // invalid regex -> treat as non-match
+        matched = false;
+      }
+    }
+
+    if (conditions.timeWindow) {
+      const start = Number(conditions.timeWindow.start || 0);
+      const end = Number(conditions.timeWindow.end || 23);
+      const ts = new Date(logEntry.created_at || Date.now()).getHours();
+      matched = matched && (ts >= start && ts <= end);
+    }
+
+    if (conditions.userRole && logEntry.metadata && logEntry.metadata.role) {
+      const roles = Array.isArray(conditions.userRole) ? conditions.userRole : [conditions.userRole];
+      matched = matched && roles.includes(logEntry.metadata.role);
+    }
+  } catch (e) {
+    // Any error while evaluating a condition should default to non-match for safety
+    return false;
+  }
+
+  return matched;
+}
+
 module.exports = {
   async evaluateAlertRules(logEntry) {
     try {
@@ -13,11 +105,13 @@ module.exports = {
       const triggered = [];
       for (const rule of rules) {
         const cond = rule.conditions || {};
-        // simple example matching: if rule.conditions.matchAction and logEntry.action contains it
-        if (cond.matchAction && logEntry.action && String(logEntry.action).includes(cond.matchAction)) {
-          triggered.push({ rule, logEntry });
+        try {
+          if (evaluateCondition(logEntry, cond)) {
+            triggered.push({ rule, logEntry });
+          }
+        } catch (e) {
+          // ignore bad rule condition parsing for safety
         }
-        // TODO: evaluate more complex conditions
       }
       // trigger alerts for each unique rule
       for (const t of triggered) {

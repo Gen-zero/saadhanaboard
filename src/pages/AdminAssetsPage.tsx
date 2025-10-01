@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { adminApi } from '@/services/adminApi';
+import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ const AdminAssetsPage = () => {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const { toast } = useToast();
 
   const load = async (offset = 0) => {
     setLoading(true);
@@ -45,7 +47,7 @@ const AdminAssetsPage = () => {
       setAssets(data.items || []);
       setPagination(prev => ({ ...prev, total: data.total || 0, offset: ((data.page && data.limit) ? ((data.page - 1) * data.limit) : 0), limit: data.limit || prev.limit }));
     } catch (error) {
-      console.error('Failed to load assets:', error);
+      toast({ title: 'Failed to load assets', description: String(error) });
     } finally {
       setLoading(false);
     }
@@ -67,7 +69,7 @@ const AdminAssetsPage = () => {
       setShowUploadDialog(false);
       load();
     } catch (error) {
-      console.error('Upload failed:', error);
+      toast({ title: 'Upload failed', description: String(error) });
     } finally {
       setUploading(false);
     }
@@ -85,7 +87,7 @@ const AdminAssetsPage = () => {
       setSelectedAsset(null);
       load(pagination.offset);
     } catch (error) {
-      console.error('Update failed:', error);
+      toast({ title: 'Update failed', description: String(error) });
     }
   };
 
@@ -95,7 +97,7 @@ const AdminAssetsPage = () => {
       await adminApi.deleteAsset(id);
       load(pagination.offset);
     } catch (error) {
-      console.error('Delete failed:', error);
+      toast({ title: 'Delete failed', description: String(error) });
     }
   };
 

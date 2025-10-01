@@ -4,17 +4,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import api from '@/services/api';
 import BookFormFields from './BookFormFields';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
-// Define FormData interface locally to avoid conflicts
-interface BookFormData {
-  title: string;
-  author: string;
-  traditions: string[];
-  content: string;
-  description?: string;
-  year?: string;
-  language: string;
-}
+// Validation schema
+const BookSchema = z.object({
+  title: z.string().min(2, 'Title is required'),
+  author: z.string().min(2, 'Author is required'),
+  traditions: z.array(z.string()).optional(),
+  content: z.string().optional(),
+  description: z.string().optional(),
+  year: z.string().optional().refine(y => !y || /^\d{4}$/.test(y), { message: 'Year must be a 4 digit number' }),
+  language: z.string().min(2),
+});
+
+type BookFormType = z.infer<typeof BookSchema>;
 
 interface BookUploadFormProps {
   onClose: () => void;
@@ -24,118 +29,43 @@ interface BookUploadFormProps {
 const BookUploadForm = ({ onClose, onBookUploaded }: BookUploadFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState<BookFormData>({
-    title: '',
-    author: '',
-    traditions: [],
-    content: '',
-    description: '',
-    year: '',
-    language: 'english',
-  });
-  const [newTradition, setNewTradition] = useState('');
   const [uploadedFile, setUploadedFile] = useState<File | undefined>(undefined);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<BookFormType>({
+    resolver: zodResolver(BookSchema),
+    defaultValues: { title: '', author: '', traditions: [], content: '', description: '', year: '', language: 'english' }
+  });
 
-  const handleFormFieldsChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleFileChange = (file: File | undefined) => {
-    setUploadedFile(file);
-  };
-
-  const handleTraditionAdd = () => {
-    if (newTradition.trim() && !formData.traditions.includes(newTradition.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        traditions: [...prev.traditions, newTradition.trim()]
-      }));
-      setNewTradition('');
-    }
-  };
-
-  const handleTraditionRemove = (tradition: string) => {
-    setFormData(prev => ({
-      ...prev,
-      traditions: prev.traditions.filter(t => t !== tradition)
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!formData.title || !formData.author) {
-      toast({
-        title: "Missing fields",
-        description: "Please fill in title and author fields.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // For PDF uploads, either file or content must be provided
-    if (!uploadedFile && !formData.content) {
-      toast({
-        title: "Missing content",
-        description: "Please upload a file or enter book content.",
-        variant: "destructive",
-      });
+  const onSubmit = async (values: BookFormType) => {
+    // If no file and no content, invalid
+    if (!uploadedFile && !values.content) {
+      toast({ title: 'Missing content', description: 'Please upload a file or enter book content.', variant: 'destructive' });
       return;
     }
 
     setLoading(true);
-
     try {
-      // Prepare book data
       const bookData = {
-        title: formData.title,
-        author: formData.author,
-        traditions: formData.traditions,
-        content: formData.content,
-        description: formData.description || null,
-        year: formData.year ? parseInt(formData.year) : null,
-        language: formData.language,
-        page_count: formData.content ? formData.content.split('---PAGE---').length : null,
+        title: values.title,
+        author: values.author,
+        traditions: values.traditions || [],
+        content: values.content || null,
+        description: values.description || null,
+        year: values.year ? parseInt(values.year) : null,
+        language: values.language,
+        page_count: values.content ? values.content.split('---PAGE---').length : null,
       };
 
-      // Upload book with file if provided, otherwise regular upload
       await api.createBook(bookData, uploadedFile);
 
-      toast({
-        title: "Book uploaded",
-        description: "Your spiritual book has been successfully uploaded.",
-      });
+      toast({ title: 'Book uploaded', description: 'Your spiritual book has been successfully uploaded.' });
 
-      // Call the onBookUploaded callback if provided
-      if (onBookUploaded) {
-        onBookUploaded();
-      }
-
-      // Reset form
-      setFormData({
-        title: '',
-        author: '',
-        traditions: [],
-        content: '',
-        description: '',
-        year: '',
-        language: 'english',
-      });
-      setUploadedFile(undefined);
-      
+      if (onBookUploaded) onBookUploaded();
       onClose();
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      toast({
-        title: "Upload failed",
-        description: error.message || "Failed to upload book. Please try again.",
-        variant: "destructive",
-      });
+    } catch (err: any) {
+      console.error('Upload error:', err);
+      const msg = err?.message || 'Failed to upload book. Please try again.';
+      toast({ title: 'Upload failed', description: msg, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -148,49 +78,28 @@ const BookUploadForm = ({ onClose, onBookUploaded }: BookUploadFormProps) => {
         <CardDescription>Share your spiritual wisdom with the community</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <BookFormFields 
             formData={{
-              title: formData.title,
-              author: formData.author,
-              content: formData.content,
-              description: formData.description || '',
-              year: formData.year || '',
-              language: formData.language
+              title: watch('title'),
+              author: watch('author'),
+              content: watch('content'),
+              description: watch('description') || '',
+              year: watch('year') || '',
+              language: watch('language')
             }} 
-            onInputChange={handleFormFieldsChange} 
-            onFileChange={handleFileChange}
+            onInputChange={(field, value) => setValue(field as any, value)} 
+            onFileChange={(file) => setUploadedFile(file)}
           />
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Traditions</label>
-            <div className="flex gap-2">
-              <input
-                value={newTradition}
-                onChange={(e) => setNewTradition(e.target.value)}
-                placeholder="Add tradition"
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 flex-1"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleTraditionAdd())}
-              />
-              <Button type="button" onClick={handleTraditionAdd} variant="outline">
-                Add
-              </Button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {formData.traditions.map((tradition) => (
-                <div key={tradition} className="flex items-center bg-secondary px-3 py-1 rounded-full text-sm">
-                  {tradition}
-                  <button
-                    type="button"
-                    onClick={() => handleTraditionRemove(tradition)}
-                    className="ml-2 text-muted-foreground hover:text-foreground"
-                  >
-                    <span className="h-4 w-4">✕</span>
-                  </button>
-                </div>
+
+          {/* Display validation errors */}
+          {errors && (
+            <div className="text-sm text-destructive">
+              {Object.values(errors).map((e: any) => (
+                <div key={e.message}>{e.message}</div>
               ))}
             </div>
-          </div>
+          )}
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={onClose}>

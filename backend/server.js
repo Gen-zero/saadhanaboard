@@ -181,7 +181,8 @@ try { app.use(require('compression')()); } catch (e) { /* best-effort if not ins
 // Security headers (helmet) and CORS configuration for frontend origin
   try {
     const helmet = require('helmet');
-    const rawOrigin = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || 'http://localhost:8080,http://localhost:5173';
+    // include 8081 as a fallback dev origin (vite may auto-select a different free port)
+    const rawOrigin = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || 'http://localhost:8080,http://localhost:5173,http://localhost:8081';
     const allowedOrigins = String(rawOrigin).split(',').map(s => s.trim()).filter(Boolean);
     const connectSrc = ["'self'", ...allowedOrigins];
     app.use(helmet({
@@ -291,6 +292,8 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/books', bookRoutes);
 app.use('/api/sadhanas', sadhanaRoutes);
+const groupsRoutes = require('./routes/groups');
+app.use('/api/groups', groupsRoutes);
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
@@ -339,6 +342,17 @@ function tryListen(port) {
 
   server.listen(port, () => {
     console.log(`Server is running on port ${port}`);
+    // initialize scheduled reminder jobs after server is up
+    try {
+      const reminderService = require('./services/reminderService');
+      if (reminderService && typeof reminderService.initializeScheduledJobs === 'function') {
+        reminderService.initializeScheduledJobs().then((r) => {
+          console.log('Reminder scheduler initialized:', r && r.scheduled);
+        }).catch(() => {});
+      }
+    } catch (e) {
+      // ignore if reminderService not available
+    }
   });
 }
 

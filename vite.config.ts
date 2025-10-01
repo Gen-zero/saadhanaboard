@@ -47,6 +47,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@themes": path.resolve(__dirname, "./src/themes"),
     },
   },
   // Ensure environment variables are properly loaded

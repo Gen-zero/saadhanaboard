@@ -37,7 +37,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
   }), []);
 
   const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
-    console.log('PDF loaded successfully with pages:', numPages);
+  // success shown via toast/UI
     setNumPages(numPages);
     setIsLoading(false);
     setError('');
@@ -48,7 +48,7 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
   }, [fileName, toast]);
 
   const onDocumentLoadError = useCallback((error: Error) => {
-    console.error('PDF loading error:', error);
+  // error shown via toast/UI and error state
     setIsLoading(false);
     setError(error.message || 'Failed to load PDF');
     toast({
