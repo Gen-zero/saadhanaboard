@@ -32,20 +32,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       setIsOnboardingLoading(true);
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('onboarding_completed')
-        .eq('id', user.id)
-        .single();
+      // TODO: Re-enable once migration is applied
+      // const { data: profile, error } = await supabase
+      //   .from('profiles')
+      //   .select('onboarding_completed')
+      //   .eq('id', user.id)
+      //   .single();
       
-      if (error) throw error;
+      // if (error) throw error;
       
-      const completed = profile?.onboarding_completed || false;
-      setIsOnboardingComplete(completed);
-      return completed;
+      // const completed = profile?.onboarding_completed || false;
+      // setIsOnboardingComplete(completed);
+      // return completed;
+      
+      // Temporarily set as complete until migration is applied
+      setIsOnboardingComplete(true);
+      return true;
     } catch (error) {
       console.error('Error checking onboarding status:', error);
-      // Set onboarding as complete on error to prevent blocking the app
       setIsOnboardingComplete(true);
       return true;
     } finally {

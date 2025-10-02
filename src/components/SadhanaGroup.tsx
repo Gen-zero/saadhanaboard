@@ -40,7 +40,7 @@ const SadhanaGroup = ({
       {sadhanas.map(sadhana => (
         <SadhanaCard
           key={sadhana.id}
-          sadhana={sadhana}
+          sadhana={{ ...sadhana, isShared: false }}
           onToggleCompletion={handleToggleCompletion}
           onDelete={onDelete}
           onUpdate={onUpdate}
