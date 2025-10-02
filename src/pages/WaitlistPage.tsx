@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UserPlus, User, Mail, ArrowLeft, Loader2, CheckCircle } from "lucide-react";
 import { useSettings } from "@/hooks/useSettings";
-import apiService from "@/services/api.js";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -48,17 +48,20 @@ const WaitlistPage = () => {
     setError(null);
     
     try {
-      const response = await apiService.post('/auth/waitlist', {
-        name: values.name,
-        email: values.email,
-        reason: values.reason || null
+      const { data, error } = await supabase.functions.invoke('submit-waitlist', {
+        body: {
+          name: values.name,
+          email: values.email,
+          reason: values.reason || null
+        }
       });
+
+      if (error) throw error;
       
       setSuccess(true);
-  // success handled via UI state/toast
     } catch (err: any) {
-  // error shown to user via setError()
-      setError(err.response?.data?.error || "Failed to join waiting list. Please try again.");
+      console.error('Waitlist submission error:', err);
+      setError(err.message || "Failed to join waiting list. Please try again.");
     } finally {
       setIsLoading(false);
     }
