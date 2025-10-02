@@ -14,49 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
+      mentorship_relationships: {
+        Row: {
+          accepted_at: string | null
+          ended_at: string | null
+          guru_id: string
+          id: string
+          notes: string | null
+          requested_at: string | null
+          shishya_id: string
+          status: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          ended_at?: string | null
+          guru_id: string
+          id?: string
+          notes?: string | null
+          requested_at?: string | null
+          shishya_id: string
+          status?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          ended_at?: string | null
+          guru_id?: string
+          id?: string
+          notes?: string | null
+          requested_at?: string | null
+          shishya_id?: string
+          status?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          mentorship_id: string | null
+          message_type: string | null
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          mentorship_id?: string | null
+          message_type?: string | null
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          mentorship_id?: string | null
+          message_type?: string | null
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_mentorship_id_fkey"
+            columns: ["mentorship_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_relationships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
+          available_for_guidance: boolean | null
           avatar_url: string | null
           bio: string | null
           created_at: string | null
-          date_of_birth: string | null
           display_name: string
-          favorite_deity: string | null
+          experience_level: string | null
           id: string
           location: string | null
-          onboarding_completed: boolean | null
-          place_of_birth: string | null
-          time_of_birth: string | null
           traditions: string[] | null
           updated_at: string | null
         }
         Insert: {
+          available_for_guidance?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
-          date_of_birth?: string | null
           display_name: string
-          favorite_deity?: string | null
+          experience_level?: string | null
           id: string
           location?: string | null
-          onboarding_completed?: boolean | null
-          place_of_birth?: string | null
-          time_of_birth?: string | null
           traditions?: string[] | null
           updated_at?: string | null
         }
         Update: {
+          available_for_guidance?: boolean | null
           avatar_url?: string | null
           bio?: string | null
           created_at?: string | null
-          date_of_birth?: string | null
           display_name?: string
-          favorite_deity?: string | null
+          experience_level?: string | null
           id?: string
           location?: string | null
-          onboarding_completed?: boolean | null
-          place_of_birth?: string | null
-          time_of_birth?: string | null
           traditions?: string[] | null
           updated_at?: string | null
         }
@@ -105,6 +170,7 @@ export type Database = {
       }
       sadhanas: {
         Row: {
+          assigned_by: string | null
           category: string | null
           completed: boolean | null
           created_at: string | null
@@ -120,6 +186,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_by?: string | null
           category?: string | null
           completed?: boolean | null
           created_at?: string | null
@@ -135,6 +202,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_by?: string | null
           category?: string | null
           completed?: boolean | null
           created_at?: string | null
@@ -199,16 +267,46 @@ export type Database = {
         }
         Relationships: []
       }
-
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "guru" | "shishya"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -335,6 +433,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["guru", "shishya"],
+    },
   },
 } as const
