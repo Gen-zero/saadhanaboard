@@ -79,7 +79,25 @@ npm run dev
 node backend/utils/initDb.js
 ```
 
-### �️ Database migrations
+### 📤 Google Sheets Integration Setup
+
+To enable the waiting list form to send data to Google Sheets:
+
+1. Create a Google Sheet with columns: `Name`, `Email`, `Reason`, `Timestamp`
+2. Create a Google Apps Script with a `doPost` function to handle incoming data:
+   ```javascript
+   function doPost(e) {
+     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+     var data = JSON.parse(e.postData.contents);
+     sheet.appendRow([data.name, data.email, data.reason, data.timestamp]);
+     return ContentService.createTextOutput(JSON.stringify({status: 'success'})).setMimeType(ContentService.MimeType.JSON);
+   }
+   ```
+3. Deploy the script as a web app (Menu: Deploy > New deployment > Web app)
+4. Set "Who has access" to "Anyone" (or "Anyone with the link")
+5. Copy the deployment URL and set it as the `GOOGLE_SHEETS_WEBHOOK_URL` environment variable
+
+### 🗃️ Database migrations
 
 If you need to apply the soft-delete migration (adds a `deleted_at` column to `spiritual_books`) you can run the helper script included in the backend:
 
@@ -90,7 +108,7 @@ node backend/scripts/apply_book_soft_delete_migration.js
 This script reads the SQL file `supabase/migrations/20250108000000_add_book_soft_delete.sql` and executes it against the configured database (it uses the same connection parameters as the backend). Ensure your backend environment variables (in `backend/.env`) are configured before running it.
 
 
-### �🔐 Environment Variables
+### 🔐 Environment Variables
 Create a `.env` file in the project root for frontend values (copy `.env.example`) and in `backend/.env` for backend values (copy `backend/.env.example`).
 
 Example backend values include:
@@ -107,6 +125,9 @@ JWT_SECRET=your_jwt_secret_key
 
 # Server Configuration
 PORT=3004
+
+# Google Sheets Integration
+GOOGLE_SHEETS_WEBHOOK_URL=your_google_sheets_webhook_url_here
 ```
 
 ## 🏗️ Development 👷
