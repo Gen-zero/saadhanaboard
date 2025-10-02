@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth as useLocalAuth } from '@/hooks/useAuth';
-import api from '@/services/api';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
   user: any;
@@ -32,8 +32,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       setIsOnboardingLoading(true);
-      const data = await api.getProfile();
-      const completed = data.profile?.onboarding_completed || false;
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('id', user.id)
+        .single();
+      
+      if (error) throw error;
+      
+      const completed = profile?.onboarding_completed || false;
       setIsOnboardingComplete(completed);
       return completed;
     } catch (error) {

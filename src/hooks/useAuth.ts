@@ -1,55 +1,89 @@
 import { useState, useEffect } from 'react';
 import { toast } from '@/hooks/use-toast';
-import api from '@/services/api';
+import { supabase } from '@/integrations/supabase/client';
+import type { User as SupabaseUser, Session } from '@supabase/supabase-js';
 
-// Define a local User type since we're removing Supabase
+// User type matching Supabase structure
 interface User {
   id: string;
   email: string;
-  display_name: string;
+  display_name?: string;
   created_at?: string;
   updated_at?: string;
-  // Removed welcome_quiz_completed field
-}
-
-interface AuthResponse {
-  user: User;
-  token?: string;
-}
-
-interface AuthError {
-  message: string;
 }
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const initializeAuth = async () => {
-    try {
-      if (api.token) {
-        const data = await api.getCurrentUser();
-        setUser(data.user);
-      }
-    } catch (error) {
-      console.error('Error initializing auth:', error);
-      // Clear token if it's invalid
-      api.clearToken();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    // Check for existing session
-    initializeAuth();
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setSession(session);
+        
+        if (session?.user) {
+          // Fetch profile data for display_name
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('display_name')
+            .eq('id', session.user.id)
+            .single();
+          
+          setUser({
+            id: session.user.id,
+            email: session.user.email!,
+            display_name: profile?.display_name || session.user.email!,
+          });
+        } else {
+          setUser(null);
+        }
+        
+        setIsLoading(false);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      setSession(session);
+      
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', session.user.id)
+          .single();
+        
+        setUser({
+          id: session.user.id,
+          email: session.user.email!,
+          display_name: profile?.display_name || session.user.email!,
+        });
+      }
+      
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const refreshUser = async () => {
     try {
-      if (api.token) {
-        const data = await api.getCurrentUser();
-        setUser(data.user);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('display_name')
+          .eq('id', session.user.id)
+          .single();
+        
+        setUser({
+          id: session.user.id,
+          email: session.user.email!,
+          display_name: profile?.display_name || session.user.email!,
+        });
       }
     } catch (error) {
       console.error('Error refreshing user:', error);
@@ -60,17 +94,35 @@ export const useAuth = () => {
     try {
       setIsLoading(true);
       
-      const data: AuthResponse = await api.register(email, password, displayName);
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            display_name: displayName
+          }
+        }
+      });
+
+      if (error) {
+        toast({ 
+          title: 'Registration failed', 
+          description: error.message, 
+          variant: 'destructive' 
+        });
+        return { error: error.message };
+      }
 
       toast({
         title: "Success!",
-        description: "Account created successfully."
+        description: "Account created successfully. Please check your email to verify your account."
       });
 
-      setUser(data.user);
       return { error: null };
     } catch (error: any) {
-      console.error('Signup error:', error);
       const message = error?.message || 'Registration failed';
       toast({ title: 'Registration failed', description: message, variant: 'destructive' });
       return { error: message };
@@ -83,17 +135,27 @@ export const useAuth = () => {
     try {
       setIsLoading(true);
       
-      const data: AuthResponse = await api.login(email, password);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        toast({ 
+          title: 'Sign in failed', 
+          description: error.message, 
+          variant: 'destructive' 
+        });
+        return { error: error.message };
+      }
 
       toast({
         title: "Welcome back!",
         description: "You have successfully signed in."
       });
 
-      setUser(data.user);
       return { error: null };
     } catch (error: any) {
-      console.error('Signin error:', error);
       const message = error?.message || 'Sign in failed';
       toast({ title: 'Sign in failed', description: message, variant: 'destructive' });
       return { error: message };
@@ -105,16 +167,18 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       setIsLoading(true);
-      await api.logout();
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) throw error;
       
       setUser(null);
+      setSession(null);
       
       toast({
         title: "Signed out",
         description: "You have been successfully signed out."
       });
     } catch (error: any) {
-      console.error('Signout error:', error);
       toast({
         title: "Error",
         description: "Failed to sign out. Please try again.",

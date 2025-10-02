@@ -170,7 +170,6 @@ const Dashboard = () => {
         setGoalProgress(Math.floor((progress.currentDay / progress.totalDays) * 100));
       } catch (e) {
         // parsing failed, fall back to default progress
-      }
         // Set default values
         localStorage.setItem('spiritualPracticeProgress', JSON.stringify({
           currentDay: 15,
