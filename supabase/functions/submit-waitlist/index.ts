@@ -33,7 +33,7 @@ serve(async (req) => {
     console.log('Processing waitlist submission:', { name, email });
 
     // Get the Google Sheets webhook URL from secrets
-    const googleSheetsUrl = Deno.env.get('GOOGLE_SHEETS_WEBHOOK_URL');
+    const googleSheetsUrl = Deno.env.get('https://script.google.com/macros/s/AKfycbwWZoxZ9rco2sPgrq21yB7EGlC-q0O08A78i8P1GcJT4wv-wdvy8GQffjzguJ-9Qmfv/exec');
     
     if (!googleSheetsUrl) {
       console.error('GOOGLE_SHEETS_WEBHOOK_URL not configured');

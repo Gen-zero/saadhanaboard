@@ -1,98 +1,63 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { LogIn, User, Key, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/lib/auth-context";
-import { LogIn, User, Key, Loader2, ArrowLeft } from "lucide-react";
-import { useSettings } from "@/hooks/useSettings";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 
 const formSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
+  email: z.string().email("Please enter a valid email"),
+  password: z.string().min(6, "Password must be at least 6 characters")
 });
 
 const LoginPage = () => {
+  const { toast } = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
-  const { settings } = useSettings();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
-    },
+      password: ""
+    }
   });
 
-  // Check if Shiva theme is active
-  const isShivaTheme = settings?.appearance?.colorScheme === 'shiva';
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsLoading(true);
-    setError(null);
-    
     try {
+      setIsLoading(true);
       await login(values.email, values.password);
-      navigate("/dashboard");
-    } catch (err) {
-  // error is shown to user via setError()
-      setError("Invalid email or password. Please try again.");
+      toast({
+        title: "Login successful",
+        description: "Welcome to Saadhana Yantra"
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "Invalid email or password. Try demo@example.com / password",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${isShivaTheme ? '' : 'cosmic-nebula-bg'}`}>
-      {/* Fixed Back Button - Top Left Corner */}
-      <div className="fixed top-4 left-4 z-50">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/landingpage')}
-          className="flex items-center text-muted-foreground hover:text-foreground bg-background/80 backdrop-blur-sm border border-purple-500/20"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Homepage
-        </Button>
-      </div>
-
-      {/* Main Content - Centered */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md animate-fade-in">
+    <div className="min-h-screen flex flex-col items-center justify-center cosmic-nebula-bg p-4">
+      <div className="w-full max-w-md space-y-6 animate-fade-in">
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="relative mb-4">
-            <img 
-              src="/lovable-uploads/sadhanaboard_logo.png" 
-              alt="Saadhana Board Logo" 
-              className="h-20 w-20 rounded-full relative z-10" 
-              style={{
-                filter: 'drop-shadow(0 0 8px rgba(255, 215, 0, 0.3))'
-              }}
-            />
-            {/* Constant glowing ring around logo */}
-            <div 
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: 'conic-gradient(from 0deg, rgba(255, 215, 0, 0.3), rgba(138, 43, 226, 0.3), rgba(255, 215, 0, 0.3))',
-                padding: '2px'
-              }}
-            >
-              <div className="w-full h-full rounded-full bg-background/20" />
-            </div>
-          </div>
+          <img 
+            src="/lovable-uploads/750cc9ea-fdb3-49ae-9a42-504d1a30ef4e.png" 
+            alt="Saadhana Board Logo" 
+            className="h-20 w-20 mb-4" 
+          />
           <h1 className="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">Saadhana Board</h1>
           <p className="text-sm text-muted-foreground mt-1">
             Access your spiritual journey
@@ -104,12 +69,6 @@ const LoginPage = () => {
             <LogIn className="h-5 w-5 text-purple-500" />
             Welcome Back
           </h2>
-
-          {error && (
-            <div className="mb-4 p-3 bg-destructive/20 text-destructive text-sm rounded-md">
-              {error}
-            </div>
-          )}
 
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -167,15 +126,14 @@ const LoginPage = () => {
             <p>
               Don't have an account?{" "}
               <Link to="/signup" className="text-purple-500 hover:text-purple-700 hover:underline">
-                Join waitlist
+                Sign up
               </Link>
             </p>
           </div>
         </div>
 
         <div className="text-center text-xs text-muted-foreground">
-          <p>Create an account to begin your spiritual journey</p>
-        </div>
+          <p>Demo account: demo@example.com / password</p>
         </div>
       </div>
     </div>
