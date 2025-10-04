@@ -1,24 +1,36 @@
 
 import { useState } from 'react';
-import { Sadhana } from '@/types/sadhana';
+import { SharedSadhana, PrivacyLevel } from '@/types/sadhana';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { MoreHorizontal, Edit, Trash2, MessageSquare, Clock, Calendar, Sparkles } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2, MessageSquare, Clock, Calendar, Sparkles, Share2, Heart } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import api from '@/services/api';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 
 interface SadhanaCardProps {
-  sadhana: Sadhana;
-  onUpdate: (sadhana: Sadhana) => void;
-  onDelete: (id: number) => void;
-  onToggleCompletion: (id: number) => void;
+  sadhana: SharedSadhana;
+  onUpdate?: (sadhana: SharedSadhana) => void;
+  onDelete?: (id: number) => void;
+  onToggleCompletion?: (id: number) => void;
+  onShare?: (id: number, privacy: PrivacyLevel) => void;
+  onLike?: (id: number) => void;
+  onComment?: (id: number) => void;
+  showSocialFeatures?: boolean;
 }
 
-const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion }: SadhanaCardProps) => {
+const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion, onShare, onLike, onComment, showSocialFeatures = false }: SadhanaCardProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [selectedPrivacy, setSelectedPrivacy] = useState<PrivacyLevel>('public');
+  const [isSharing, setIsSharing] = useState(false);
+  const { toast } = useToast();
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -57,7 +69,7 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion }: Sadhan
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <Checkbox
               checked={sadhana.completed}
-              onCheckedChange={() => onToggleCompletion(sadhana.id)}
+              onCheckedChange={() => onToggleCompletion?.(sadhana.id)}
               className="mt-0.5 shrink-0"
             />
             
@@ -119,29 +131,83 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion }: Sadhan
             </div>
           </div>
           
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              {sadhana.completed && (
-                <DropdownMenuItem onClick={handleReflection}>
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Add Reflection
+          <div className="flex items-center gap-2">
+            {showSocialFeatures && (
+              <div className="flex items-center gap-2">
+                <button onClick={() => onLike?.(sadhana.id)} className="p-1 rounded hover:bg-gray-800/20">
+                  <Heart className={cn('h-4 w-4', sadhana.userHasLiked && 'text-red-400')} />
+                </button>
+                <button onClick={() => onComment?.(sadhana.id)} className="p-1 rounded hover:bg-gray-800/20">
+                  <MessageSquare className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                  <Edit className="mr-2 h-4 w-4" />
+                  Edit
                 </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={() => onDelete(sadhana.id)} className="text-destructive">
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {sadhana.completed && (
+                  <DropdownMenuItem onClick={handleReflection}>
+                    <MessageSquare className="mr-2 h-4 w-4" />
+                    Add Reflection
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => setIsShareDialogOpen(true)}>
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onDelete(sadhana.id)} className="text-destructive">
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Share Sadhana</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">Choose who can see this sadhana</p>
+                <Select onValueChange={(val) => setSelectedPrivacy(val as PrivacyLevel)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Privacy" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="friends">Friends (coming soon)</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setIsShareDialogOpen(false)}>Cancel</Button>
+                  <Button onClick={async () => {
+                    try {
+                      setIsSharing(true);
+                      await api.shareSadhana(sadhana.id, selectedPrivacy);
+                      toast({ title: 'Sadhana shared', description: 'Your sadhana is now shared' });
+                      onShare?.(sadhana.id, selectedPrivacy);
+                      setIsShareDialogOpen(false);
+                    } catch (e) {
+                      toast({ title: 'Error', description: e?.message || 'Failed to share' });
+                    } finally {
+                      setIsSharing(false);
+                    }
+                  }} disabled={isSharing}>{isSharing ? 'Sharing...' : 'Share'}</Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </CardContent>
     </Card>

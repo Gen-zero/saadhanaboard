@@ -11,7 +11,9 @@ async function adminRequest<T>(path: string, init: RequestInit = {}, asText = fa
     ...((init.headers as Record<string, string>) || {}),
   };
 
-  const res = await fetch(`${ADMIN_API_BASE}${path}`, {
+  // Support absolute API paths (starting with /api) or full URLs
+  const target = (typeof path === 'string' && (path.startsWith('http') || path.startsWith('/api'))) ? path : `${ADMIN_API_BASE}${path}`;
+  const res = await fetch(target, {
     ...(USE_CREDENTIALS ? { credentials: 'include' } : {}),
     headers,
     ...init,
@@ -251,7 +253,20 @@ export const adminApi = {
     }
     // connect, cookies are sent automatically by the browser
     const base = SOCKET_BASE;
-    const socket = io(base, { withCredentials: true, path: '/socket.io' });
+    // Try to include an admin token when cookies are not available (useful in dev across ports)
+    const getCookie = (name: string) => {
+      if (typeof document === 'undefined') return null;
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match[2]) : null;
+    };
+    const fallbackToken = (typeof window !== 'undefined' && (getCookie('admin_token') || window.localStorage.getItem('admin_token'))) || null;
+    const socketOptions: any = { withCredentials: true, path: '/socket.io' };
+    if (fallbackToken) {
+      // include as auth for modern socket.io and query for older servers
+      socketOptions.auth = { token: fallbackToken };
+      socketOptions.query = { token: fallbackToken };
+    }
+    const socket = io(base, socketOptions);
     this._socket = socket as Socket;
     socket.on('connect', () => {
       // connected
@@ -357,10 +372,99 @@ export const adminApi = {
     if (params.q) search.append('q', params.q);
     if (params.limit) search.append('limit', String(params.limit));
     if (params.offset) search.append('offset', String(params.offset));
-    const r = await adminRequest<any>(`/books?${search.toString()}`);
+    // Books are exposed under the public API path `/api/books` (not `/api/admin/books`) so use an absolute path.
+    const r = await adminRequest<any>(`${BASE_API}/books?${search.toString()}`);
     const books = r.books || r.items || r;
     const pagination = r.pagination || { total_count: Array.isArray(books) ? books.length : 0, current_page: 1, per_page: r.limit || 20, total_pages: 1 };
     return { items: books, total: pagination.total_count ?? pagination.total, page: pagination.current_page ?? 1, limit: pagination.per_page ?? r.limit ?? 20, totalPages: pagination.total_pages ?? 1 };
+  },
+  // Admin: fetch books with filters (shows deleted when requested)
+  async getAllBooksAdmin(params: { search?: string; traditions?: string[]; language?: string; year?: number; showDeleted?: boolean; limit?: number; offset?: number } = {}) {
+    const qs = new URLSearchParams();
+    if (params.search) qs.append('search', params.search);
+    if (params.traditions) qs.append('traditions', JSON.stringify(params.traditions));
+    if (params.language) qs.append('language', params.language);
+    if (typeof params.year !== 'undefined') qs.append('year', String(params.year));
+    if (typeof params.showDeleted !== 'undefined') qs.append('showDeleted', String(params.showDeleted));
+    qs.append('limit', String(params.limit ?? 100));
+    qs.append('offset', String(params.offset ?? 0));
+
+    // Note: admin route added on backend at /api/books/admin/all
+    const r = await adminRequest<any>(`/books/admin/all?${qs.toString()}`);
+    const books = r.books || r.items || r || [];
+    const total = r.total ?? (Array.isArray(books) ? books.length : 0);
+    return { books, total };
+  },
+
+  // Library analytics (admin)
+  async getLibraryAnalytics(params: { days?: number; timeframe?: string; from?: string; to?: string; limit?: number; offset?: number } = {}) {
+    const qs = new URLSearchParams();
+    if (params.days) qs.append('days', String(params.days));
+    if (params.timeframe) qs.append('timeframe', params.timeframe);
+    if (params.from) qs.append('from', params.from);
+    if (params.to) qs.append('to', params.to);
+    if (params.limit) qs.append('limit', String(params.limit));
+    if (params.offset) qs.append('offset', String(params.offset));
+    return adminRequest<any>(`/books/admin/analytics?${qs.toString()}`);
+  },
+
+  async exportLibraryAnalytics(filters: any = {}, format: 'csv' | 'json' = 'csv') {
+    // Use fetch directly to download raw CSV/text since adminRequest wraps non-json as { css }
+    const qs = new URLSearchParams();
+    if (filters.days) qs.append('days', String(filters.days));
+    if (filters.timeframe) qs.append('timeframe', filters.timeframe);
+    if (filters.from) qs.append('from', filters.from);
+    if (filters.to) qs.append('to', filters.to);
+    if (filters.bookIds) qs.append('bookIds', Array.isArray(filters.bookIds) ? filters.bookIds.join(',') : String(filters.bookIds));
+    qs.append('format', format);
+
+    const url = `${ADMIN_API_BASE}/books/admin/analytics/export?${qs.toString()}`;
+    const res = await fetch(url, { ...(USE_CREDENTIALS ? { credentials: 'include' } : {}), headers: { 'Accept': 'text/csv' } });
+    if (!res.ok) {
+      const txt = await res.text().catch(() => `HTTP ${res.status}`);
+      const err: any = new Error(txt || `HTTP ${res.status}`);
+      err.status = res.status;
+      throw err;
+    }
+    const text = await res.text();
+    return text;
+  },
+
+  async getBookAnalytics(bookId: string | number) {
+    return adminRequest<any>(`/books/admin/analytics/${bookId}`);
+  },
+
+  // Admin: update book (supports multipart when file is provided)
+  async updateBook(bookId: string | number, bookData: Record<string, any>, file?: File | null) {
+    try {
+      if (file) {
+        const form = new FormData();
+        form.append('bookFile', file);
+        form.append('bookData', JSON.stringify(bookData));
+        const res = await fetch(`${ADMIN_API_BASE}/books/${bookId}`, { method: 'PUT', body: form, credentials: 'include' });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || 'Update book failed');
+        }
+        const json = await res.json().catch(() => ({}));
+        return json.book || json;
+      }
+      // No file - send JSON
+      const r = await adminRequest<any>(`/books/${bookId}`, { method: 'PUT', body: JSON.stringify(bookData) });
+      return r.book || r;
+    } catch (err: any) {
+      throw err;
+    }
+  },
+
+  // Admin: soft-delete a book
+  async deleteBook(bookId: string | number) {
+    try {
+      const r = await adminRequest<any>(`/books/${bookId}`, { method: 'DELETE' });
+      return r;
+    } catch (err: any) {
+      throw err;
+    }
   },
   // Admin create book supports multipart with fields 'book' and 'cover' (or bookFile/bookData depending on backend). Accepts { form, book?, cover? }
   async createBookAdmin(input: { form: Record<string, any>; book?: File | null; cover?: File | null }) {
@@ -381,6 +485,101 @@ export const adminApi = {
     }
     const json = await res.json().catch(() => ({}));
     return json.book || json;
+  },
+  /**
+   * Validate bulk upload inputs client-side
+   */
+  validateBulkUploadInputs(files: File[] | null | undefined, metadataArray: any[] | null | undefined) {
+    const errors: string[] = [];
+    if (!files || !Array.isArray(files) || files.length === 0) errors.push('No files provided');
+    if (!metadataArray || !Array.isArray(metadataArray) || metadataArray.length === 0) errors.push('No metadata provided');
+    if (files && metadataArray && files.length !== metadataArray.length) errors.push('Number of files must match metadata array length');
+    return errors.length ? errors : null;
+  },
+
+  /**
+   * Upload multiple books with progress support. Calls /books/admin/bulk-upload
+   * onProgress receives a map-like object { loaded, total, percent } for global progress
+   */
+  async bulkUploadBooks(files: File[], metadataArray: any[], onProgress?: (p: { loaded: number; total: number; percent: number }) => void): Promise<import('../types/books').BulkOperationResponse> {
+    const validation = this.validateBulkUploadInputs(files, metadataArray as any[]);
+    if (validation) throw new Error('Bulk upload validation failed: ' + validation.join('; '));
+
+    // Create FormData and append files and metadata JSON
+    const form = new FormData();
+    files.forEach((f) => form.append('bookFiles', f));
+    form.append('bookDataArray', JSON.stringify(metadataArray));
+
+    // Use XHR to support upload progress events
+    return new Promise((resolve, reject) => {
+      try {
+        const xhr = new XMLHttpRequest();
+        const url = `${ADMIN_API_BASE}/books/admin/bulk-upload`;
+        xhr.open('POST', url, true);
+        // include credentials
+        xhr.withCredentials = !!USE_CREDENTIALS;
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable && onProgress) onProgress({ loaded: e.loaded, total: e.total, percent: Math.round((e.loaded / e.total) * 100) });
+        };
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4) {
+            if (xhr.status >= 200 && xhr.status < 300) {
+              try {
+                const json = JSON.parse(xhr.responseText || '{}');
+                resolve(json as import('../types/books').BulkOperationResponse);
+              } catch (e) {
+                resolve({ results: [], summary: { total: 0, successful: 0, failed: 0 } });
+              }
+            } else {
+              let msg = `Bulk upload failed with status ${xhr.status}`;
+              try { const body = JSON.parse(xhr.responseText || '{}'); msg = body.error || body.message || msg; } catch (e) {}
+              reject(new Error(msg));
+            }
+          }
+        };
+        xhr.send(form);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  },
+
+  async importBookFromURL(urlStr: string, bookData: any) {
+    if (!urlStr || typeof urlStr !== 'string') throw new Error('Invalid URL');
+    const body = { url: urlStr, bookData };
+    return adminRequest<any>(`/books/admin/import-url`, { method: 'POST', body: JSON.stringify(body) });
+  },
+
+  async bulkImportFromURLs(urls: string[], metadataArray: any[], onProgress?: (p: { loaded: number; total: number; percent: number }) => void) {
+    if (!Array.isArray(urls) || !Array.isArray(metadataArray) || urls.length !== metadataArray.length) throw new Error('URLs and metadata must be arrays of same length');
+    const body = { urls, bookDataArray: metadataArray };
+    // Simulate progress while backend processes URL imports because fetch does not provide progress for server-side processing.
+    let interval: any = null;
+    let percent = 0;
+    if (onProgress) {
+      onProgress({ loaded: 0, total: 100, percent });
+      interval = setInterval(() => {
+        percent = Math.min(90, percent + Math.floor(Math.random() * 10) + 5);
+        onProgress({ loaded: percent, total: 100, percent });
+      }, 500);
+    }
+    try {
+      const res = await adminRequest<any>(`/books/admin/bulk-import-urls`, { method: 'POST', body: JSON.stringify(body) });
+      if (onProgress) onProgress({ loaded: 100, total: 100, percent: 100 });
+      return res;
+    } finally {
+      if (interval) clearInterval(interval);
+    }
+  },
+
+  async batchUpdateBooks(updates: Array<{ id: string; bookData: any }>) {
+    if (!Array.isArray(updates)) throw new Error('Updates must be an array');
+    return adminRequest<any>(`/books/admin/batch-update`, { method: 'PUT', body: JSON.stringify({ updates }) });
+  },
+
+  async batchDeleteBooks(bookIds: string[]) {
+    if (!Array.isArray(bookIds)) throw new Error('bookIds must be an array');
+    return adminRequest<any>(`/books/admin/batch-delete`, { method: 'DELETE', body: JSON.stringify({ bookIds }) });
   },
   async createTheme(payload: any) { return adminRequest<{ theme: any }>(`/themes`, { method: 'POST', body: JSON.stringify(payload) }); },
   async updateTheme(id: number, payload: any) { return adminRequest<{ theme: any }>(`/themes/${id}`, { method: 'PATCH', body: JSON.stringify(payload) }); },

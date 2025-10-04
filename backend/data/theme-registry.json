@@ -1,0 +1,124 @@
+{
+  "themes": [
+    {
+      "id": "default",
+      "metadata": {
+        "id": "default",
+        "name": "Default Theme",
+        "description": "Cosmic purple landing page",
+        "category": "landing",
+        "isLandingPage": "true",
+        "landingPagePath": "/landingpage",
+        "gradient": "from-purple-500 to-fuchsia-500"
+      }
+    },
+    {
+      "id": "shiva",
+      "metadata": {
+        "id": "shiva",
+        "name": "Peaceful Shiva",
+        "description": "Serene blue theme for meditation",
+        "deity": "Shiva",
+        "category": "color-scheme",
+        "isLandingPage": false,
+        "gradient": "from-blue-900 to-indigo-900"
+      }
+    },
+    {
+      "id": "mahakali",
+      "metadata": {
+        "id": "mahakali",
+        "name": "Mahakali Theme",
+        "description": "🔥 Cremation ground landing page",
+        "deity": "Mahakali",
+        "category": "hybrid",
+        "isLandingPage": "true",
+        "landingPagePath": "/MahakaliLandingpage",
+        "gradient": "from-red-700 to-black"
+      }
+    },
+    {
+      "id": "mystery",
+      "metadata": {
+        "id": "mystery",
+        "name": "Mystery Theme",
+        "description": "🔮 Cosmic mystery landing page",
+        "category": "landing",
+        "isLandingPage": "true",
+        "landingPagePath": "/MysteryLandingpage",
+        "gradient": "from-blue-900 to-indigo-900"
+      }
+    },
+    {
+      "id": "earth",
+      "metadata": {
+        "id": "earth",
+        "name": "Krishna Theme",
+        "description": "Earthy brown and green tones",
+        "deity": "Krishna",
+        "category": "color-scheme",
+        "isLandingPage": false,
+        "gradient": "from-amber-700 to-green-700"
+      }
+    },
+    {
+      "id": "water",
+      "metadata": {
+        "id": "water",
+        "name": "Vishnu Theme",
+        "description": "Calming blue and teal water tones",
+        "deity": "Vishnu",
+        "category": "color-scheme",
+        "isLandingPage": false,
+        "gradient": "from-blue-600 to-teal-500"
+      }
+    },
+    {
+      "id": "fire",
+      "metadata": {
+        "id": "fire",
+        "name": "Maa Durga Theme",
+        "description": "Fiery red, orange and yellow tones",
+        "deity": "Durga",
+        "category": "color-scheme",
+        "isLandingPage": false,
+        "gradient": "from-red-600 to-yellow-500"
+      }
+    },
+    {
+      "id": "bhairava",
+      "metadata": {
+        "id": "bhairava",
+        "name": "Bhairava Theme",
+        "description": "Fierce dark red and crimson tones",
+        "deity": "Bhairava",
+        "category": "color-scheme",
+        "isLandingPage": "false",
+        "gradient": "from-red-900 to-red-700"
+      }
+    },
+    {
+      "id": "serenity",
+      "metadata": {
+        "id": "serenity",
+        "name": "Serenity Theme",
+        "description": "Calm and peaceful soft blue tones",
+        "category": "color-scheme",
+        "isLandingPage": false,
+        "gradient": "from-blue-300 to-teal-300"
+      }
+    },
+    {
+      "id": "ganesha",
+      "metadata": {
+        "id": "ganesha",
+        "name": "Ganesha Theme",
+        "description": "Divine purple and gold tones",
+        "deity": "Ganesha",
+        "category": "color-scheme",
+        "isLandingPage": false,
+        "gradient": "from-purple-600 to-amber-500"
+      }
+    }
+  ]
+}

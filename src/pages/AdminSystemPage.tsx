@@ -93,7 +93,7 @@ const AdminSystemPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {metrics?.cpu_usage_percent ? `${metrics.cpu_usage_percent.toFixed(1)}%` : 'N/A'}
+              {metrics && typeof metrics.cpu_usage_percent !== 'undefined' && metrics.cpu_usage_percent !== null && isFinite(Number(metrics.cpu_usage_percent)) ? `${Number(metrics.cpu_usage_percent).toFixed(1)}%` : 'N/A'}
             </div>
             <p className="text-xs text-muted-foreground">
               {metrics?.extra?.cpu_count ? `${metrics.extra.cpu_count} cores` : 'N/A'}
@@ -108,10 +108,10 @@ const AdminSystemPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {metrics?.memory_usage_percent ? `${metrics.memory_usage_percent.toFixed(1)}%` : 'N/A'}
+              {metrics && typeof metrics.memory_usage_percent !== 'undefined' && metrics.memory_usage_percent !== null && isFinite(Number(metrics.memory_usage_percent)) ? `${Number(metrics.memory_usage_percent).toFixed(1)}%` : 'N/A'}
             </div>
             <p className="text-xs text-muted-foreground">
-              Load average: {metrics?.load_average?.one?.toFixed(2) || 'N/A'}
+              Load average: {(metrics && metrics.load_average && isFinite(Number(metrics.load_average.one))) ? Number(metrics.load_average.one).toFixed(2) : 'N/A'}
             </p>
           </CardContent>
         </Card>
@@ -249,18 +249,18 @@ const AdminSystemPage = () => {
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Load Average</h3>
               <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>1 min:</span>
-                  <span className="font-medium">{metrics?.load_average?.one?.toFixed(2) || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>5 min:</span>
-                  <span className="font-medium">{metrics?.load_average?.five?.toFixed(2) || 'N/A'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>15 min:</span>
-                  <span className="font-medium">{metrics?.load_average?.fifteen?.toFixed(2) || 'N/A'}</span>
-                </div>
+                  <div className="flex justify-between">
+                    <span>1 min:</span>
+                    <span className="font-medium">{(metrics && metrics.load_average && isFinite(Number(metrics.load_average.one))) ? Number(metrics.load_average.one).toFixed(2) : 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>5 min:</span>
+                    <span className="font-medium">{(metrics && metrics.load_average && isFinite(Number(metrics.load_average.five))) ? Number(metrics.load_average.five).toFixed(2) : 'N/A'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>15 min:</span>
+                    <span className="font-medium">{(metrics && metrics.load_average && isFinite(Number(metrics.load_average.fifteen))) ? Number(metrics.load_average.fifteen).toFixed(2) : 'N/A'}</span>
+                  </div>
               </div>
             </div>
           </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -13,26 +13,34 @@ import BookRequestDialog from "./BookRequestDialog";
 import RecommendedRow from "./RecommendedRow";
 import FoundationsCategory from "./FoundationsCategory";
 import FoundationSadhanaViewer from "./FoundationSadhanaViewer";
-import { useSpiritualBooks } from "@/hooks/useSpiritualBooks";
+import { useSpiritualBooks, useBookTraditions } from "@/hooks/useSpiritualBooks";
+import { useQuery } from '@tanstack/react-query';
+import api from '@/services/api';
+import type { BookFilters, BookSuggestion } from '@/types/books';
+import AdvancedFilters from './AdvancedFilters';
+import FilterChips from './FilterChips';
 import { StoreSadhana } from "@/types/store";
 import { Link } from "react-router-dom";
 
 const LibraryContainer = () => {
   const { toast } = useToast();
-  const { books, isLoading, refreshBooks } = useSpiritualBooks();
+  const [filters, setFilters] = useState<BookFilters>({ limit: 40, offset: 0 });
+  const { books, isLoading, total, limit, offset, refreshBooks } = useSpiritualBooks(filters);
+  const { data: traditions = [], isLoading: traditionsLoading } = useBookTraditions();
+  // Languages and year range loaded from API endpoints
+  const { data: languages = [], isLoading: languagesLoading } = useQuery({ queryKey: ['book-languages'], queryFn: async () => { const r = await api.getLanguages(); return r.languages || []; } });
+  const { data: yearRange = { min: null, max: null }, isLoading: yearRangeLoading } = useQuery({ queryKey: ['book-year-range'], queryFn: async () => { const r = await api.getYearRange(); return { min: r.min, max: r.max }; } });
   const [selectedBook, setSelectedBook] = useState<string | null>(null);
   const [selectedFoundationSadhana, setSelectedFoundationSadhana] = useState<StoreSadhana | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+  // Search is managed via filters.search; no local searchQuery duplication
   const [view, setView] = useState<"grid" | "list">("grid");
   const [activeTab, setActiveTab] = useState("books");
   
-  // Add safety check to ensure books is an array before filtering
-  const filteredBooks = (books || []).filter(
-    (book) => 
-      book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      book.traditions.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const handleFiltersChange = (next: Partial<BookFilters>) => {
+    setFilters(prev => ({ ...prev, ...next, offset: 0 }));
+  };
+
+  const filteredBooks = books || [];
   
   const handleSelectBook = (bookId: string) => {
     setSelectedBook(bookId);
@@ -94,11 +102,43 @@ const LibraryContainer = () => {
         </TabsList>
         
         <TabsContent value="books" className="space-y-4">
-          <SearchBar
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search by title, author or tradition..."
-          />
+          <div className="flex flex-col gap-3">
+            <SearchBar
+              value={filters.search || ''}
+              onChange={(e) => handleFiltersChange({ search: e.target.value })}
+              placeholder="Search by title, author or tradition..."
+              onSelectSuggestion={(sugg: BookSuggestion) => {
+                if (sugg.title) handleFiltersChange({ search: sugg.title });
+                if (sugg.tradition) handleFiltersChange({ traditions: Array.from(new Set([...(filters.traditions || []), sugg.tradition])) });
+                // open the book optionally
+                if (sugg.id) setSelectedBook(sugg.id);
+              }}
+            />
+
+            <AdvancedFilters
+              filters={filters}
+              onFiltersChange={(next: BookFilters) => handleFiltersChange(next)}
+              languages={languages}
+              yearRange={yearRange}
+              traditions={traditions}
+            />
+
+            <FilterChips
+              filters={filters}
+              onRemoveFilter={(key, value) => {
+                // handle domain-level remove semantics
+                if (key === 'search') handleFiltersChange({ search: undefined });
+                else if (key === 'language') handleFiltersChange({ language: undefined });
+                else if (key === 'fileType') handleFiltersChange({ fileType: 'all' });
+                else if (key === 'minYear' || key === 'maxYear') handleFiltersChange({ minYear: undefined, maxYear: undefined });
+                else if (key === 'sort') handleFiltersChange({ sortBy: undefined, sortOrder: undefined });
+                else if (key === 'tradition' && typeof value === 'string') {
+                  const newTrad = (filters.traditions || []).filter(t => t !== value);
+                  handleFiltersChange({ traditions: newTrad });
+                }
+              }}
+            />
+          </div>
           
           <div className="mb-4 p-4 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 rounded-lg border border-purple-500/20">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">

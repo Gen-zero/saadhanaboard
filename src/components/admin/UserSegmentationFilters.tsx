@@ -10,12 +10,12 @@ export default function UserSegmentationFilters({ value = {}, onChange }: { valu
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="text-sm">Experience Level</label>
-          <Select value={value.experience_level || ''} onValueChange={(v) => onChange({ ...value, experience_level: v as any || undefined })}>
+          <Select value={value.experience_level ?? '__any'} onValueChange={(v) => onChange({ ...value, experience_level: v === '__any' ? undefined : (v as any) })}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Any</SelectItem>
+              <SelectItem value="__any">Any</SelectItem>
               <SelectItem value="beginner">Beginner</SelectItem>
               <SelectItem value="intermediate">Intermediate</SelectItem>
               <SelectItem value="advanced">Advanced</SelectItem>

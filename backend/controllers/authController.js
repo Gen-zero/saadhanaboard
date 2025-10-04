@@ -18,7 +18,8 @@ class AuthController {
         token
       });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.error('AuthController.register error:', error);
+      res.status(400).json({ error: error.message || 'Registration failed', details: error.stack || null });
     }
   }
 
@@ -38,7 +39,8 @@ class AuthController {
         waitlistEntry
       });
     } catch (error) {
-      res.status(400).json({ error: error.message });
+      console.error('AuthController.joinWaitlist error:', error);
+      res.status(400).json({ error: error.message || 'Failed to join waitlist', details: error.stack || null });
     }
   }
 
@@ -59,7 +61,8 @@ class AuthController {
         token
       });
     } catch (error) {
-      res.status(401).json({ error: error.message });
+      console.error('AuthController.login error:', error);
+      res.status(401).json({ error: error.message || 'Authentication failed', details: error.stack || null });
     }
   }
 
@@ -70,7 +73,8 @@ class AuthController {
         user: req.user
       });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      console.error('AuthController.getCurrentUser error:', error);
+      res.status(500).json({ error: error.message || 'Failed to get current user', details: error.stack || null });
     }
   }
 }

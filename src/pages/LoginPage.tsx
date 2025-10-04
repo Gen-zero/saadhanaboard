@@ -48,7 +48,7 @@ const LoginPage = () => {
       await login(values.email, values.password);
       navigate("/dashboard");
     } catch (err) {
-      console.error("Login error:", err);
+  // error is shown to user via setError()
       setError("Invalid email or password. Please try again.");
     } finally {
       setIsLoading(false);

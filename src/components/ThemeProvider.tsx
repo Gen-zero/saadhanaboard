@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { SettingsType } from '@/components/settings/SettingsTypes';
 import i18n from '@/lib/i18n';
+import { getThemeById, listThemes, themeUtils } from '@/themes';
 
 interface ThemeProviderProps {
   settings: SettingsType;
@@ -9,14 +10,10 @@ interface ThemeProviderProps {
 
 const ThemeProvider: React.FC<ThemeProviderProps> = ({ settings, children }) => {
   useEffect(() => {
-    // Apply the base theme
-    const theme = settings?.theme || 'dark';
-    
-    // Remove any existing theme classes
-    document.body.classList.remove('light', 'dark');
-    
-    // Apply the new theme class
-    document.body.classList.add(theme);
+  // Base theme (light/dark) remains as simple classes
+  const baseTheme = settings?.theme || 'dark';
+  document.body.classList.remove('light', 'dark');
+  document.body.classList.add(baseTheme);
     
     // Apply appearance settings
     const appearance = settings?.appearance;
@@ -44,29 +41,23 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ settings, children }) => 
       }
     }
     
-    // Apply color scheme
+    // Apply color scheme via registry-driven classes + CSS variables
     if (appearance?.colorScheme) {
-      // Remove any existing color scheme classes
-      document.body.classList.remove(
-        'color-scheme-default', 
-        'color-scheme-earth', 
-        'color-scheme-water', 
-        'color-scheme-fire', 
-        'shiva-theme',
-        'theme-default',
-        'theme-mahakali',
-        'theme-mystery'
-      );
-      
-      // Apply the new color scheme class
-      if (appearance.colorScheme !== 'default') {
-        if (appearance.colorScheme === 'shiva') {
-          document.body.classList.add('shiva-theme');
-        } else if (appearance.colorScheme === 'mahakali') {
-          // Add Mahakali body class for CSS-based adjustments (colors, fonts)
-          document.body.classList.add('theme-mahakali');
-        } else {
-          document.body.classList.add(`color-scheme-${appearance.colorScheme}`);
+      // remove any known color-scheme-* and theme-* classes conservatively
+      Array.from(document.body.classList)
+        .filter((c) => c.startsWith('color-scheme-') || c.startsWith('theme-') || c.endsWith('-theme'))
+        .forEach((c) => document.body.classList.remove(c));
+
+      const selected = appearance.colorScheme;
+      if (selected && selected !== 'default') {
+        // add a theme class for legacy CSS that expects it
+        document.body.classList.add(`theme-${selected}`);
+
+        // apply CSS vars if the theme is in registry
+        const themeDef = getThemeById(selected as string);
+        if (themeDef) {
+          // apply theme token colors
+          themeUtils.applyThemeColors(themeDef.colors as any);
         }
       }
     }
@@ -81,25 +72,10 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ settings, children }) => 
       const languageCode = languageMap[settings.language] || 'en';
       i18n.changeLanguage(languageCode);
     }
-    // Apply theme color variables if provided
-    // Expect settings.appearance?.themeColors or settings.themeColors to be an object with fields
-    const colors = (settings as any)?.appearance?.themeColors || (settings as any)?.themeColors;
-    if (colors) {
-      const root = document.documentElement;
-      const vars: Record<string, string> = {
-        '--color-primary': colors.primary || '#8B2A94',
-        '--color-secondary': colors.secondary || '#4A1547',
-        '--color-accent': colors.accent || '#E91E63',
-        '--color-border': colors.border || '#e5e7eb',
-        '--color-success': colors.success || '#16a34a',
-        '--color-warning': colors.warning || '#f59e0b',
-        '--color-error': colors.error || '#ef4444',
-        '--color-info': colors.info || '#3b82f6'
-      };
-
-      Object.entries(vars).forEach(([key, val]) => {
-        root.style.setProperty(key, val);
-      });
+    // Apply explicit themeColors from settings if present (overrides)
+    const explicitColors = (settings as any)?.appearance?.themeColors || (settings as any)?.themeColors;
+    if (explicitColors) {
+      themeUtils.applyThemeColors(explicitColors as any);
     }
   }, [settings?.theme, settings?.appearance, settings?.language]);
 

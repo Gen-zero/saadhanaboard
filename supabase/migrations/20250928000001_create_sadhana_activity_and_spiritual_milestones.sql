@@ -1,4 +1,4 @@
--- Migration: Create sadhana_activity and spiritual_milestones tables
+- Migration: Create sadhana_activity and spiritual_milestones tables
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 

@@ -11,8 +11,9 @@
 8. [Data Management](#data-management)
 9. [UI/UX Components](#uiux-components)
 10. [Spiritual Features](#spiritual-features)
-11. [Settings and Customization](#settings-and-customization)
-12. [Deployment](#deployment)
+11. [Theme System](#theme-system)
+14. [Settings and Customization](#settings-and-customization)
+15. [Deployment](#deployment)
 
 ## Overview
 
@@ -321,15 +322,81 @@ The application uses PostgreSQL with the following main tables:
 ## Spiritual Features
 
 ### Themes
-The application supports multiple spiritual themes that affect the entire UI:
-- **Default** - Cosmic energy theme
-- **Earth** - Nature-based elements
-- **Water** - Flowing water aesthetics
-- **Fire** - Dynamic fire effects
-- **Shiva** - Lord Shiva cosmic theme
-- **Bhairava** - Intense protective energy
-- **Serenity** - Calming peaceful theme
-- **Ganesha** - Auspicious remover of obstacles
+The application uses a modular, folder-based theme system located in `src/themes/` with static imports for tree-shaking and type safety. Currently available themes:
+- **Default** - Cosmic purple landing page
+- **Shiva** - Serene blue meditation theme
+- **Mahakali** - Cremation ground with 3D effects
+- **Mystery** - Cosmic mystery landing page
+- **Earth (Krishna)** - Nature-based brown and green
+- **Water (Vishnu)** - Calming blue and teal
+- **Fire (Durga)** - Fiery red, orange and yellow
+- **Bhairava** - Fierce dark red and crimson
+- **Serenity** - Calm peaceful soft blue
+- **Ganesha** - Divine purple and gold
+
+## Theme System
+
+SaadhanaBoard uses a sophisticated folder-based theme architecture that provides modularity, type safety, and easy extensibility.
+
+### Architecture Overview
+
+The theme system follows a single source of truth pattern:
+1. **Frontend Registry** (`src/themes/`) - Complete theme definitions with TypeScript types
+2. **Build Script** (`scripts/generate-theme-manifest.js`) - Extracts metadata to JSON
+3. **Backend Manifest** (`backend/data/theme-registry.json`) - Serialized theme metadata
+4. **Backend Persistence** (`backend/data/themes.json`) - Availability flags and admin overrides
+5. **Admin UI** (`/admin/themes`) - Theme availability management
+
+### Theme Structure
+
+Each theme is organized in its own folder under `src/themes/` with the following structure:
+- `index.ts` - Main theme definition with metadata
+- `colors.ts` - CSS variable color values in HSL format
+- `assets/` - Optional theme-specific images and icons
+- `background.tsx` - Optional custom background component
+
+### Theme Categories
+
+- **Landing Page Themes** - Themes with dedicated landing pages (default, mystery, mahakali)
+- **Color Scheme Themes** - Themes that only change colors (shiva, earth, water, fire, bhairava, serenity, ganesha)
+- **Hybrid Themes** - Themes with both landing pages and color schemes (mahakali)
+
+### Theme Registry API
+
+The theme system provides a comprehensive API for accessing themes:
+- `getThemeById(id)` - Retrieve a theme by its ID
+- `listThemes(options)` - Get filtered list of themes
+- `getThemesByDeity(deity)` - Get themes associated with a deity
+- `getLandingPageThemes()` - Get all landing page themes
+- `getColorSchemeThemes()` - Get all color scheme themes
+
+### Adding New Themes
+
+For detailed instructions on adding new themes, managing theme availability, and understanding the complete workflow, see the comprehensive guide:
+
+**📖 [Theme Workflow Guide](docs/THEME_WORKFLOW.md)**
+
+This guide covers:
+- Theme folder anatomy with code examples
+- Step-by-step process for adding new themes
+- Frontend static registration
+- Backend manifest generation and syncing
+- Admin availability management
+- Testing and deployment workflows
+- Troubleshooting common issues
+- Best practices and advanced topics
+
+### Key Features
+
+- **Type Safety** - Full TypeScript support with strict type checking
+- **Tree Shaking** - Only imported themes are included in the bundle
+- **Modularity** - Each theme is self-contained and independent
+- **Extensibility** - Easy to add new themes by creating a folder
+- **Admin Control** - Admins can toggle theme availability without code changes
+- **Custom Backgrounds** - Themes can provide custom background components
+- **Deity Associations** - Themes can be associated with specific deities
+- **Accessibility** - Color contrast and accessibility built-in
+
 
 ### Deity Connections
 - Integration with Claude AI for spiritual guidance

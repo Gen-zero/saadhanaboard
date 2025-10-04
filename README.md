@@ -79,7 +79,18 @@ npm run dev
 node backend/utils/initDb.js
 ```
 
-### 🔐 Environment Variables
+### �️ Database migrations
+
+If you need to apply the soft-delete migration (adds a `deleted_at` column to `spiritual_books`) you can run the helper script included in the backend:
+
+```powershell
+node backend/scripts/apply_book_soft_delete_migration.js
+```
+
+This script reads the SQL file `supabase/migrations/20250108000000_add_book_soft_delete.sql` and executes it against the configured database (it uses the same connection parameters as the backend). Ensure your backend environment variables (in `backend/.env`) are configured before running it.
+
+
+### �🔐 Environment Variables
 Create a `.env` file in the project root for frontend values (copy `.env.example`) and in `backend/.env` for backend values (copy `backend/.env.example`).
 
 Example backend values include:
@@ -220,3 +231,43 @@ The application now uses a local PostgreSQL database instead of Supabase, with t
 ## 📄 License 📜 ✅
 
 This project is licensed under the MIT License.
+
+## Theme Icons (developer guide)
+
+This project keeps a small canonical `icons/` folder at the repository root. During development and build the project copies a curated subset of files from `icons/` into `src/themes/<themeId>/assets` so theme components can reference them as local assets.
+
+Why this exists:
+- Keeps large or animated icon files out of the committed theme folders until they are needed.
+- Avoids duplication while allowing theme authors to override or extend assets inside `src/themes/*/assets`.
+
+How it works:
+- `scripts/generate-theme-manifest.js` creates a manifest used by the build.
+- `scripts/copy-theme-icons.cjs` copies files listed in the mapping into `src/themes/<themeId>/assets`.
+- The project exposes npm scripts that run these helpers automatically during dev/build/postinstall.
+
+Useful commands:
+- Install & sync icons (recommended before first run):
+
+```powershell
+npm install
+npm run dev:setup
+```
+
+- Run the copy script manually (dry-run):
+
+```powershell
+npm run themes:copy-icons -- --dry-run
+```
+
+- Force overwrite existing destination files:
+
+```powershell
+npm run themes:copy-icons -- --force
+```
+
+Troubleshooting:
+- If icons are missing in the UI, verify `icons/` contains the expected filenames listed in the repository `scripts/copy-theme-icons.cjs` mapping.
+- Use `--dry-run` to see which files would be copied without changing the filesystem.
+- If `npm run dev` starts but assets are not present, run `npm run dev:setup` to regenerate themes and copy icons.
+
+For more details and advanced troubleshooting steps, see `docs/THEME_ICON_SETUP.md`.

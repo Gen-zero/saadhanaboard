@@ -26,6 +26,7 @@ export default {
 			fontFamily: {
 				apple: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
 				sans: ['-apple-system', 'BlinkMacSystemFont', 'San Francisco', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+				handwritten: ['Caveat', 'Patrick Hand', 'Kalam', 'Comic Sans MS', 'cursive', 'sans-serif'],
 			},
 			colors: {
 				border: 'hsl(var(--border))',

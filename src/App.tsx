@@ -31,8 +31,11 @@ import AboutPage from "./pages/AboutPage";
 import NotFound from "./pages/NotFound";
 import SpiritualDemoPage from "./pages/SpiritualDemoPage";
 import StorePage from "./pages/StorePage";
+import CommunityFeedPage from "./pages/CommunityFeedPage";
+import SharedSadhanaDetailPage from "./pages/SharedSadhanaDetailPage";
 import LanguageTestPage from "./pages/LanguageTestPage";
 import PratyangiraPage from "./pages/PratyangiraPage";
+import AnalyticsPage from "./pages/AnalyticsPage";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Leaf } from "lucide-react";
@@ -190,8 +193,9 @@ const AppRoutes = () => {
       <Route path="/language-test" element={<ProtectedRoute><LanguageTestPage /></ProtectedRoute>} />
       <Route path="/pratyangira" element={<ProtectedRoute><PratyangiraPage /></ProtectedRoute>} />
 
-      <Route path="/landingpage" element={<HomePage />} />
-      <Route path="/" element={<Navigate to="/landingpage" replace />} />
+  <Route path="/landingpage" element={<HomePage />} />
+  <Route path="/" element={<Navigate to="/landingpage" replace />} />
+  <Route path="/pages" element={<Navigate to="/landingpage" replace />} />
       <Route path="/MahakaliLandingpage" element={<ExperimentPage />} />
       <Route path="/MysteryLandingpage" element={<MysteryLandingPage />} />
       <Route path="/about" element={<AboutPage />} />
@@ -206,9 +210,12 @@ const AppRoutes = () => {
         {/* legacy: assets/themes/templates routes are deprecated in favor of /admin/content */}
         <Route path="settings" element={<AdminSettingsReportsPage />} />
       </Route>
-      <Route path="/dashboard" element={<OnboardingRoute><DashboardPage /></OnboardingRoute>} />
+    <Route path="/dashboard" element={<OnboardingRoute><DashboardPage /></OnboardingRoute>} />
+    <Route path="/analytics" element={<OnboardingRoute><AnalyticsPage /></OnboardingRoute>} />
       <Route path="/sadhana" element={<OnboardingRoute><SadhanaPage /></OnboardingRoute>} />
       <Route path="/saadhanas" element={<OnboardingRoute><SaadhanasPage /></OnboardingRoute>} />
+  <Route path="/community" element={<OnboardingRoute><CommunityFeedPage /></OnboardingRoute>} />
+  <Route path="/community/:id" element={<OnboardingRoute><SharedSadhanaDetailPage /></OnboardingRoute>} />
       <Route path="/library" element={<OnboardingRoute><LibraryPage /></OnboardingRoute>} />
       <Route path="/settings" element={<OnboardingRoute><SettingsPage /></OnboardingRoute>} />
       <Route path="/profile" element={<OnboardingRoute><ProfilePage /></OnboardingRoute>} />

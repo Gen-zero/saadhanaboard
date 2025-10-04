@@ -123,7 +123,7 @@ const Dashboard = () => {
         
         setUrgentTasks(urgent.slice(0, 5)); // Get top 5 urgent tasks
       } catch (e) {
-        console.error("Failed to parse tasks:", e);
+        // parsing failed, fall back to empty tasks
       }
     }
   };
@@ -169,8 +169,8 @@ const Dashboard = () => {
         setTotalDays(progress.totalDays);
         setGoalProgress(Math.floor((progress.currentDay / progress.totalDays) * 100));
       } catch (e) {
-        console.error("Failed to parse spiritual progress:", e);
-        
+        // parsing failed, fall back to default progress
+      }
         // Set default values
         localStorage.setItem('spiritualPracticeProgress', JSON.stringify({
           currentDay: 15,

@@ -51,11 +51,65 @@ const mediaProcessingService = {
   },
 
   async processAudio(srcPath, outPath) {
-    // TODO: implement audio conversion and metadata extraction
-    return { path: outPath };
+    // Implement audio conversion and metadata extraction using ffprobe/ffmpeg
+    const { spawn } = require('child_process');
+    return new Promise((resolve, reject) => {
+      // run ffprobe to get metadata
+      const ffprobe = spawn('ffprobe', ['-v', 'quiet', '-print_format', 'json', '-show_format', '-show_streams', srcPath]);
+      let metadataOutput = '';
+      ffprobe.stdout.on('data', (d) => metadataOutput += d.toString());
+      ffprobe.stderr.on('data', () => {});
+      ffprobe.on('error', (err) => reject(new Error(`ffprobe spawn error: ${err.message}`)));
+      ffprobe.on('close', (code) => {
+        if (code !== 0) return reject(new Error('ffmpeg/ffprobe not available'));
+        let metadata = {};
+        try {
+          const probe = JSON.parse(metadataOutput || '{}');
+          const audioStream = (probe.streams || []).find(s => s.codec_type === 'audio') || {};
+          metadata = {
+            duration: parseFloat(probe.format && probe.format.duration) || 0,
+            codec: audioStream.codec_name || 'unknown',
+            sampleRate: parseInt(audioStream.sample_rate || 0) || 0,
+            channels: parseInt(audioStream.channels || 0) || 0,
+            bitrate: parseInt(probe.format && probe.format.bit_rate) || 0,
+            format: probe.format && probe.format.format_name || 'unknown'
+          };
+        } catch (e) {
+          metadata = {};
+        }
+
+        // If conversion requested (outPath different), run ffmpeg
+        if (outPath && outPath !== srcPath) {
+          const format = (path.extname(outPath) || '').replace('.', '') || 'mp3';
+          const bitrate = '128k';
+          const sampleRate = 44100;
+          const codec = format === 'mp3' ? 'libmp3lame' : 'aac';
+          const args = ['-i', srcPath, '-acodec', codec, '-b:a', bitrate, '-ar', String(sampleRate), '-y', outPath];
+          const ffmpeg = spawn('ffmpeg', args);
+          ffmpeg.on('error', (err) => reject(new Error(`ffmpeg spawn error: ${err.message}`)));
+          ffmpeg.on('close', (c) => {
+            if (c === 0) return resolve({ path: outPath, metadata });
+            return reject(new Error(`ffmpeg conversion failed with code ${c}`));
+          });
+        } else {
+          return resolve({ path: srcPath, metadata });
+        }
+      });
+    });
   },
 
   // TODO: queue integration, virus scanning, cloud storage adapters, error handling
+
+  async normalizeAudio(srcPath, outPath, targetLevel = -16) {
+    return new Promise((resolve, reject) => {
+      const ffmpeg = spawn('ffmpeg', ['-i', srcPath, '-af', `loudnorm=I=${targetLevel}:TP=-1.5:LRA=11`, '-ar', '44100', '-y', outPath]);
+      ffmpeg.on('error', (err) => reject(new Error(`normalization spawn error: ${err.message}`)));
+      ffmpeg.on('close', (code) => {
+        if (code === 0) return resolve(outPath);
+        return reject(new Error(`Audio normalization failed with code ${code}`));
+      });
+    });
+  }
 };
 
 module.exports = mediaProcessingService;

@@ -55,9 +55,9 @@ const SignupPage = () => {
       });
       
       setSuccess(true);
-      console.log('Waitlist registration successful:', response.data);
+  // success handled via UI state/toast
     } catch (err: any) {
-      console.error("Waitlist registration error:", err);
+  // error shown to user via setError()
       setError(err.response?.data?.error || "Failed to join waiting list. Please try again.");
     } finally {
       setIsLoading(false);

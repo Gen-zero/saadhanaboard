@@ -22,12 +22,15 @@ import {
   Brain
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditProfileModal from "@/components/EditProfileModal";
 import { useProfileData } from "@/hooks/useProfileData";
 import { useUserProgression } from "@/hooks/useUserProgression";
 import { useBadges } from "@/hooks/useBadges";
 import { usePsychologicalLevers } from "@/hooks/usePsychologicalLevers";
+import { useAuth } from '@/lib/auth-context';
+import { useUserAnalytics } from '@/hooks/useUserAnalytics';
+import PracticeTrendsChart from '@/components/analytics/PracticeTrendsChart';
 import PersonalRhythmReports from "@/components/psychological-levers/PersonalRhythmReports";
 import DoshaKoshaMapping from "@/components/psychological-levers/DoshaKoshaMapping";
 import Quests from "@/components/psychological-levers/Quests";
@@ -40,6 +43,15 @@ const ProfilePage = () => {
   const [isInitiationModalOpen, setIsInitiationModalOpen] = useState(false);
   const { profile } = useProfileData();
   const { progression } = useUserProgression();
+  const { user } = useAuth();
+  const { practiceTrends, fetchPracticeTrends, loading: analyticsLoading, error: analyticsError } = useUserAnalytics(user?.id || '');
+
+  // Load quick analytics preview on mount (last 7 days)
+  useEffect(() => {
+    if (!user?.id) return;
+    // best-effort fetch, ignore errors here (UI shows fallback)
+    fetchPracticeTrends('7d').catch(() => {});
+  }, [user?.id, fetchPracticeTrends]);
   const { earnedBadges, earnedCount, totalBadges, unearnedBadges } = useBadges();
   const { 
     psychologicalProfile, 
@@ -362,6 +374,24 @@ const ProfilePage = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Analytics Preview */}
+        <Card className="backdrop-blur-sm bg-background/70 border border-purple-500/20">
+          <CardHeader>
+            <CardTitle>Quick Analytics</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {analyticsLoading ? (
+                <div className="text-center text-sm text-muted-foreground py-6">Loading analytics...</div>
+              ) : analyticsError ? (
+                <div className="text-center text-sm text-destructive py-6">Unable to load analytics</div>
+              ) : (
+                <PracticeTrendsChart data={practiceTrends?.trends?.slice(-7) || []} />
+              )}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

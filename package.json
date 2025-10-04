@@ -5,10 +5,13 @@
   "type": "module",
   "packageManager": "npm@9.8.0",
   "scripts": {
-    "dev": "vite",
+  "dev": "npm run dev:setup && vite",
+    "dev:setup": "npm run themes:generate && npm run themes:copy-icons && npm run assets:move",
+  "themes:generate": "node scripts/generate-theme-manifest.cjs",
+    "themes:copy-icons": "node scripts/copy-theme-icons.cjs",
     "assets:move": "node scripts/move-assets.js",
-    "build": "npm run assets:move && tsc -b && vite build",
-    "postinstall": "npm run assets:move",
+    "build": "npm run themes:generate && npm run themes:copy-icons && npm run assets:move && tsc -b && vite build",
+    "postinstall": "npm run themes:generate && npm run themes:copy-icons && npm run assets:move",
     "lint": "eslint .",
     "preview": "vite preview",
     "backend:dev": "cd backend && npm run dev",
@@ -98,8 +101,11 @@
     "vaul": "^0.9.3",
     "winston": "^3.17.0",
     "zod": "^3.25.76"
+    ,
+    "papaparse": "^5.4.1"
   },
   "devDependencies": {
+    "@types/papaparse": "^5.3.14",
     "@eslint/js": "^9.9.0",
     "@tailwindcss/typography": "^0.5.15",
     "@types/i18next": "^12.1.0",
