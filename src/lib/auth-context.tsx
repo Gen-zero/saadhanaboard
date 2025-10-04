@@ -61,10 +61,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, isLoading]);
 
   const login = async (email: string, password: string) => {
+    // Validate inputs
+    if (!email || !password) {
+      return { error: new Error('Email and password are required') };
+    }
+    
     return await signIn(email, password);
   };
 
   const signup = async (email: string, password: string, displayName: string) => {
+    // Validate inputs
+    if (!email || !password || !displayName) {
+      return { error: new Error('Email, password, and display name are required') };
+    }
+    
     return await signUp(email, password, displayName);
   };
 

@@ -1,19 +1,37 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SpiritualBook } from '@/types/books';
+import { useBookReading } from '@/hooks/useBookReading';
 
 interface TextViewerProps {
   book: SpiritualBook;
+  bookId?: string;
 }
 
-const TextViewer = ({ book }: TextViewerProps) => {
+const TextViewer = ({ book, bookId }: TextViewerProps) => {
   const [currentPage, setCurrentPage] = useState(0);
+  const { progress, scheduleSave } = useBookReading(bookId ? Number(bookId) : null);
   
   const pages = book.content?.split('---PAGE---') || ['No content available'];
   const totalPages = pages.length;
+
+  // Restore last reading position
+  useEffect(() => {
+    if (progress?.page !== undefined && progress.page >= 0 && progress.page < totalPages) {
+      setCurrentPage(progress.page);
+    }
+  }, [progress, totalPages]);
+
+  // Save progress when page changes
+  useEffect(() => {
+    if (bookId && totalPages > 0) {
+      const percent = ((currentPage + 1) / totalPages) * 100;
+      scheduleSave({ page: currentPage, percent });
+    }
+  }, [currentPage, totalPages, bookId, scheduleSave]);
   
   const handleNextPage = () => {
     if (currentPage < totalPages - 1) {

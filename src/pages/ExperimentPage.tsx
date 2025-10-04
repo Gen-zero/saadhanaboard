@@ -1,3 +1,5 @@
+import React, { Suspense } from 'react';
+import ErrorBoundary from '@/components/ErrorBoundary';
 import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -292,12 +294,23 @@ const ExperimentPage = () => {
     <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-900 via-red-950 to-black text-white overflow-hidden relative">
       {/* Wrapper for background layers - prepared for MahakaliAnimatedBackground integration */}
       <div className="fixed inset-0 z-0">
-  {/* Mount MahakaliAnimatedBackground for visual testing. Toggle props while tuning. */}
-  <MahakaliAnimatedBackground className="fixed inset-0 z-0" enableBloom={true} enableParticles={true} intensity={1} />
+        {/* Mount MahakaliAnimatedBackground with error boundary */}
+        <ErrorBoundary fallback={
+          <div className="fixed inset-0 z-0 bg-gradient-to-br from-red-900 via-black to-red-950">
+            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(ellipse_at_center,rgba(255,0,0,0.2)_0%,rgba(0,0,0,0)_70%)]"></div>
+          </div>
+        }>
+          <Suspense fallback={
+            <div className="fixed inset-0 z-0 bg-gradient-to-br from-red-900 via-black to-red-950 flex items-center justify-center">
+              <div className="text-red-200">Loading sacred background...</div>
+            </div>
+          }>
+            <MahakaliAnimatedBackground className="fixed inset-0 z-0" enableBloom={true} enableParticles={true} intensity={1} />
+          </Suspense>
+        </ErrorBoundary>
         {/* Removed legacy CSS gradient and emoji-based background layers — Three.js now provides the background visuals */}
         {/* FloatingElements retained only if desired for extra 2D overlays; currently suppressed to avoid visual duplication */}
-
-  </div>
+      </div>
 
       {/* Beta banner */}
       <div className="px-2 sm:px-4 pt-2">

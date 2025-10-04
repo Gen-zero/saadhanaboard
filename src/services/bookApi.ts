@@ -17,7 +17,7 @@ export const bookApi = {
   async getProgress(bookId: number): Promise<{ data: BookProgress | null }>{
     return req(`/books/${bookId}/reading/progress`);
   },
-  async upsertProgress(bookId: number, payload: { position?: string; page?: number; percent?: number }): Promise<{ data: BookProgress }>{
+  async upsertProgress(bookId: number, payload: { position?: string; page?: number; percent?: number; timeSpentMinutes?: number }): Promise<{ data: BookProgress }>{
     return req(`/books/${bookId}/reading/progress`, { method: 'POST', body: JSON.stringify(payload) });
   },
   async createBookmark(bookId: number, payload: { label?: string; page?: number; position?: any; isPublic?: boolean }): Promise<{ data: Bookmark }>{

@@ -1,23 +1,32 @@
-
-import { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCw, Download, Search, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/hooks/use-toast';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
+import { useToast } from '@/components/ui/use-toast';
+import { ChevronLeft, ChevronRight, Download, ZoomIn, ZoomOut, Menu, Search, RotateCw } from 'lucide-react';
+import { useBookReading } from '@/hooks/useBookReading';
+// @ts-ignore - Vite worker import
+import PDFWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?worker';
 
-// Set up PDF.js worker with reliable CDN
-pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
+// Set up the worker with local import instead of CDN
+const worker = new PDFWorker();
+pdfjs.GlobalWorkerOptions.workerPort = worker;
+
+// Terminate worker on HMR dispose to prevent dev-time worker leaks
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => {
+    worker.terminate();
+  });
+}
 
 interface PDFViewerProps {
   fileUrl: string;
   fileName: string;
+  bookId?: string;
 }
 
-const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
+const PDFViewer = ({ fileUrl, fileName, bookId }: PDFViewerProps) => {
   const [numPages, setNumPages] = useState<number>(0);
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
@@ -27,12 +36,36 @@ const PDFViewer = ({ fileUrl, fileName }: PDFViewerProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
   const { toast } = useToast();
+  const { progress, scheduleSave } = useBookReading(bookId ? Number(bookId) : null);
+
+  // Reset viewer state when fileUrl changes
+  useEffect(() => {
+    setNumPages(0);
+    setPageNumber(1);
+    setScale(1.0);
+    setRotation(0);
+    setIsLoading(true);
+    setError('');
+  }, [fileUrl]);
+
+  // Restore last reading position
+  useEffect(() => {
+    if (progress?.page && progress.page > 0 && progress.page <= numPages) {
+      setPageNumber(progress.page);
+    }
+  }, [progress, numPages]);
+
+  // Save progress when page changes
+  useEffect(() => {
+    if (numPages > 0 && bookId) {
+      const percent = (pageNumber / numPages) * 100;
+      scheduleSave({ page: pageNumber, percent });
+    }
+  }, [pageNumber, numPages, bookId, scheduleSave]);
 
   // Memoize PDF options to prevent unnecessary reloads
   const pdfOptions = useMemo(() => ({
-    cMapUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/cmaps/`,
     cMapPacked: true,
-    standardFontDataUrl: `https://unpkg.com/pdfjs-dist@${pdfjs.version}/standard_fonts/`,
     verbosity: 0,
   }), []);
 

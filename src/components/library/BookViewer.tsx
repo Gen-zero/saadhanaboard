@@ -58,7 +58,7 @@ const BookViewer = ({ bookId, onClose }: BookViewerProps) => {
       />
       
       <div className="flex-1 overflow-hidden">
-        <UnifiedViewer book={book} />
+        <UnifiedViewer book={book} bookId={bookId} />
       </div>
     </div>
   );

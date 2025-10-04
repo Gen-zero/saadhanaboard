@@ -438,7 +438,8 @@ class BookController {
   static async serveBookFile(req, res) {
     try {
       const { filename } = req.params;
-      const filePath = path.join(__dirname, '../../uploads', filename);
+      // Fix the file path construction - go up one more directory level
+      const filePath = path.join(__dirname, '../uploads', filename);
       
       // Check if file exists
       try {
@@ -451,6 +452,10 @@ class BookController {
             BookAnalyticsService.trackBookEvent(book.id, 'download', userId, { ip_address: req.ip, user_agent: req.get('user-agent') });
           }
         } catch (e) { /* ignore */ }
+        // Set CORS headers for file access
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
         res.sendFile(filePath);
       } catch (err) {
         res.status(404).json({ error: 'File not found' });
@@ -518,3 +523,10 @@ class BookController {
 BookController.upload = upload;
 
 module.exports = BookController;
+
+
+
+
+
+
+

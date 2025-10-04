@@ -157,10 +157,42 @@ export async function loadYantraTexture(path: string): Promise<THREE.Texture> {
 /** Specific loader for Mahakali yantra (uses cropped texture) */
 export async function createMahakaliYantraTexture(): Promise<THREE.Texture> {
   const path = '/icons/mahakali-yantra.png';
-  // use the cropped loader for performance and consistency
-  const tex = await loadCroppedTexture(path, 1024).catch(() => loadYantraTexture(path));
-  textureCache.set(path, tex);
-  return tex;
+  try {
+    // try to load the cropped texture first
+    const tex = await loadCroppedTexture(path, 1024);
+    return tex;
+  } catch (err) {
+    console.warn('Failed to load cropped Mahakali yantra, trying direct load:', err);
+    try {
+      // fallback to direct load
+      const tex = await loadYantraTexture(path);
+      return tex;
+    } catch (err2) {
+      console.warn('Failed to load Mahakali yantra texture, using fallback:', err2);
+      // create a procedural fallback texture
+      const canvas = document.createElement('canvas');
+      canvas.width = 256;
+      canvas.height = 256;
+      const ctx = canvas.getContext('2d')!;
+      
+      // Create a yantra-like pattern
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(0, 0, 256, 256);
+      
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.moveTo(128, 40);
+      ctx.lineTo(210, 210);
+      ctx.lineTo(46, 210);
+      ctx.closePath();
+      ctx.fill();
+      
+      const tex = new THREE.CanvasTexture(canvas);
+      preprocessYantraImage(tex);
+      textureCache.set(path, tex);
+      return tex;
+    }
+  }
 }
 
 // export cache for debugging

@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
+import React from 'react';
 import MahakaliAnimatedBackground from '@/components/MahakaliAnimatedBackground';
 import { getThemeById } from '@/themes';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 // Function to draw the Om symbol for the Default theme
 const drawOmSymbol = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, alpha: number, isGold: boolean = false) => {
@@ -964,6 +966,76 @@ interface ThemedBackgroundProps {
 
 const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const themeConfig = getThemeById(theme);
+    if (!themeConfig) return;
+    
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw mandala pattern
+      drawMandalaPattern(ctx, theme, canvas.width, canvas.height);
+      
+      // Draw additional elements based on theme
+      if (theme === 'default') {
+        drawOmSymbol(ctx, canvas.width / 2, canvas.height / 2, 100, 1);
+        drawSriYantra(ctx, canvas.width / 2, canvas.height / 2, 150, 0, 1);
+      } else if (theme === 'earth') {
+        drawLotus(ctx, canvas.width / 2, canvas.height / 2, 150, 0, 1);
+        drawEarthParticle(ctx, canvas.width / 4, canvas.height / 4, 10, 0.8);
+        drawEarthParticle(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 10, 0.8);
+      } else if (theme === 'water') {
+        drawWaterRipple(ctx, canvas.width / 2, canvas.height / 2, 150, 1);
+        drawDiya(ctx, canvas.width / 4, canvas.height / 4, 20, 1);
+        drawDiya(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 20, 1);
+      } else if (theme === 'fire') {
+        drawFireParticle(ctx, canvas.width / 2, canvas.height / 2, 150, 1);
+        drawEmber(ctx, canvas.width / 4, canvas.height / 4, 10, 0.8);
+        drawEmber(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 10, 0.8);
+      } else if (theme === 'shiva') {
+        drawSnowflake(ctx, canvas.width / 2, canvas.height / 2, 150, 1);
+        drawShivaSilhouette(ctx, canvas.width / 4, canvas.height / 4, 100, 0.8);
+        drawShivaSilhouette(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 100, 0.8);
+      } else if (theme === 'bhairava') {
+        drawTrident(ctx, canvas.width / 2, canvas.height / 2, 150, 0, 1);
+        drawSkull(ctx, canvas.width / 4, canvas.height / 4, 20, 1);
+        drawSkull(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 20, 1);
+        drawSacredFire(ctx, canvas.width / 2, canvas.height / 2, 150, 1);
+        drawBhairavaSilhouette(ctx, canvas.width / 4, canvas.height / 4, 100, 0.8);
+        drawBhairavaSilhouette(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 100, 0.8);
+        drawGlowingEyes(ctx, canvas.width / 2, canvas.height / 2, 20, 1);
+        drawTantricYantra(ctx, canvas.width / 4, canvas.height / 4, 100, 0, 1);
+        drawTantricYantra(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 100, 0, 1);
+      } else if (theme === 'serenity') {
+        drawCalmingLotus(ctx, canvas.width / 2, canvas.height / 2, 150, 0, 1);
+        drawGentleWave(ctx, canvas.width / 4, canvas.height / 4, 100, 0.8);
+        drawGentleWave(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 100, 0.8);
+        drawSoftLight(ctx, canvas.width / 2, canvas.height / 2, 100, 0.8);
+        drawPeacefulMountain(ctx, canvas.width / 4, canvas.height / 4, 100, 0.8);
+        drawPeacefulMountain(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 100, 0.8);
+        drawTranquilRipple(ctx, canvas.width / 2, canvas.height / 2, 100, 0.8);
+      } else if (theme === 'ganesha') {
+        drawGaneshaHead(ctx, canvas.width / 2, canvas.height / 2, 150, 1);
+        drawModak(ctx, canvas.width / 4, canvas.height / 4, 20, 1);
+        drawModak(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 20, 1);
+        drawGoldenParticle(ctx, canvas.width / 2, canvas.height / 2, 100, 1);
+        drawGaneshaOm(ctx, canvas.width / 4, canvas.height / 4, 20, 1);
+        drawGaneshaOm(ctx, (canvas.width * 3) / 4, (canvas.height * 3) / 4, 20, 1);
+        drawGaneshaTrident(ctx, canvas.width / 2, canvas.height / 2, 150, 0, 1);
+      } else if (theme === 'mahakali') {
+        return <MahakaliAnimatedBackground />;
+      }
+    };
+    
+    draw();
+  }, [theme]);
   
   useEffect(() => {
     // If the active theme provides a BackgroundComponent in the registry, skip canvas init
@@ -1956,7 +2028,13 @@ const ThemedBackground: React.FC<ThemedBackgroundProps> = ({ theme }) => {
   const registered = getThemeById(theme);
   if (registered && (registered as any).BackgroundComponent) {
     const BackgroundComp = (registered as any).BackgroundComponent;
-    return <BackgroundComp className="fixed inset-0 z-0" />;
+    return (
+      <ErrorBoundary fallback={<canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[-1]"/>}>
+        <React.Suspense fallback={<canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[-1]"/>}>
+          <BackgroundComp className="fixed inset-0 z-0" />
+        </React.Suspense>
+      </ErrorBoundary>
+    );
   }
 
   return (

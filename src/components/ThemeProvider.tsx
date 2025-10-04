@@ -55,9 +55,15 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ settings, children }) => 
 
         // apply CSS vars if the theme is in registry
         const themeDef = getThemeById(selected as string);
-        if (themeDef) {
+        if (!themeDef) {
+          console.warn(`Unknown theme id '${selected}', falling back to default`);
+        } else {
           // apply theme token colors
-          themeUtils.applyThemeColors(themeDef.colors as any);
+          try {
+            themeUtils.applyThemeColors(themeDef.colors as any);
+          } catch(e) {
+            console.warn('applyThemeColors failed', e);
+          }
         }
       }
     }
@@ -75,7 +81,11 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ settings, children }) => 
     // Apply explicit themeColors from settings if present (overrides)
     const explicitColors = (settings as any)?.appearance?.themeColors || (settings as any)?.themeColors;
     if (explicitColors) {
-      themeUtils.applyThemeColors(explicitColors as any);
+      try {
+        themeUtils.applyThemeColors(explicitColors as any);
+      } catch(e) {
+        console.warn('applyThemeColors failed for explicit colors', e);
+      }
     }
   }, [settings?.theme, settings?.appearance, settings?.language]);
 

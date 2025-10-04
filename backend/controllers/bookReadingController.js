@@ -6,8 +6,8 @@ const upsertProgress = async (req, res) => {
   try {
     const userId = req.user.id;
     const bookId = Number(req.params.bookId);
-    const { position, page, percent } = req.body;
-    const result = await bookProgressService.upsertProgress({ userId, bookId, position, page, percent });
+    const { position, page, percent, timeSpentMinutes } = req.body;
+    const result = await bookProgressService.upsertProgress({ userId, bookId, position, page, percent, timeSpentMinutes });
     res.json({ success: true, data: result });
   } catch (err) {
     console.error('upsertProgress error', err);

@@ -1,273 +1,95 @@
-# SaadhanaBoard 🌟
+# SaadhanaBoard
 
-A spiritual productivity and self-development application designed to help users engage in guided spiritual practices, meditation, and personal growth journeys. 🙏✨
+SadhanaBoard is a spiritual productivity and mindfulness application designed to help users track their spiritual practices, set intentions, and cultivate deeper awareness through gamified elements and cosmic themes.
 
-## 🚀 Tech Stack 💻
+## Features
 
-- ⚛️ **Frontend**: React + TypeScript + Vite
-- 🖥️ **Backend**: Node.js + Express + PostgreSQL
-- 🎨 **Styling**: Tailwind CSS
-- 🧩 **UI Components**: Radix UI + shadcn-ui
-- 🔄 **State Management**: React Context API + Custom Hooks
-- 🎯 **3D Graphics**: react-three/fiber + drei
-- 🧭 **Routing**: react-router-dom
-- 📝 **Form Handling**: react-hook-form + zod
-- 📡 **Data Fetching**: @tanstack/react-query
-- 🔐 **Authentication**: Local JWT-based Auth
-- ✨ **Animations**: Framer Motion
-- 🤖 **AI Integration**: Claude AI API
+- Track spiritual practices and habits
+- Set intentions and goals
+- Cosmic-themed UI with multiple spiritual themes
+- Progress tracking and insights
+- Community features and social sharing
+- Meditation and mindfulness tools
 
-## 📁 Project Structure 🗂️
+## Theme System
 
-```
-saadhanaboard/
-├── src/
-│   ├── components/     # React components
-│   ├── hooks/          # Custom React hooks
-│   ├── lib/            # Core utilities and context
-│   ├── pages/          # Page components
-│   ├── services/       # API service layer
-│   ├── styles/         # CSS and styling files
-│   ├── types/          # TypeScript types
-│   └── utils/          # Helper functions
-├── backend/            # Node.js + Express backend
-│   ├── controllers/    # Request handlers
-│   ├── models/         # Data models
-│   ├── routes/         # API routes
-│   ├── services/       # Business logic
-│   ├── middleware/     # Express middleware
-│   ├── config/         # Configuration files
-│   └── utils/          # Utility functions
-├── public/             # Static assets
-└── supabase/           # Database migrations (for reference)
-```
+SadhanaBoard includes a sophisticated theme system with 10+ spiritual themes:
 
-## 🛠️ Setup Instructions ⚙️
+1. **Default** - Clean, minimal theme
+2. **Shiva** - Cosmic destroyer theme
+3. **Mahakali** - Powerful goddess theme with animated 3D background
+4. **Mystery** - Enigmatic dark theme
+5. **Earth** - Grounding nature theme
+6. **Water** - Flowing aquatic theme
+7. **Fire** - Energetic flame theme
+8. **Bhairava** - Fierce protector theme
+9. **Serenity** - Peaceful light theme
+10. **Ganesha** - Remover of obstacles theme
 
-### 📋 Prerequisites
-- 🟩 Node.js (v18+)
-- 🧧 Bun (optional, project includes a bun.lockb)
-- 🗄️ PostgreSQL database or Supabase
+### Mahakali Theme
 
-### 🖥️ Frontend Setup
+The Mahakali theme features a dynamic 3D animated background using Three.js. It requires specific assets to function properly:
+
+- `mahakali-yantra.png` - The central yantra texture
+- `Skull and Bone Turnaround.gif` - Theme icon
+
+### Theme Asset Management
+
+Theme assets are managed through a series of npm scripts:
+
 ```bash
-# Clone the repository
-git clone <YOUR_GIT_URL>
-cd saadhanaboard
+# Ensure all theme assets are in place
+npm run themes:ensure-assets
 
-# Install frontend dependencies
-npm install
+# Generate theme manifest
+npm run themes:generate
 
-# Start development server
-npm run dev
-```
+# Copy theme icons from root icons/ directory
+npm run themes:copy-icons
 
-### 🔧 Backend Setup
-```bash
-cd backend
-# Install backend dependencies
-npm install
-# Start backend server
-npm run dev
-```
+# Move and optimize assets
+npm run assets:move
 
-### 🗄️ Database Setup
-1. Create a PostgreSQL database named `saadhanaboard` (or use Supabase)
-2. Update the database configuration in `backend/.env` (copy from `backend/.env.example`)
-3. Run the database initialization script:
-```bash
-node backend/utils/initDb.js
-```
-
-### �️ Database migrations
-
-If you need to apply the soft-delete migration (adds a `deleted_at` column to `spiritual_books`) you can run the helper script included in the backend:
-
-```powershell
-node backend/scripts/apply_book_soft_delete_migration.js
-```
-
-This script reads the SQL file `supabase/migrations/20250108000000_add_book_soft_delete.sql` and executes it against the configured database (it uses the same connection parameters as the backend). Ensure your backend environment variables (in `backend/.env`) are configured before running it.
-
-
-### �🔐 Environment Variables
-Create a `.env` file in the project root for frontend values (copy `.env.example`) and in `backend/.env` for backend values (copy `backend/.env.example`).
-
-Example backend values include:
-```env
-# Database Configuration
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=saadhanaboard
-DB_USER=your_postgres_username
-DB_PASSWORD=your_postgres_password
-
-# JWT Configuration
-JWT_SECRET=your_jwt_secret_key
-
-# Server Configuration
-PORT=3004
-```
-
-## 🏗️ Development 👷
-
-## Admin Panel Setup
-
-If you need a demo admin account for local/testing, the repository includes helper scripts to create admin users.
-
-- Create demo admin (non-interactive):
-
-	```powershell
-	cd d:\saadhanaboard\backend
-	npm run admin:create-demo
-	```
-
-- Comprehensive setup (checks DB and creates demo admin if none exists):
-
-	```powershell
-	cd d:\saadhanaboard\backend
-	npm run admin:setup
-	```
-
-## Admin Panel Setup & Troubleshooting
-
-If you're having trouble logging into the Admin panel, follow these steps:
-
-1. Verify database connectivity and admin schema:
-
-```powershell
-cd d:\saadhanaboard\backend
-npm run debug:admin
-# This runs debug_admin_login.js and will print detailed diagnostics
-```
-
-2. If the admin table is missing or the demo admin isn't present, run the repair script:
-
-```powershell
-# Create table (if missing) and demo admin
-npm run fix:admin
-
-# Force-reset demo admin password to 'Subham@98'
-npm run reset:admin
-```
-
-3. If CORS issues appear in the browser console, ensure your frontend dev server origin is one of the allowed origins (defaults: http://localhost:8080, http://localhost:5173). You can set a comma-separated list in `backend/.env` as `CORS_ORIGIN=http://localhost:8080,http://localhost:5173`.
-
-4. To test a live login attempt via the backend endpoint directly:
-
-```powershell
-curl -v -X POST "http://localhost:3004/api/admin/login" -H "Content-Type: application/json" -d '{"usernameOrEmail":"KaliVaibhav","password":"Subham@98"}'
-```
-
-5. If you still cannot login, run `npm run debug:admin` and open an issue or contact the project maintainer with the output.
-
-
-- Create default admin via env (more flexible):
-
-	```powershell
-	# set env vars for this PowerShell session
-	$env:ADMIN_USERNAME = 'KaliVaibhav'
-	$env:ADMIN_EMAIL = 'kali@example.com'
-	$env:ADMIN_PASSWORD = 'Subham@98'
-	cd d:\saadhanaboard\backend
-	npm run admin:create-default
-	```
-
-Notes:
-- The demo account username is `KaliVaibhav` and password `Subham@98` (for local/demo use only). Change these in production.
-- Ensure the `admin_details` table exists in your database before running the scripts. Run the migration file in `supabase/migrations/` if needed.
-- Scripts use `adminAuthService` which applies bcrypt hashing for passwords.
-
-
-### 🎨 Frontend Development
-- 🌐 The frontend runs on http://localhost:8080 (configured via Vite)
-- ⚡ Uses Vite for fast development builds
-
-### ⚙️ Backend Development
-- 🌐 The backend API runs on http://localhost:3004
-- 🔗 API endpoints are prefixed with `/api`
-
-## 🚢 Deployment 🚀
-
-### 🏭 Build for Production 📦
-```bash
-# Build frontend
-npm run build
-
-# Start production server
-npm run preview
-```
-
-## 📚 Features ✨
-
-- 🧘 **Sadhana Tracking**: Structured spiritual practice routines
-- 📚 **Spiritual Library**: Book viewer and upload functionality
-- 🧘‍♀️ **Guided Meditation**: Interactive meditation tools
-- 📈 **Progress Tracking**: Visualize your spiritual journey
-- 🎮 **3D Visualization**: Immersive deity interfaces
-- ⚙️ **Personalization**: Customizable settings and preferences
-- 🎨 **Enhanced UI**: Spiritual Hindu-inspired interface with lotus petals, chakra visualization, and yantra geometry
-- 📋 **Always Expanded Sidebar**: Sidebar is now fixed in expanded state for better navigation
-
-## 🔐 Authentication 🛡️
-
-The application uses JWT-based authentication with local PostgreSQL storage instead of Supabase Auth.
-
-## 🗄️ Database 💾
-
-The application now uses a local PostgreSQL database instead of Supabase, with tables for:
-- Users and profiles
-- Spiritual books
-- Sadhanas and progress tracking
-
-## 🤝 Contributing 🤲
-
-1. 🍴 Fork the repository
-2. 🌿 Create your feature branch
-3. 💾 Commit your changes
-4. ⬆️ Push to the branch
-5. 📬 Open a pull request
-
-## 📄 License 📜 ✅
-
-This project is licensed under the MIT License.
-
-## Theme Icons (developer guide)
-
-This project keeps a small canonical `icons/` folder at the repository root. During development and build the project copies a curated subset of files from `icons/` into `src/themes/<themeId>/assets` so theme components can reference them as local assets.
-
-Why this exists:
-- Keeps large or animated icon files out of the committed theme folders until they are needed.
-- Avoids duplication while allowing theme authors to override or extend assets inside `src/themes/*/assets`.
-
-How it works:
-- `scripts/generate-theme-manifest.js` creates a manifest used by the build.
-- `scripts/copy-theme-icons.cjs` copies files listed in the mapping into `src/themes/<themeId>/assets`.
-- The project exposes npm scripts that run these helpers automatically during dev/build/postinstall.
-
-Useful commands:
-- Install & sync icons (recommended before first run):
-
-```powershell
-npm install
+# Run all setup scripts (used in dev and build)
 npm run dev:setup
 ```
 
-- Run the copy script manually (dry-run):
+### Troubleshooting Theme Issues
 
-```powershell
-npm run themes:copy-icons -- --dry-run
+1. **Missing public/icons directory**: The `themes:ensure-assets` script will create this directory if missing.
+
+2. **Mahakali theme background not rendering**: 
+   - Check that `public/icons/mahakali-yantra.png` exists and is a valid image file
+   - Run `npm run dev:setup` to ensure assets are properly copied
+   - The system will use a procedural fallback if the texture fails to load
+
+3. **Theme icons not loading**:
+   - Run `npm run themes:copy-icons` to copy icons from the root `icons/` directory
+   - Check that the source icons exist in the `icons/` directory
+
+4. **Theme switching issues**:
+   - Verify that all themes are properly registered in `src/themes/index.ts`
+   - Check browser console for theme-related errors
+
+## Development Setup
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up theme assets: `npm run dev:setup`
+4. Start the development server: `npm run dev`
+
+## Building for Production
+
+```bash
+npm run build
 ```
 
-- Force overwrite existing destination files:
+This will run all asset preparation scripts and build the application.
 
-```powershell
-npm run themes:copy-icons -- --force
-```
+## Contributing
 
-Troubleshooting:
-- If icons are missing in the UI, verify `icons/` contains the expected filenames listed in the repository `scripts/copy-theme-icons.cjs` mapping.
-- Use `--dry-run` to see which files would be copied without changing the filesystem.
-- If `npm run dev` starts but assets are not present, run `npm run dev:setup` to regenerate themes and copy icons.
+Contributions are welcome! Please read our contributing guidelines before submitting pull requests.
 
-For more details and advanced troubleshooting steps, see `docs/THEME_ICON_SETUP.md`.
+## License
+
+[License information would go here]

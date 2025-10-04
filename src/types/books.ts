@@ -47,6 +47,7 @@ export interface BookFilters {
   showDeleted?: boolean;
   limit?: number;
   offset?: number;
+  preset?: string; // tracks which preset is currently active
 }
 
 export interface BookSuggestion {
@@ -191,6 +192,7 @@ export interface BookProgress {
   page?: number | null;
   percent?: number | null;
   last_seen_at?: string | null;
+  time_spent_minutes?: number | null;  // Added for time-spent tracking
 }
 
 export interface Bookmark {
@@ -216,3 +218,22 @@ export interface Annotation {
   created_at?: string;
   updated_at?: string;
 }
+
+// Filter Preset Types
+export interface FilterPreset {
+  id: string;
+  name: string;
+  description: string;
+  icon?: string;
+  filters: Partial<BookFilters>;
+}
+
+export interface SavedFilter {
+  id: string;
+  name: string;
+  filters: BookFilters;
+  createdAt: string;
+  lastUsed?: string;
+}
+
+

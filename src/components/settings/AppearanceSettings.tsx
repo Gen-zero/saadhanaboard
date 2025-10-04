@@ -12,7 +12,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Slider } from '@/components/ui/slider';
 import { Palette } from 'lucide-react';
 import { SettingsType } from './SettingsTypes';
-import { listThemes, themeUtils } from '@/themes';
+import { listThemes, themeUtils, getThemeHealth } from '@/themes';
 
 interface AppearanceSettingsProps {
   settings: SettingsType;
@@ -49,24 +49,44 @@ const AppearanceSettings: React.FC<AppearanceSettingsProps> = ({
             <Label>Color Scheme</Label>
             <RadioGroup
               value={settings.appearance?.colorScheme || 'default'}
-              onValueChange={(value) => updateSettings(['appearance', 'colorScheme'], value)}
+              onValueChange={(value) => {
+                try {
+                  updateSettings(['appearance', 'colorScheme'], value);
+                } catch (error) {
+                  console.warn('Failed to update color scheme', error);
+                  // Optionally revert to previous value or show error message
+                }
+              }}
               className="grid grid-cols-2 sm:grid-cols-5 gap-2"
             >
               {[
                 { metadata: { id: 'default', name: 'Default', description: 'Default' } },
-                ...listThemes({ category: undefined }).filter(t => t.metadata.category === 'color-scheme' || t.metadata.category === 'hybrid' || t.metadata.isLandingPage)
+                ...listThemes({ category: undefined, available: true }).filter(t => t.metadata.category === 'color-scheme' || t.metadata.category === 'hybrid' || t.metadata.isLandingPage)
               ].map((theme) => {
                 const id = (theme as any).metadata.id;
                 const label = (theme as any).metadata.name || id;
+                const health = getThemeHealth(theme as any);
+                const isHealthy = health.status === 'healthy';
+                
                 return (
                   <div key={id}>
                     <RadioGroupItem value={id} id={`scheme-${id}`} className="sr-only" />
                     <Label
                       htmlFor={`scheme-${id}`}
-                      className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                      className={`flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary ${
+                        !isHealthy ? 'opacity-50' : ''
+                      }`}
                     >
-                      <div className="rounded-full w-8 h-8">
-                        {themeUtils.renderThemeIcon(theme as any, 'w-8 h-8 rounded-full')}
+                      <div className="relative">
+                        <div className="rounded-full w-8 h-8">
+                          {themeUtils.renderThemeIcon(theme as any, 'w-8 h-8 rounded-full')}
+                        </div>
+                        {!isHealthy && (
+                          <div 
+                            className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-red-500"
+                            title={`Theme health: ${health.status}. Issues: ${health.issues.join(', ')}`}
+                          />
+                        )}
                       </div>
                       <span className="mt-2">{label}</span>
                     </Label>

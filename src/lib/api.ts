@@ -1,4 +1,3 @@
-
 import { SpiritualBook } from "@/types/books";
 
 // API endpoints
@@ -41,11 +40,11 @@ export async function fetchOpenLibrarySubject(subject: string): Promise<Spiritua
         : '';
       
       return {
-        id: `openlibrary-${book.key.replace('/works/', '')}`,
+        id: `openlibrary-${book.key?.replace('/works/', '') || Math.random().toString(36).substr(2, 9)}`,
         title: book.title,
         author: book.authors?.[0]?.name || 'Unknown Author',
         traditions: [subject.charAt(0).toUpperCase() + subject.slice(1)],
-        content: `https://openlibrary.org${book.key}`,
+        content: `https://openlibrary.org${book.key || ''}`,
         coverUrl,
         description: book.description || '',
         year: book.first_publish_year || null,
@@ -71,11 +70,11 @@ export async function fetchOpenLibraryBooks(): Promise<SpiritualBook[]> {
         : '';
       
       return {
-        id: `openlibrary-${book.key.replace('/works/', '')}`,
+        id: `openlibrary-${book.key?.replace('/works/', '') || Math.random().toString(36).substr(2, 9)}`,
         title: book.title,
         author: book.authors?.[0]?.name || 'Unknown Author',
         traditions: ['Open Library'],
-        content: `https://openlibrary.org${book.key}`,
+        content: `https://openlibrary.org${book.key || ''}`,
         coverUrl,
         description: book.description || '',
         year: book.first_publish_year || null,
