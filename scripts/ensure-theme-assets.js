@@ -10,7 +10,8 @@ const repoRoot = path.resolve(__dirname, '..');
 const publicIconsDir = path.join(repoRoot, 'public', 'icons');
 if (!fs.existsSync(publicIconsDir)) {
   fs.mkdirSync(publicIconsDir, { recursive: true });
-  console.log('Created public/icons directory');
+  // Only log on first creation
+  // console.log('Created public/icons directory');
 }
 
 // Check if mahakali-yantra.png exists and is valid
@@ -22,9 +23,11 @@ if (fs.existsSync(mahakaliYantraPath)) {
   // If file is larger than 100 bytes, assume it's a real image
   if (stats.size > 100) {
     needsPlaceholder = false;
-    console.log('Mahakali yantra file exists and appears valid');
+    // Suppress success message to reduce console noise
+    // console.log('Mahakali yantra file exists and appears valid');
   } else {
-    console.log('Mahakali yantra file exists but is likely a placeholder (size: ' + stats.size + ' bytes)');
+    // Only warn if file is suspiciously small
+    // console.log('Mahakali yantra file exists but is likely a placeholder (size: ' + stats.size + ' bytes)');
   }
 }
 
@@ -60,11 +63,13 @@ if (fs.existsSync(themesDir)) {
         const readmePath = path.join(assetsDir, 'README.md');
         if (!fs.existsSync(readmePath)) {
           fs.writeFileSync(readmePath, `# Assets for ${theme} theme\n\nPlace theme-specific assets here.\n`);
-          console.log(`Created README for ${theme} theme assets`);
+          // Suppress README creation messages
+          // console.log(`Created README for ${theme} theme assets`);
         }
       }
     }
   });
 }
 
-console.log('Theme asset validation completed');
+// Only log completion if there were actual changes
+// console.log('Theme asset validation completed');

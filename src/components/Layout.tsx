@@ -3,6 +3,7 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useSettings } from '@/hooks/useSettings';
 import { useTranslation } from 'react-i18next';
+import { getThemeById, themeUtils } from '@/themes';
 import EnhancedDeityIcon from './EnhancedDeityIcon';
 import { Leaf, Zap, User, ChevronRight, LogOut, LogIn } from 'lucide-react';
 import {
@@ -76,44 +77,48 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }
 
   // Map themes to deity icons and names
-  const themeData = {
+  const themeData: Record<string, { icon: React.ReactNode; name: string; element: string }> = {
     default: {
       icon: <Zap className="h-16 w-16 text-purple-400" />,
       name: 'Cosmic Energy',
       element: 'Ether'
     },
     earth: {
-      icon: <EnhancedDeityIcon src="/icons/Bhagwan_Krishna.png" alt="Krishna" className="bg-transparent" size="xl" />,
+      icon: themeUtils.renderThemeIcon(getThemeById('water')!, 'h-20 w-20 rounded-full'),
       name: 'Lord Krishna',
       element: 'Earth'
     },
     water: {
-      icon: <EnhancedDeityIcon src="/icons/Bhagwan_Vishnu.png" alt="Vishnu" className="bg-transparent" size="xl" />,
+      icon: themeUtils.renderThemeIcon(getThemeById('earth')!, 'h-20 w-20 rounded-full'),
       name: 'Lord Vishnu',
       element: 'Water'
     },
     fire: {
-      icon: <EnhancedDeityIcon src="/icons/Maa_Durga_icon.png" alt="Durga" className="bg-transparent" size="xl" />,
+      icon: themeUtils.renderThemeIcon(getThemeById('fire')!, 'h-20 w-20 rounded-full'),
       name: 'Maa Durga',
       element: 'Fire'
     },
     shiva: {
-      icon: <EnhancedDeityIcon src="/icons/Bhagwan_Shiva_icon.png" alt="Shiva" className="bg-transparent" size="xl" />,
+      icon: themeUtils.renderThemeIcon(getThemeById('shiva')!, 'h-20 w-20 rounded-full'),
       name: 'Lord Shiva',
       element: 'Air'
     },
     bhairava: {
-      icon: <EnhancedDeityIcon src="/icons/Bhairava.png" alt="Bhairava" className="bg-transparent" size="xl" />,
+      icon: themeUtils.renderThemeIcon(getThemeById('bhairava')!, 'h-16 w-16 rounded-full'),
       name: 'Lord Bhairava',
       element: 'Fire'
     },
     mahakali: {
-      // Use a graceful fallback icon for Mahakali to avoid broken imports
-      icon: <Zap className="h-16 w-16 text-red-400" />,
+      icon: themeUtils.renderThemeIcon(getThemeById('mahakali')!, 'h-20 w-20 rounded-full'),
       name: 'Maa Mahakali',
       element: 'Fire'
+    },
+    ganesha: {
+      icon: themeUtils.renderThemeIcon(getThemeById('ganesha')!, 'h-24 w-24 rounded-full'),
+      name: 'Lord Ganesha',
+      element: 'Earth'
     }
-  } as const;
+  };
 
   // Updated navigation items - removed Dashboard and using translations
   const navItems = [

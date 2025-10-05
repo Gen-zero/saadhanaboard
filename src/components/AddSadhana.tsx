@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -76,7 +75,7 @@ const AddSadhana = ({ onAddSadhana, triggerButton }: AddSadhanaProps) => {
   };
   
   const defaultTrigger = (
-    <Button>
+    <Button className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/30">
       <Plus className="mr-2 h-4 w-4" />
       Add Sadhana
     </Button>
@@ -87,15 +86,15 @@ const AddSadhana = ({ onAddSadhana, triggerButton }: AddSadhanaProps) => {
       <DialogTrigger asChild>
         {triggerButton || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] rounded-xl">
         <DialogHeader>
-          <DialogTitle>Add New Sadhana</DialogTitle>
+          <DialogTitle className="text-2xl">Add New Sadhana</DialogTitle>
           <DialogDescription>
             Create a new sadhana for your spiritual practice or choose from your unlocked practices.
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <div className="space-y-4 py-4">
           {/* Selected Store Sadhana Indicator */}
           {selectedStoreSadhana && (
             <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
@@ -111,6 +110,7 @@ const AddSadhana = ({ onAddSadhana, triggerButton }: AddSadhanaProps) => {
                   variant="outline" 
                   size="sm" 
                   onClick={handleClearSelection}
+                  className="bg-background/70 border-purple-500/30 hover:bg-purple-500/10"
                 >
                   Clear
                 </Button>
@@ -150,9 +150,9 @@ const AddSadhana = ({ onAddSadhana, triggerButton }: AddSadhanaProps) => {
           </div>
         </div>
         
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={handleAdd}>Add Sadhana</Button>
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button variant="outline" onClick={() => setOpen(false)} className="bg-background/70 border-purple-500/30 hover:bg-purple-500/10">Cancel</Button>
+          <Button onClick={handleAdd} className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/30">Add Sadhana</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

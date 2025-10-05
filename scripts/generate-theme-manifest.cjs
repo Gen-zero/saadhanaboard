@@ -71,7 +71,8 @@ function extractMetadataFromFile(themeName) {
         // Return only serializable/allowed fields for the manifest
         return filterSerializableMetadata(obj);
       } catch (e) {
-        console.log(`Note: Theme '${themeName}' contains non-serializable fields (React components/imports), using fallback parser`);
+        // Suppress the note about non-serializable fields to reduce console noise
+        // console.log(`Note: Theme '${themeName}' contains non-serializable fields (React components/imports), using fallback parser`);
         // Fallback: attempt a tolerant extraction of simple key: value pairs from the
         // metadata body. This handles cases where values reference local variables
         // (e.g. icon: skullPath) or use unquoted keys/values.
@@ -123,7 +124,8 @@ function main() {
   const manifest = buildManifest();
   ensureOutDir();
   fs.writeFileSync(OUT_PATH, JSON.stringify({ themes: manifest }, null, 2), 'utf8');
-  console.log('Wrote theme registry manifest to', OUT_PATH);
+  // Only log on first creation or significant changes
+  // console.log('Wrote theme registry manifest to', OUT_PATH);
 }
 
 main();

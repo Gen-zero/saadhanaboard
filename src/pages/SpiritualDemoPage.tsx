@@ -42,6 +42,10 @@ const SpiritualDemoPage = () => {
     }
   ];
 
+  // Separate yantras into owned and recommended
+  const ownedYantras = yantras.filter(yantra => yantra.isUnlocked);
+  const recommendedYantras = yantras.filter(yantra => !yantra.isUnlocked);
+
   // Mock data for the yantra
   const yantraData = {
     streak: 15,
@@ -70,6 +74,56 @@ const SpiritualDemoPage = () => {
     navigate('/store');
   };
 
+  const YantraCard = ({ yantra }: { yantra: any }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card 
+        className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
+          yantra.isUnlocked 
+            ? 'border-purple-500/50 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 hover:from-purple-500/10 hover:to-fuchsia-500/10' 
+            : 'border-gray-500/20 opacity-90 hover:opacity-100'
+        } relative overflow-hidden`}
+        onClick={() => handleYantraClick(yantra.id)}
+      >
+        {/* Glow effect for unlocked yantras */}
+        {yantra.isUnlocked && (
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 rounded-lg blur-xl -z-10"></div>
+        )}
+        
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="font-semibold">{yantra.title}</span>
+            {yantra.isUnlocked ? (
+              <Gem className="h-5 w-5 text-purple-500" />
+            ) : (
+              <Lock className="h-5 w-5 text-gray-500" />
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm mb-4">
+            {yantra.description}
+          </p>
+          {!yantra.isUnlocked && (
+            <Button 
+              className="w-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleUnlockYantra();
+              }}
+            >
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Unlock in Store
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+
   return (
     <Layout>
       <div className="space-y-8 w-full max-w-7xl mx-auto px-4">
@@ -91,65 +145,41 @@ const SpiritualDemoPage = () => {
           </p>
         </motion.div>
 
-        {/* Yantra Gallery */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {yantras.map((yantra, index) => (
-              <motion.div
-                key={yantra.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: 0.1 * index }}
-              >
-                <Card 
-                  className={`cursor-pointer transition-all duration-300 hover:scale-105 ${
-                    yantra.isUnlocked 
-                      ? 'border-purple-500/50 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 hover:from-purple-500/10 hover:to-fuchsia-500/10' 
-                      : 'border-gray-500/20 opacity-90 hover:opacity-100'
-                  } relative overflow-hidden`}
-                  onClick={() => handleYantraClick(yantra.id)}
-                >
-                  {/* Glow effect for unlocked yantras */}
-                  {yantra.isUnlocked && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 rounded-lg blur-xl -z-10"></div>
-                  )}
-                  
-                  <CardHeader>
-                    <CardTitle className="flex items-center justify-between">
-                      <span className="font-semibold">{yantra.title}</span>
-                      {yantra.isUnlocked ? (
-                        <Gem className="h-5 w-5 text-purple-500" />
-                      ) : (
-                        <Lock className="h-5 w-5 text-gray-500" />
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-sm mb-4">
-                      {yantra.description}
-                    </p>
-                    {!yantra.isUnlocked && (
-                      <Button 
-                        className="w-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleUnlockYantra();
-                        }}
-                      >
-                        <ShoppingCart className="h-4 w-4 mr-2" />
-                        Unlock in Store
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+        {/* Your Yantras Section */}
+        {ownedYantras.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
+              Your Yantras
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {ownedYantras.map((yantra, index) => (
+                <YantraCard key={yantra.id} yantra={yantra} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Recommended Yantras Section */}
+        {recommendedYantras.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <h2 className="text-2xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
+              Recommended Yantras
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {recommendedYantras.map((yantra, index) => (
+                <YantraCard key={yantra.id} yantra={yantra} />
+              ))}
+            </div>
+          </motion.div>
+        )}
 
         {/* Selected Yantra Display */}
         {selectedYantra && (
@@ -193,7 +223,7 @@ const SpiritualDemoPage = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
           className="grid grid-cols-1 lg:grid-cols-2 gap-6"
         >
           <Card className="backdrop-blur-sm bg-background/70 border border-purple-500/20">

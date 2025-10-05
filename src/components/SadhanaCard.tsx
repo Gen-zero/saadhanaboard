@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { SharedSadhana, PrivacyLevel } from '@/types/sadhana';
 import { Card, CardContent } from '@/components/ui/card';
@@ -59,12 +58,12 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion, onShare,
   return (
     <Card className={cn(
       "group hover:shadow-md transition-all duration-300 cosmic-highlight",
-      "backdrop-blur-sm border border-purple-500/20 bg-transparent",
+      "backdrop-blur-sm border border-purple-500/20 bg-transparent rounded-xl",
       sadhana.completed && "opacity-75",
       isSadhanaTask && "border-purple-300 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 shadow-lg shadow-purple-500/10",
       !isSadhanaTask && "bg-gradient-to-r from-purple-900/10 to-indigo-900/10 hover:border-purple-500/40 hover:shadow-purple-500/20 hover:from-purple-900/20 hover:to-indigo-900/20"
     )}>
-      <CardContent className="p-4">
+      <CardContent className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-start gap-3 flex-1 min-w-0">
             <Checkbox
@@ -74,42 +73,42 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion, onShare,
             />
             
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-2 mb-2">
                 <h3 className={cn(
-                  "font-medium text-sm leading-tight",
+                  "font-semibold text-base leading-tight",
                   sadhana.completed && "line-through text-muted-foreground"
                 )}>
                   {sadhana.title}
                 </h3>
                 {isSadhanaTask && (
-                  <Sparkles className="h-3 w-3 text-purple-500 shrink-0" />
+                  <Sparkles className="h-4 w-4 text-purple-500 shrink-0" />
                 )}
               </div>
               
               {sadhana.description && (
-                <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                   {sadhana.description}
                 </p>
               )}
               
               <div className="flex flex-wrap items-center gap-1.5">
-                <Badge variant="outline" className={cn("text-xs px-1.5 py-0.5 h-auto", getPriorityColor(sadhana.priority))}>
+                <Badge variant="outline" className={cn("text-xs px-2 py-1 h-auto", getPriorityColor(sadhana.priority))}>
                   {sadhana.priority}
                 </Badge>
                 
-                <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto flex items-center gap-1 bg-purple-500/10 text-purple-300 border-purple-500/30">
+                <Badge variant="outline" className="text-xs px-2 py-1 h-auto flex items-center gap-1 bg-purple-500/10 text-purple-300 border-purple-500/30">
                   {getCategoryIcon(sadhana.category)}
-                  {sadhana.category}
+                  <span>{sadhana.category}</span>
                 </Badge>
                 
                 {sadhana.dueDate && (
-                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto bg-cyan-500/10 text-cyan-300 border-cyan-500/30">
+                  <Badge variant="outline" className="text-xs px-2 py-1 h-auto bg-cyan-500/10 text-cyan-300 border-cyan-500/30">
                     {format(new Date(sadhana.dueDate), 'MMM dd')}
                   </Badge>
                 )}
                 
                 {sadhana.time && (
-                  <Badge variant="outline" className="text-xs px-1.5 py-0.5 h-auto bg-slate-500/10 text-slate-300 border-slate-500/30">
+                  <Badge variant="outline" className="text-xs px-2 py-1 h-auto bg-slate-500/10 text-slate-300 border-slate-500/30">
                     {sadhana.time}
                   </Badge>
                 )}
@@ -119,7 +118,7 @@ const SadhanaCard = ({ sadhana, onUpdate, onDelete, onToggleCompletion, onShare,
                     key={tag} 
                     variant="secondary" 
                     className={cn(
-                      "text-xs px-1.5 py-0.5 h-auto",
+                      "text-xs px-2 py-1 h-auto",
                       tag === 'sadhana' && "bg-purple-500/20 text-purple-300 border-purple-500/40",
                       tag !== 'sadhana' && "bg-accent/20 text-accent-foreground border-accent/30"
                     )}

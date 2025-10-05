@@ -86,7 +86,7 @@ const ContinueReadingSection = ({ onSelectBook }: ContinueReadingSectionProps) =
         <TrendingUp className="h-6 w-6 mr-2" />
         Continue Reading
       </h2>
-      <div className="flex space-x-4 overflow-x-auto pb-4">
+      <div className="flex space-x-5 overflow-x-auto pb-4">
         {filteredBooks.map((book) => {
           const progress = progressMap[book.id];
           const percent = Math.max(0, Math.min(100, progress?.percent || 0));
@@ -94,21 +94,21 @@ const ContinueReadingSection = ({ onSelectBook }: ContinueReadingSectionProps) =
           return (
             <Card 
               key={book.id} 
-              className="min-w-[280px] flex-shrink-0 border border-purple-500/20 bg-gradient-to-b from-purple-600/10 via-purple-500/5 to-purple-400/10 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1"
+              className="min-w-[280px] flex-shrink-0 border border-purple-500/20 bg-gradient-to-b from-purple-600/10 via-purple-500/5 to-purple-400/10 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1 rounded-xl"
             >
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start mb-2">
+              <CardContent className="p-5">
+                <div className="flex justify-between items-start mb-3">
                   <h3 className="font-semibold text-lg line-clamp-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
                     {book.title}
                   </h3>
                 </div>
-                <p className="text-sm text-muted-foreground mb-2 line-clamp-1">
+                <p className="text-sm text-muted-foreground mb-3 line-clamp-1">
                   by {book.author}
                 </p>
                 
                 {/* Progress bar */}
-                <div className="mb-3">
-                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                <div className="mb-4">
+                  <div className="flex justify-between text-xs text-muted-foreground mb-2">
                     <span>
                       {percent > 0 ? `${Math.round(percent)}% complete` : ''}
                       {percent > 0 && progress?.time_spent_minutes && progress.time_spent_minutes > 0 && (
@@ -145,7 +145,7 @@ const ContinueReadingSection = ({ onSelectBook }: ContinueReadingSectionProps) =
                 
                 <Button 
                   size="sm" 
-                  className="w-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 transition-all duration-300"
+                  className="w-full bg-gradient-to-r from-purple-500/30 to-fuchsia-500/30 border border-purple-500/30 hover:from-purple-500/40 hover:to-fuchsia-500/40 transition-all duration-300"
                   onClick={() => onSelectBook(book.id)}
                 >
                   <BookOpen className="h-4 w-4 mr-2" />

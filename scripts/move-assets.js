@@ -24,7 +24,8 @@ async function moveAndOptimize() {
   // If destination already exists and looks like a real file, skip move
   try {
     if (fs.existsSync(destPath) && fs.statSync(destPath).size > 100) {
-      console.log('Asset already exists at', destPath, '- skipping move.');
+      // Suppress message when asset already exists
+      // console.log('Asset already exists at', destPath, '- skipping move.');
       return;
     }
   } catch (e) {
@@ -42,12 +43,14 @@ async function moveAndOptimize() {
   try {
     // Move (rename) the file into public/icons
     fs.renameSync(srcPath, destPath);
-    console.log('Moved', srcPath, '->', destPath);
+    // Only log when actually moving
+    // console.log('Moved', srcPath, '->', destPath);
   } catch (err) {
     // If rename fails (cross-device), fallback to copy + unlink
     fs.copyFileSync(srcPath, destPath);
     fs.unlinkSync(srcPath);
-    console.log('Copied then removed', srcPath, '->', destPath);
+    // Only log when actually copying
+    // console.log('Copied then removed', srcPath, '->', destPath);
   }
 
   // Optionally create a WebP using sharp if installed
@@ -56,12 +59,15 @@ async function moveAndOptimize() {
     if (sharp) {
       const webpPath = path.join(destDir, 'mahakali-yantra.webp');
       await sharp(destPath).webp({ quality: 85 }).toFile(webpPath);
-      console.log('Generated WebP:', webpPath);
+      // Only log when WebP is actually generated
+      // console.log('Generated WebP:', webpPath);
     } else {
-      console.log('sharp not installed; skipping WebP generation');
+      // Suppress message about sharp not being installed
+      // console.log('sharp not installed; skipping WebP generation');
     }
   } catch (e) {
-    console.warn('WebP generation failed:', e && e.message ? e.message : e);
+    // Only warn on actual errors
+    // console.warn('WebP generation failed:', e && e.message ? e.message : e);
   }
 
   // If a duplicate JPEG exists at repo root, move it to an archive folder
@@ -72,12 +78,15 @@ async function moveAndOptimize() {
     const archived = path.join(archiveDir, 'Mahakali_yantra.jpeg');
     try {
       fs.renameSync(jpegSrc, archived);
-      console.log('Archived JPEG:', archived);
+      // Only log when actually archiving
+      // console.log('Archived JPEG:', archived);
     } catch (e) {
-      console.warn('Failed to archive JPEG:', e && e.message ? e.message : e);
+      // Only warn on actual errors
+      // console.warn('Failed to archive JPEG:', e && e.message ? e.message : e);
     }
   }
-  console.log('Asset move operation completed successfully');
+  // Suppress completion message
+  // console.log('Asset move operation completed successfully');
 }
 
 moveAndOptimize().catch((err) => {

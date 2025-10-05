@@ -150,11 +150,11 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
   };
 
   return (
-    <div className="p-3 bg-background/70 rounded-md border border-purple-200/10 flex flex-col gap-3 md:gap-4">
+    <div className="space-y-4">
       {/* Preset Filters Section */}
-      <div className="flex flex-col gap-2">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <label className="text-xs md:text-sm font-medium text-muted-foreground">Quick Filters</label>
+          <h3 className="text-sm font-medium text-muted-foreground">Quick Filters</h3>
           {hasActiveFilters && (
             <Button 
               size="sm" 
@@ -186,8 +186,8 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
 
       {/* Saved Filters Section */}
       {savedFilters.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <label className="text-xs md:text-sm font-medium text-muted-foreground">Saved Filters</label>
+        <div className="space-y-3">
+          <h3 className="text-sm font-medium text-muted-foreground">Saved Filters</h3>
           <div className="flex flex-wrap gap-2">
             {savedFilters.map((savedFilter) => (
               <div key={savedFilter.id} className="flex items-center">
@@ -245,20 +245,20 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Traditional Filters */}
-      <div className="flex flex-col md:flex-row gap-3 md:gap-4 flex-wrap items-center">
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <label className="text-xs md:text-sm font-medium text-muted-foreground">Traditions</label>
+      {/* Traditional Filters - Clean Grid Layout */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Traditions</label>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="h-11 md:h-10 w-full md:w-[220px] justify-between text-left font-normal">
+              <Button variant="outline" className="w-full justify-between text-left font-normal">
                 <span className="truncate">
                   {filters.traditions && filters.traditions.length > 0 ? `${filters.traditions.length} selected` : 'Select traditions'}
                 </span>
-                <ChevronDown className="ml-2" />
+                <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[calc(100vw-2rem)] md:w-[220px] p-0">
+            <PopoverContent className="w-[calc(100vw-2rem)] md:w-[300px] p-0">
               <div className="max-h-[300px] overflow-y-auto p-3 space-y-2">
                 {traditions.map((t) => (
                   <label key={t} className="flex items-center gap-2 py-1">
@@ -281,7 +281,7 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 {filters.traditions && filters.traditions.length > 0 && (
                   <div className="pt-2 border-t mt-2 flex justify-end">
                     <Button size="sm" variant="ghost" onClick={() => patch({ traditions: [] })}>
-                      <X className="mr-2" /> Clear
+                      <X className="mr-2 h-4 w-4" /> Clear
                     </Button>
                   </div>
                 )}
@@ -290,10 +290,10 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           </Popover>
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <label className="text-xs md:text-sm font-medium text-muted-foreground">Language</label>
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Language</label>
           <Select onValueChange={(v) => patch({ language: v === 'all' ? undefined : v })} value={filters.language || 'all'}>
-            <SelectTrigger className="w-full md:w-[160px] h-11 md:h-10">
+            <SelectTrigger>
               <SelectValue placeholder="All" />
             </SelectTrigger>
             <SelectContent>
@@ -305,38 +305,10 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           </Select>
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
-          <label className="text-xs md:text-sm font-medium text-muted-foreground">Sort</label>
-          <div className="flex gap-2">
-            <Select onValueChange={(v: any) => patch({ sortBy: v || undefined })} value={(filters.sortBy ?? 'created_at') as 'created_at' | 'title' | 'language' | 'year' | 'author'}>
-              <SelectTrigger className="w-full md:w-[140px] h-11 md:h-10">
-                <SelectValue placeholder="Newest"/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="created_at">Newest</SelectItem>
-                <SelectItem value="title">Title</SelectItem>
-                <SelectItem value="author">Author</SelectItem>
-                <SelectItem value="year">Year</SelectItem>
-                <SelectItem value="language">Language</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Select onValueChange={(v: any) => patch({ sortOrder: v || undefined })} value={(filters.sortOrder ?? 'desc') as 'asc' | 'desc'}>
-              <SelectTrigger className="w-full md:w-[100px] h-11 md:h-10">
-                <SelectValue placeholder="Desc"/>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="desc">Desc</SelectItem>
-                <SelectItem value="asc">Asc</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 w-full md:w-auto">
-          <label className="text-xs md:text-sm font-medium text-muted-foreground">Type</label>
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">File Type</label>
           <Select onValueChange={(v: any) => patch({ fileType: v || undefined })} value={(filters.fileType ?? 'all') as 'all' | 'pdf' | 'text'}>
-            <SelectTrigger className="w-full md:w-[120px] h-11 md:h-10">
+            <SelectTrigger>
               <SelectValue placeholder="All"/>
             </SelectTrigger>
             <SelectContent>
@@ -347,9 +319,38 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
           </Select>
         </div>
 
-        <div className="flex flex-col w-full">
-          <label className="text-xs md:text-sm font-medium text-muted-foreground mb-2">Year Range</label>
-          <div className="flex flex-col md:flex-row items-center gap-3 w-full">
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Sort By</label>
+          <Select onValueChange={(v: any) => patch({ sortBy: v || undefined })} value={(filters.sortBy ?? 'created_at') as 'created_at' | 'title' | 'language' | 'year' | 'author'}>
+            <SelectTrigger>
+              <SelectValue placeholder="Newest"/>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="created_at">Newest</SelectItem>
+              <SelectItem value="title">Title</SelectItem>
+              <SelectItem value="author">Author</SelectItem>
+              <SelectItem value="year">Year</SelectItem>
+              <SelectItem value="language">Language</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Order</label>
+          <Select onValueChange={(v: any) => patch({ sortOrder: v || undefined })} value={(filters.sortOrder ?? 'desc') as 'asc' | 'desc'}>
+            <SelectTrigger>
+              <SelectValue placeholder="Desc"/>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">Descending</SelectItem>
+              <SelectItem value="asc">Ascending</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-medium text-muted-foreground">Year Range</label>
+          <div className="flex items-center gap-2">
             <Input
               type="number"
               value={sliderValue[0] ?? ''}
@@ -367,16 +368,10 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 if (v > currentMax) v = currentMax;
                 patch({ minYear: v });
               }}
-              className="w-full md:w-20 h-11 md:h-10"
+              className="w-20"
               placeholder="Min"
             />
-            <div className="w-full md:flex-1 px-2 py-2 md:py-0">
-              <Slider min={min} max={max} value={sliderValue} onValueChange={(vals: any) => {
-                const a = clamp(vals[0]);
-                const b = clamp(vals[1]);
-                patch({ minYear: a, maxYear: b });
-              }} />
-            </div>
+            <span className="text-muted-foreground">-</span>
             <Input
               type="number"
               value={sliderValue[1] ?? ''}
@@ -394,8 +389,20 @@ const AdvancedFilters: React.FC<AdvancedFiltersProps> = ({
                 if (v < currentMin) v = currentMin;
                 patch({ maxYear: v });
               }}
-              className="w-full md:w-20 h-11 md:h-10"
+              className="w-20"
               placeholder="Max"
+            />
+          </div>
+          <div className="pt-1">
+            <Slider 
+              min={min} 
+              max={max} 
+              value={sliderValue} 
+              onValueChange={(vals: any) => {
+                const a = clamp(vals[0]);
+                const b = clamp(vals[1]);
+                patch({ minYear: a, maxYear: b });
+              }} 
             />
           </div>
         </div>

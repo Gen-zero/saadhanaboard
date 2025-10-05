@@ -2,15 +2,22 @@ import { useState, useEffect } from 'react';
 import { useSettings } from '@/hooks/useSettings';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getLandingPageThemes, themeUtils } from '@/themes';
 
 const ThemePanel = () => {
   const [currentTheme, setCurrentTheme] = useState('default');
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { settings, updateSettings } = useSettings();
   const [globalMode, setGlobalMode] = useState(false); // toggle between landing vs global theme
+
+  // Hide theme panel on landing page
+  const isLandingPage = location.pathname === '/landingpage';
+  if (isLandingPage) {
+    return null;
+  }
 
   const themeOptions = getLandingPageThemes();
   // Apply theme to body when currentTheme changes

@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { BookOpen, Trophy, Calendar, Users, Sparkles, MoonStar, Flame, Target, Heart, Mountain, Star, TrendingUp, Play, Volume2, Eye, Zap } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
 import CosmicLibraryShowcase from '@/components/library/CosmicLibraryShowcase';
+import { useSettings } from '@/hooks/useSettings';
 
 // Simple count-up hook for animated stats
 const useCountUp = (targetValue: number, durationMs: number = 1500) => {
@@ -29,6 +30,17 @@ const useCountUp = (targetValue: number, durationMs: number = 1500) => {
 // replaced inline SpiritualLibraryShowcase with CosmicLibraryShowcase component
 
 const HomePage = () => {
+  const { settings, updateSettings } = useSettings();
+  const navigate = useNavigate();
+  
+  // Ensure default theme is applied to landing page
+  useEffect(() => {
+    // If no theme is set or it's not the default theme, set it to default
+    if (!settings?.appearance?.colorScheme || settings.appearance.colorScheme !== 'default') {
+      updateSettings(['appearance', 'colorScheme'], 'default');
+    }
+  }, [settings, updateSettings]);
+
   // Ambient audio toggle
   const [audioOn, setAudioOn] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -308,338 +320,338 @@ const HomePage = () => {
             </div>
             <div className="max-w-7xl mx-0 sm:mx-2 lg:mx-4" onMouseMove={handleMouseMove}>
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-center">
-              {/* Left Side - Spiritual Content */}
-              <div className="lg:col-span-8 space-y-6 sm:space-y-8">
-                <div className="text-center lg:text-left">
-                  <h1 className="text-4xl xs:text-5xl sm:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6">
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
-                      ✨ The First Digital Platform
-                    </span>
-                    <br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 via-purple-400 to-fuchsia-600">
-                      for Your Daily Saadhana
-                    </span>
-                  </h1>
-                  
-                  <p className="text-xl sm:text-2xl text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
-                    Design, track, and deepen your spiritual practice in one sacred space.
-                  </p>
-                  
-                  <p className="text-lg sm:text-xl text-muted-foreground/90 mb-6 sm:mb-8 leading-relaxed">
-                    Join the private waitlist and be among the first to experience discipline, guidance, and growth through SaadhanaBoard.
-                  </p>
-                  
-                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-4 sm:mb-6">
-                    <Button 
-                      size="lg" 
-                      className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-400 hover:to-fuchsia-400 text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 shadow-lg hover:shadow-2xl transition-all duration-300"
-                      style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.3)' }}
-                      asChild
-                    >
-                      <Link to="/waitlist">
-                        🌟 Join the Waitlist
-                      </Link>
-                    </Button>
-                    
-                    <Button 
-                      size="lg" 
-                      variant="outline" 
-                      className="border-purple-500/40 text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
-                      style={{ boxShadow: '0 0 15px rgba(168, 85, 247, 0.1)' }}
-                      asChild
-                    >
-                      <Link to="/about">
-                        🌙 Explore Features
-                      </Link>
-                    </Button>
-                    <Button 
-                      size="lg"
-                      variant="ghost"
-                      className="text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
-                      onClick={() => setAudioOn((v) => !v)}
-                    >
-                      <Volume2 className="w-6 h-6 mr-2" /> {audioOn ? 'Sound: On' : 'Sound: Off'}
-                    </Button>
-                  </div>
-                  
-                  {/* Urgency + Exclusivity Line */}
-                  <div className="flex items-center justify-center lg:justify-start gap-2 text-sm sm:text-base">
-                    <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20 backdrop-blur-sm">
-                      <span className="text-purple-400">🔒</span>
-                      <span className="text-muted-foreground text-center sm:text-left">
-                        Limited seats available. Early seekers get priority access and exclusive features.
+                {/* Left Side - Spiritual Content */}
+                <div className="lg:col-span-8 space-y-6 sm:space-y-8">
+                  <div className="text-center lg:text-left">
+                    <h1 className="text-4xl xs:text-5xl sm:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6">
+                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
+                        ✨ The First Digital Platform
                       </span>
+                      <br />
+                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-fuchsia-500 via-purple-400 to-fuchsia-600">
+                        for Your Daily Saadhana
+                      </span>
+                    </h1>
+                    
+                    <p className="text-xl sm:text-2xl text-muted-foreground mb-4 sm:mb-6 leading-relaxed">
+                      Design, track, and deepen your spiritual practice in one sacred space.
+                    </p>
+                    
+                    <p className="text-lg sm:text-xl text-muted-foreground/90 mb-6 sm:mb-8 leading-relaxed">
+                      Join the private waitlist and be among the first to experience discipline, guidance, and growth through SaadhanaBoard.
+                    </p>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start mb-4 sm:mb-6">
+                      <Button 
+                        size="lg" 
+                        className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-400 hover:to-fuchsia-400 text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 shadow-lg hover:shadow-2xl transition-all duration-300"
+                        style={{ boxShadow: '0 0 30px rgba(168, 85, 247, 0.3)' }}
+                        asChild
+                      >
+                        <Link to="/waitlist">
+                          🌟 Join the Waitlist
+                        </Link>
+                      </Button>
+                      
+                      <Button 
+                        size="lg" 
+                        variant="outline" 
+                        className="border-purple-500/40 text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
+                        style={{ boxShadow: '0 0 15px rgba(168, 85, 247, 0.1)' }}
+                        asChild
+                      >
+                        <Link to="/about">
+                          🌙 Explore Features
+                        </Link>
+                      </Button>
+                      <Button 
+                        size="lg"
+                        variant="ghost"
+                        className="text-lg sm:text-xl px-8 sm:px-10 py-5 sm:py-7 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
+                        onClick={() => setAudioOn((v) => !v)}
+                      >
+                        <Volume2 className="w-6 h-6 mr-2" /> {audioOn ? 'Sound: On' : 'Sound: Off'}
+                      </Button>
+                    </div>
+                    
+                    {/* Urgency + Exclusivity Line */}
+                    <div className="flex items-center justify-center lg:justify-start gap-2 text-sm sm:text-base">
+                      <div className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-purple-500/10 to-fuchsia-500/10 border border-purple-500/20 backdrop-blur-sm">
+                        <span className="text-purple-400">🔒</span>
+                        <span className="text-muted-foreground text-center sm:text-left">
+                          Limited seats available. Early seekers get priority access and exclusive features.
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* Right Side - Sadhana Paper (Transparent Golden Metallic) */}
-              <div className="lg:col-span-4 relative">
-                <div className="relative max-w-xl mx-auto lg:mx-0">
-                  {/* Paper Container - Transparent Golden Metallic styling */}
-                  <div 
-                    className="relative p-6 rounded-2xl border-2 backdrop-blur-md"
-                    style={{
-                      background: 'linear-gradient(145deg, rgba(255, 223, 0, 0.05) 0%, rgba(255, 215, 0, 0.08) 30%, rgba(255, 207, 0, 0.04) 70%, rgba(255, 199, 0, 0.06) 100%)',
-                      borderColor: 'rgba(255, 215, 0, 0.3)',
-                      fontFamily: 'Georgia, serif',
-                      boxShadow: `
-                        0 8px 32px rgba(255, 215, 0, 0.12),
-                        0 0 0 1px rgba(255, 215, 0, 0.15),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.15),
-                        inset 0 -1px 0 rgba(255, 215, 0, 0.08)
-                      `,
-                      backdropFilter: 'blur(14px) saturate(140%)',
-                      WebkitBackdropFilter: 'blur(14px) saturate(140%)'
-                    }}
-                  >
-                    {/* Metallic overlay gradient */}
+                
+                {/* Right Side - Sadhana Paper (Transparent Golden Metallic) */}
+                <div className="lg:col-span-4 relative">
+                  <div className="relative max-w-xl mx-auto lg:mx-0">
+                    {/* Paper Container - Transparent Golden Metallic styling */}
                     <div 
-                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      className="relative p-6 rounded-2xl border-2 backdrop-blur-md"
                       style={{
-                        background: `
-                          linear-gradient(135deg, 
-                            rgba(255, 255, 200, 0.08) 0%, 
-                            transparent 25%, 
-                            rgba(255, 223, 0, 0.05) 50%, 
-                            transparent 75%, 
-                            rgba(255, 255, 180, 0.03) 100%
-                          )
+                        background: 'linear-gradient(145deg, rgba(255, 223, 0, 0.05) 0%, rgba(255, 215, 0, 0.08) 30%, rgba(255, 207, 0, 0.04) 70%, rgba(255, 199, 0, 0.06) 100%)',
+                        borderColor: 'rgba(255, 215, 0, 0.3)',
+                        fontFamily: 'Georgia, serif',
+                        boxShadow: `
+                          0 8px 32px rgba(255, 215, 0, 0.12),
+                          0 0 0 1px rgba(255, 215, 0, 0.15),
+                          inset 0 1px 0 rgba(255, 255, 255, 0.15),
+                          inset 0 -1px 0 rgba(255, 215, 0, 0.08)
                         `,
-                        opacity: 0.5
+                        backdropFilter: 'blur(14px) saturate(140%)',
+                        WebkitBackdropFilter: 'blur(14px) saturate(140%)'
                       }}
-                    />
-                    
-                    {/* Enhanced ornate corners with golden metallic effect */}
-                    <div 
-                      className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 rounded-tl-lg"
-                      style={{
-                        borderColor: 'rgba(255, 215, 0, 0.8)',
-                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
-                      }}
-                    />
-                    <div 
-                      className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 rounded-tr-lg"
-                      style={{
-                        borderColor: 'rgba(255, 215, 0, 0.8)',
-                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
-                      }}
-                    />
-                    <div 
-                      className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 rounded-bl-lg"
-                      style={{
-                        borderColor: 'rgba(255, 215, 0, 0.8)',
-                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
-                      }}
-                    />
-                    <div 
-                      className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 rounded-br-lg"
-                      style={{
-                        borderColor: 'rgba(255, 215, 0, 0.8)',
-                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
-                      }}
-                    />
-                    
-                    {/* Header with enhanced golden styling */}
-                    <div className="text-center mb-4 relative z-10">
-                      <h3 
-                        className="text-2xl font-bold mb-2" 
-                        style={{ 
-                          fontFamily: 'Georgia, serif',
-                          color: 'rgba(255, 223, 0, 0.95)',
-                          textShadow: '0 0 8px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3)'
-                        }}
-                      >
-                        🕉️ Sadhana Paper
-                      </h3>
+                    >
+                      {/* Metallic overlay gradient */}
                       <div 
-                        className="w-20 h-0.5 mx-auto"
+                        className="absolute inset-0 rounded-2xl pointer-events-none"
                         style={{
-                          background: 'linear-gradient(to right, transparent, rgba(255, 215, 0, 0.8), transparent)',
-                          filter: 'drop-shadow(0 0 2px rgba(255, 215, 0, 0.4))'
+                          background: `
+                            linear-gradient(135deg, 
+                              rgba(255, 255, 200, 0.08) 0%, 
+                              transparent 25%, 
+                              rgba(255, 223, 0, 0.05) 50%, 
+                              transparent 75%, 
+                              rgba(255, 255, 180, 0.03) 100%
+                            )
+                          `,
+                          opacity: 0.5
+                        }}
+                      />
+                      
+                      {/* Enhanced ornate corners with golden metallic effect */}
+                      <div 
+                        className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 rounded-tl-lg"
+                        style={{
+                          borderColor: 'rgba(255, 215, 0, 0.8)',
+                          filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
+                        }}
+                      />
+                      <div 
+                        className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 rounded-tr-lg"
+                        style={{
+                          borderColor: 'rgba(255, 215, 0, 0.8)',
+                          filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
+                        }}
+                      />
+                      <div 
+                        className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 rounded-bl-lg"
+                        style={{
+                          borderColor: 'rgba(255, 215, 0, 0.8)',
+                          filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
+                        }}
+                      />
+                      <div 
+                        className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 rounded-br-lg"
+                        style={{
+                          borderColor: 'rgba(255, 215, 0, 0.8)',
+                          filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))'
+                        }}
+                      />
+                      
+                      {/* Header with enhanced golden styling */}
+                      <div className="text-center mb-4 relative z-10">
+                        <h3 
+                          className="text-2xl font-bold mb-2" 
+                          style={{ 
+                            fontFamily: 'Georgia, serif',
+                            color: 'rgba(255, 223, 0, 0.95)',
+                            textShadow: '0 0 8px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3)'
+                          }}
+                        >
+                          🕉️ Sadhana Paper
+                        </h3>
+                        <div 
+                          className="w-20 h-0.5 mx-auto"
+                          style={{
+                            background: 'linear-gradient(to right, transparent, rgba(255, 215, 0, 0.8), transparent)',
+                            filter: 'drop-shadow(0 0 2px rgba(255, 215, 0, 0.4))'
+                          }}
+                        />
+                      </div>
+
+                      {/* Content with enhanced golden metallic text */}
+                      <div className="space-y-2 relative z-10" style={{ fontFamily: 'Georgia, serif' }}>
+                        <div>
+                          <div 
+                            className="font-semibold mb-1 text-base"
+                            style={{
+                              color: 'rgba(255, 223, 0, 0.95)',
+                              textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
+                            }}
+                          >
+                            Purpose:
+                          </div>
+                          <div 
+                            className="text-sm leading-relaxed pl-2"
+                            style={{
+                              color: 'rgba(255, 255, 255, 0.85)',
+                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                            }}
+                          >
+                            To honor Divine Mother Durga during the sacred nine nights of Navratri and invoke her blessings for strength, wisdom, and spiritual growth.
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div 
+                            className="font-semibold mb-1 text-base"
+                            style={{
+                              color: 'rgba(255, 223, 0, 0.95)',
+                              textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
+                            }}
+                          >
+                            Goal:
+                          </div>
+                          <div 
+                            className="text-sm leading-relaxed pl-2"
+                            style={{
+                              color: 'rgba(255, 255, 255, 0.85)',
+                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                            }}
+                          >
+                            Complete daily worship, fasting, and meditation practices for spiritual purification and divine connection.
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div 
+                            className="font-semibold mb-1 text-base"
+                            style={{
+                              color: 'rgba(255, 223, 0, 0.95)',
+                              textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
+                            }}
+                          >
+                            Divine Focus:
+                          </div>
+                          <div 
+                            className="text-sm leading-relaxed pl-2"
+                            style={{
+                              color: 'rgba(255, 255, 255, 0.85)',
+                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                            }}
+                          >
+                            Maa Durga and her nine divine forms (Navadurga)
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div 
+                            className="font-semibold mb-1 text-base"
+                            style={{
+                              color: 'rgba(255, 223, 0, 0.95)',
+                              textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
+                            }}
+                          >
+                            Duration:
+                          </div>
+                          <div 
+                            className="text-sm leading-relaxed pl-2"
+                            style={{
+                              color: 'rgba(255, 255, 255, 0.85)',
+                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                            }}
+                          >
+                            9 days
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div 
+                            className="font-semibold mb-1 text-base"
+                            style={{
+                              color: 'rgba(255, 223, 0, 0.95)',
+                              textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
+                            }}
+                          >
+                            Message:
+                          </div>
+                          <div 
+                            className="text-sm italic leading-relaxed pl-2"
+                            style={{
+                              color: 'rgba(255, 255, 255, 0.85)',
+                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                            }}
+                          >
+                            "May the Divine Mother's grace illuminate my path and transform my being with her infinite love and protection."
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <div 
+                            className="font-semibold mb-1 text-base"
+                            style={{
+                              color: 'rgba(255, 223, 0, 0.95)',
+                              textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
+                            }}
+                          >
+                            My Offerings:
+                          </div>
+                          <div 
+                            className="text-sm space-y-0.5 pl-2"
+                            style={{
+                              color: 'rgba(255, 255, 255, 0.85)',
+                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
+                            }}
+                          >
+                            <div>1. Daily Durga Chalisa recitation</div>
+                            <div>2. Morning meditation (30 minutes)</div>
+                            <div>3. Evening aarti and prayers</div>
+                            <div>4. Sattvic fasting during day</div>
+                            <div>5. Reading Devi Mahatmya</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Enhanced metallic texture overlay */}
+                      <div 
+                        className="absolute inset-0 rounded-2xl pointer-events-none"
+                        style={{
+                          background: `
+                            radial-gradient(circle at 20% 30%, rgba(255, 223, 0, 0.05) 0%, transparent 40%),
+                            radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.04) 0%, transparent 40%),
+                            radial-gradient(circle at 40% 80%, rgba(255, 207, 0, 0.03) 0%, transparent 30%)
+                          `,
+                          opacity: 0.4
                         }}
                       />
                     </div>
-
-                    {/* Content with enhanced golden metallic text */}
-                    <div className="space-y-2 relative z-10" style={{ fontFamily: 'Georgia, serif' }}>
-                      <div>
-                        <div 
-                          className="font-semibold mb-1 text-base"
-                          style={{
-                            color: 'rgba(255, 223, 0, 0.95)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
-                          }}
-                        >
-                          Purpose:
-                        </div>
-                        <div 
-                          className="text-sm leading-relaxed pl-2"
-                          style={{
-                            color: 'rgba(255, 255, 255, 0.85)',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-                          }}
-                        >
-                          To honor Divine Mother Durga during the sacred nine nights of Navratri and invoke her blessings for strength, wisdom, and spiritual growth.
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div 
-                          className="font-semibold mb-1 text-base"
-                          style={{
-                            color: 'rgba(255, 223, 0, 0.95)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
-                          }}
-                        >
-                          Goal:
-                        </div>
-                        <div 
-                          className="text-sm leading-relaxed pl-2"
-                          style={{
-                            color: 'rgba(255, 255, 255, 0.85)',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-                          }}
-                        >
-                          Complete daily worship, fasting, and meditation practices for spiritual purification and divine connection.
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div 
-                          className="font-semibold mb-1 text-base"
-                          style={{
-                            color: 'rgba(255, 223, 0, 0.95)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
-                          }}
-                        >
-                          Divine Focus:
-                        </div>
-                        <div 
-                          className="text-sm leading-relaxed pl-2"
-                          style={{
-                            color: 'rgba(255, 255, 255, 0.85)',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-                          }}
-                        >
-                          Maa Durga and her nine divine forms (Navadurga)
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div 
-                          className="font-semibold mb-1 text-base"
-                          style={{
-                            color: 'rgba(255, 223, 0, 0.95)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
-                          }}
-                        >
-                          Duration:
-                        </div>
-                        <div 
-                          className="text-sm leading-relaxed pl-2"
-                          style={{
-                            color: 'rgba(255, 255, 255, 0.85)',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-                          }}
-                        >
-                          9 days
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div 
-                          className="font-semibold mb-1 text-base"
-                          style={{
-                            color: 'rgba(255, 223, 0, 0.95)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
-                          }}
-                        >
-                          Message:
-                        </div>
-                        <div 
-                          className="text-sm italic leading-relaxed pl-2"
-                          style={{
-                            color: 'rgba(255, 255, 255, 0.85)',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-                          }}
-                        >
-                          "May the Divine Mother's grace illuminate my path and transform my being with her infinite love and protection."
-                        </div>
-                      </div>
-                      
-                      <div>
-                        <div 
-                          className="font-semibold mb-1 text-base"
-                          style={{
-                            color: 'rgba(255, 223, 0, 0.95)',
-                            textShadow: '0 0 4px rgba(255, 215, 0, 0.4)'
-                          }}
-                        >
-                          My Offerings:
-                        </div>
-                        <div 
-                          className="text-sm space-y-0.5 pl-2"
-                          style={{
-                            color: 'rgba(255, 255, 255, 0.85)',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.5)'
-                          }}
-                        >
-                          <div>1. Daily Durga Chalisa recitation</div>
-                          <div>2. Morning meditation (30 minutes)</div>
-                          <div>3. Evening aarti and prayers</div>
-                          <div>4. Sattvic fasting during day</div>
-                          <div>5. Reading Devi Mahatmya</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Enhanced metallic texture overlay */}
+                    
+                    {/* Enhanced floating spiritual elements with golden glow */}
                     <div 
-                      className="absolute inset-0 rounded-2xl pointer-events-none"
+                      className="absolute -top-3 -right-3 text-2xl animate-pulse"
                       style={{
-                        background: `
-                          radial-gradient(circle at 20% 30%, rgba(255, 223, 0, 0.05) 0%, transparent 40%),
-                          radial-gradient(circle at 80% 70%, rgba(255, 215, 0, 0.04) 0%, transparent 40%),
-                          radial-gradient(circle at 40% 80%, rgba(255, 207, 0, 0.03) 0%, transparent 30%)
-                        `,
-                        opacity: 0.4
+                        filter: 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))',
+                        opacity: 0.8
                       }}
-                    />
-                  </div>
-                  
-                  {/* Enhanced floating spiritual elements with golden glow */}
-                  <div 
-                    className="absolute -top-3 -right-3 text-2xl animate-pulse"
-                    style={{
-                      filter: 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))',
-                      opacity: 0.8
-                    }}
-                  >
-                    🌸
-                  </div>
-                  <div 
-                    className="absolute -bottom-3 -left-3 text-xl animate-pulse"
-                    style={{
-                      filter: 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))',
-                      opacity: 0.8
-                    }}
-                  >
-                    🪔
-                  </div>
-                  <div 
-                    className="absolute top-1/2 -left-6 text-lg animate-bounce"
-                    style={{
-                      filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.5))',
-                      opacity: 0.7
-                    }}
-                  >
-                    ✨
+                    >
+                      🌸
+                    </div>
+                    <div 
+                      className="absolute -bottom-3 -left-3 text-xl animate-pulse"
+                      style={{
+                        filter: 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.6))',
+                        opacity: 0.8
+                      }}
+                    >
+                      🪔
+                    </div>
+                    <div 
+                      className="absolute top-1/2 -left-6 text-lg animate-bounce"
+                      style={{
+                        filter: 'drop-shadow(0 0 4px rgba(255, 215, 0, 0.5))',
+                        opacity: 0.7
+                      }}
+                    >
+                      ✨
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </div>
           </section>
 
@@ -647,36 +659,36 @@ const HomePage = () => {
 
           {/* Features Section - Marketing focused */}
           <section className="py-20 container mx-auto px-4 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-purple-900/5 to-fuchsia-900/5 rounded-3xl"></div>
-          <div className="relative z-10 text-center mb-16">
-            <h2 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-fuchsia-400">Powerful Features for Your Spiritual Growth</h2>
-            <p className="text-2xl text-muted-foreground max-w-3xl mx-auto">
-              Everything you need to maintain and deepen your spiritual practice in one comprehensive platform
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card 
-                  key={index} 
-                  className="backdrop-blur-lg bg-background/30 border-purple-500/20 hover:border-purple-400/50 hover:bg-background/40 transition-all duration-500 h-full transform hover:-translate-y-2 hover:shadow-2xl rounded-2xl overflow-hidden group"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <CardHeader>
-                    <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center mb-6 mx-auto group-hover:from-purple-500/30 group-hover:to-fuchsia-500/30 transition-all duration-300">
-                      <Icon className="h-10 w-10 text-purple-400 group-hover:text-purple-300 transition-colors duration-300" />
-                    </div>
-                    <CardTitle className="text-3xl text-center group-hover:text-purple-300 transition-colors duration-300">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground/90 mb-4 text-lg text-center">{feature.description}</p>
-                    <p className="text-base text-muted-foreground text-center group-hover:text-foreground/80 transition-colors duration-300">{feature.details}</p>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+            <div className="absolute inset-0 bg-gradient-to-b from-purple-900/5 to-fuchsia-900/5 rounded-3xl"></div>
+            <div className="relative z-10 text-center mb-16">
+              <h2 className="text-5xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-fuchsia-400">Powerful Features for Your Spiritual Growth</h2>
+              <p className="text-2xl text-muted-foreground max-w-3xl mx-auto">
+                Everything you need to maintain and deepen your spiritual practice in one comprehensive platform
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {features.map((feature, index) => {
+                const Icon = feature.icon;
+                return (
+                  <Card 
+                    key={index} 
+                    className="backdrop-blur-lg bg-background/30 border-purple-500/20 hover:border-purple-400/50 hover:bg-background/40 transition-all duration-500 h-full transform hover:-translate-y-2 hover:shadow-2xl rounded-2xl overflow-hidden group"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <CardHeader>
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center mb-6 mx-auto group-hover:from-purple-500/30 group-hover:to-fuchsia-500/30 transition-all duration-300">
+                        <Icon className="h-10 w-10 text-purple-400 group-hover:text-purple-300 transition-colors duration-300" />
+                      </div>
+                      <CardTitle className="text-3xl text-center group-hover:text-purple-300 transition-colors duration-300">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground/90 mb-4 text-lg text-center">{feature.description}</p>
+                      <p className="text-base text-muted-foreground text-center group-hover:text-foreground/80 transition-colors duration-300">{feature.details}</p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </section>
 
           {/* Theme Changing Section removed per request */}

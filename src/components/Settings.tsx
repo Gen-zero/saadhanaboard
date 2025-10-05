@@ -52,7 +52,7 @@ const SpiritualCard = ({
   [key: string]: any;
 }) => (
   <Card 
-    className={`transition-all duration-500 hover:shadow-xl hover:shadow-purple-500/20 spiritual-card backdrop-blur-sm ${className}`}
+    className={`transition-all duration-500 hover:shadow-xl hover:shadow-purple-500/20 spiritual-card backdrop-blur-sm bg-background/70 border-purple-500/20 ${className}`}
     {...props}
   >
     {children}
@@ -195,12 +195,15 @@ const Settings = () => {
       </div>
       
       <div className="mb-8 relative z-10">
-        <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-fuchsia-500 mb-2">
-          {t('settings')}
+        <h1 className="text-4xl font-bold mb-2">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-500 to-purple-600">
+            Settings
+          </span>
         </h1>
-        <p className="text-muted-foreground">
-          {t('customize_experience')}
+        <p className="text-muted-foreground text-lg">
+          Customize your spiritual journey experience
         </p>
+        <div className="w-24 h-1 bg-gradient-to-r from-purple-500 to-fuchsia-500 rounded-full mt-3"></div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 relative z-10">
@@ -214,85 +217,117 @@ const Settings = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <nav className="space-y-1">
+              <nav className="space-y-2">
                 <Button
                   variant={activeSection === 'general' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start gap-2"
+                  className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${
+                    activeSection === 'general' 
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 shadow-sm' 
+                      : 'hover:bg-purple-500/10'
+                  }`}
                   onClick={() => setActiveSection('general')}
                 >
-                  <div className="flex items-center gap-2">
-                    <SettingsIcon className="h-4 w-4" />
-                    <span>{t('general')}</span>
+                  <div className="flex items-center gap-3">
+                    <SettingsIcon className="h-5 w-5" />
+                    <span className="font-medium">{t('general')}</span>
                   </div>
                 </Button>
                 <Button
                   variant={activeSection === 'appearance' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start gap-2"
+                  className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${
+                    activeSection === 'appearance' 
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 shadow-sm' 
+                      : 'hover:bg-purple-500/10'
+                  }`}
                   onClick={() => setActiveSection('appearance')}
                 >
-                  <div className="flex items-center gap-2">
-                    <Palette className="h-4 w-4" />
-                    <span>{t('appearance')}</span>
+                  <div className="flex items-center gap-3">
+                    <Palette className="h-5 w-5" />
+                    <span className="font-medium">{t('appearance')}</span>
                   </div>
                 </Button>
                 <Button
                   variant={activeSection === 'meditation' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start gap-2"
+                  className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${
+                    activeSection === 'meditation' 
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 shadow-sm' 
+                      : 'hover:bg-purple-500/10'
+                  }`}
                   onClick={() => setActiveSection('meditation')}
                 >
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{t('meditation')}</span>
+                  <div className="flex items-center gap-3">
+                    <Clock className="h-5 w-5" />
+                    <span className="font-medium">{t('meditation')}</span>
                   </div>
                 </Button>
                 <Button
                   variant={activeSection === 'privacy' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start gap-2"
+                  className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${
+                    activeSection === 'privacy' 
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 shadow-sm' 
+                      : 'hover:bg-purple-500/10'
+                  }`}
                   onClick={() => setActiveSection('privacy')}
                 >
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="h-4 w-4" />
-                    <span>{t('privacy')}</span>
+                  <div className="flex items-center gap-3">
+                    <ShieldCheck className="h-5 w-5" />
+                    <span className="font-medium">{t('privacy')}</span>
                   </div>
                 </Button>
                 <Button
                   variant={activeSection === 'notifications' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start gap-2"
+                  className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${
+                    activeSection === 'notifications' 
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 shadow-sm' 
+                      : 'hover:bg-purple-500/10'
+                  }`}
                   onClick={() => setActiveSection('notifications')}
                 >
-                  <div className="flex items-center gap-2">
-                    <Bell className="h-4 w-4" />
-                    <span>{t('notifications')}</span>
+                  <div className="flex items-center gap-3">
+                    <Bell className="h-5 w-5" />
+                    <span className="font-medium">{t('notifications')}</span>
                   </div>
                 </Button>
                 <Button
                   variant={activeSection === 'accessibility' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start gap-2"
+                  className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${
+                    activeSection === 'accessibility' 
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 shadow-sm' 
+                      : 'hover:bg-purple-500/10'
+                  }`}
                   onClick={() => setActiveSection('accessibility')}
                 >
-                  <div className="flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    <span>{t('accessibility')}</span>
+                  <div className="flex items-center gap-3">
+                    <Eye className="h-5 w-5" />
+                    <span className="font-medium">{t('accessibility')}</span>
                   </div>
                 </Button>
                 <Button
                   variant={activeSection === 'profile' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start gap-2"
+                  className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${
+                    activeSection === 'profile' 
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 shadow-sm' 
+                      : 'hover:bg-purple-500/10'
+                  }`}
                   onClick={() => setActiveSection('profile')}
                 >
-                  <div className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    <span>{t('profile')}</span>
+                  <div className="flex items-center gap-3">
+                    <User className="h-5 w-5" />
+                    <span className="font-medium">{t('profile')}</span>
                   </div>
                 </Button>
                 <Button
                   variant={activeSection === 'advanced' ? 'secondary' : 'ghost'}
-                  className="w-full justify-start gap-2"
+                  className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${
+                    activeSection === 'advanced' 
+                      ? 'bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 shadow-sm' 
+                      : 'hover:bg-purple-500/10'
+                  }`}
                   onClick={() => setActiveSection('advanced')}
                 >
-                  <div className="flex items-center gap-2">
-                    <SlidersHorizontal className="h-4 w-4" />
-                    <span>{t('advanced')}</span>
+                  <div className="flex items-center gap-3">
+                    <SlidersHorizontal className="h-5 w-5" />
+                    <span className="font-medium">{t('advanced')}</span>
                   </div>
                 </Button>
               </nav>
@@ -300,15 +335,22 @@ const Settings = () => {
               <div className="mt-6 pt-6 border-t border-border space-y-3">
                 <Button
                   variant="default"
-                  className="w-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600"
+                  className="w-full bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white shadow-lg hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300"
                   onClick={handleSaveSettings}
                   disabled={isSaving}
                 >
-                  {isSaving ? t('saving') : t('save_settings')}
+                  {isSaving ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      {t('saving')}
+                    </div>
+                  ) : (
+                    t('save_settings')
+                  )}
                 </Button>
                 <Button
                   variant="outline"
-                  className="w-full"
+                  className="w-full border-purple-500/30 hover:bg-purple-500/10 transition-all duration-300"
                   onClick={handleExportSettings}
                 >
                   {t('export_settings')}
@@ -324,7 +366,7 @@ const Settings = () => {
                   <label htmlFor="import-settings">
                     <Button
                       variant="outline"
-                      className="w-full cursor-pointer"
+                      className="w-full cursor-pointer border-purple-500/30 hover:bg-purple-500/10 transition-all duration-300"
                       asChild
                     >
                       <span>{t('import_settings')}</span>
@@ -333,7 +375,7 @@ const Settings = () => {
                 </div>
                 <Button
                   variant="destructive"
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 shadow-lg hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300"
                   onClick={handleResetSettings}
                 >
                   {t('reset_to_defaults')}

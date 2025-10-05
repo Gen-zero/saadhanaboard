@@ -47,6 +47,7 @@ const LibraryContainer = () => {
   const [view, setView] = useState<"grid" | "list">("grid");
   const [activeTab, setActiveTab] = useState("books");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [isDesktopFiltersOpen, setIsDesktopFiltersOpen] = useState(false); // New state for desktop filters
   const isMobile = useIsMobile();
   
   const DEFAULT_LIMIT = 40;
@@ -210,19 +211,24 @@ const LibraryContainer = () => {
                 }}
               />
               
+              {/* Filter Button for both mobile and desktop */}
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={() => isMobile ? setIsMobileFiltersOpen(true) : setIsDesktopFiltersOpen(!isDesktopFiltersOpen)}
+              >
+                <Filter className="h-4 w-4" />
+                Filters
+                {filterCount > 0 && (
+                  <Badge variant="secondary" className="ml-1">
+                    {filterCount}
+                  </Badge>
+                )}
+              </Button>
+              
+              {/* Mobile Filter Sheet */}
               {isMobile && (
                 <Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="outline" className="flex items-center gap-2">
-                      <Filter className="h-4 w-4" />
-                      Filters
-                      {filterCount > 0 && (
-                        <Badge variant="secondary" className="ml-1">
-                          {filterCount}
-                        </Badge>
-                      )}
-                    </Button>
-                  </SheetTrigger>
                   <SheetContent side="bottom" className="h-[80vh]">
                     <SheetHeader>
                       <SheetTitle>Filter Books</SheetTitle>
@@ -244,14 +250,17 @@ const LibraryContainer = () => {
               )}
             </div>
 
-            {!isMobile && (
-              <AdvancedFilters
-                filters={filters}
-                onFiltersChange={(next: Partial<BookFilters>) => handleFiltersChange(next)}
-                languages={languages}
-                yearRange={yearRange}
-                traditions={traditions}
-              />
+            {/* Desktop Filter Panel - Collapsible */}
+            {!isMobile && isDesktopFiltersOpen && (
+              <div className="border border-purple-200/10 rounded-lg bg-background/70 p-4">
+                <AdvancedFilters
+                  filters={filters}
+                  onFiltersChange={(next: Partial<BookFilters>) => handleFiltersChange(next)}
+                  languages={languages}
+                  yearRange={yearRange}
+                  traditions={traditions}
+                />
+              </div>
             )}
 
             <FilterChips

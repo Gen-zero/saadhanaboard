@@ -127,7 +127,7 @@ const FoundationsCategory = ({ onSadhanaSelect }: FoundationsCategoryProps) => {
         {foundationsSadhanas.map((sadhana) => (
           <Card 
             key={sadhana.id} 
-            className="group relative overflow-hidden border border-purple-500/20 bg-gradient-to-b from-purple-600/10 via-purple-500/5 to-purple-400/10 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1"
+            className="group relative overflow-hidden border border-purple-500/20 bg-gradient-to-b from-purple-600/10 via-purple-500/5 to-purple-400/10 backdrop-blur-sm hover:border-purple-500/50 transition-all duration-300 hover:-translate-y-1 rounded-xl"
           >
             <CardHeader className="pb-3 bg-gradient-to-r from-purple-500/5 via-fuchsia-500/5 to-purple-500/5">
               <div className="flex justify-between items-start">
@@ -168,7 +168,7 @@ const FoundationsCategory = ({ onSadhanaSelect }: FoundationsCategoryProps) => {
                 
                 <Button
                   onClick={() => onSadhanaSelect(sadhana)}
-                  className="w-full mt-4 bg-gradient-to-r from-purple-500/20 to-fuchsia-500/20 border border-purple-500/30 hover:from-purple-500/30 hover:to-fuchsia-500/30 transition-all duration-300"
+                  className="w-full mt-4 bg-gradient-to-r from-purple-500/30 to-fuchsia-500/30 border border-purple-500/30 hover:from-purple-500/40 hover:to-fuchsia-500/40 transition-all duration-300"
                   size="sm"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />

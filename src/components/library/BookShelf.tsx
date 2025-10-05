@@ -26,7 +26,7 @@ const BookShelf = ({ books, onSelectBook, view, onClearFilters, hasActiveFilters
   
   if (books.length === 0) {
     return (
-      <div className="relative flex flex-col items-center justify-center p-6 md:p-12 text-center rounded-xl border-2 border-purple-500/30 bg-gradient-to-b from-purple-600/8 via-purple-500/6 to-purple-400/8 backdrop-blur-sm">
+      <div className="relative flex flex-col items-center justify-center p-8 md:p-12 text-center rounded-xl border-2 border-purple-500/30 bg-gradient-to-b from-purple-600/8 via-purple-500/6 to-purple-400/8 backdrop-blur-sm">
         <div className="relative mb-6">
           <div className="absolute -inset-6 rounded-full bg-purple-500/10 blur-3xl opacity-60" />
           <BookOpen className="h-16 w-16 md:h-20 md:w-20 text-purple-500 animate-pulse relative z-10" />
@@ -60,7 +60,7 @@ const BookShelf = ({ books, onSelectBook, view, onClearFilters, hasActiveFilters
   }
   
   return (
-    <div className="mt-4">
+    <div className="mt-6">
       {view === "grid" ? (
         isMobile ? (
           // Mobile carousel view
@@ -83,7 +83,7 @@ const BookShelf = ({ books, onSelectBook, view, onClearFilters, hasActiveFilters
           </Carousel>
         ) : (
           // Desktop grid view
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {books.map((book) => (
               <BookCard key={book.id} book={book} onSelect={onSelectBook} progress={progressMap[book.id]} isMobile={isMobile} />
             ))}
@@ -91,7 +91,7 @@ const BookShelf = ({ books, onSelectBook, view, onClearFilters, hasActiveFilters
         )
       ) : (
         <ScrollArea className="h-[500px] rounded-xl border border-purple-500/20 bg-gradient-to-b from-background/70 to-secondary/10 backdrop-blur-sm">
-          <div className="p-3 md:p-4">
+          <div className="p-4">
             {books.map((book) => (
               <BookListItem key={book.id} book={book} onSelect={onSelectBook} progress={progressMap[book.id]} isMobile={isMobile} />
             ))}
@@ -178,7 +178,7 @@ const BookCard = ({ book, onSelect, progress, isMobile = false }: BookCardProps)
         )}
       </div>
       
-      <div className="p-3 md:p-4 flex-1 flex flex-col">
+      <div className="p-4 flex-1 flex flex-col">
         <div className="flex-1">
           <h3 className="text-base md:text-lg font-semibold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">{book.title}</h3>
           <p className="text-xs md:text-sm text-muted-foreground mt-1 font-medium">{book.author}</p>
@@ -230,7 +230,7 @@ const BookListItem = ({ book, onSelect, progress, isMobile = false }: BookCardPr
 
   return (
     <div 
-      className="group flex justify-between items-center p-3 md:p-4 my-2 rounded-lg hover:bg-purple-500/15 hover:scale-[1.01] transition-all duration-300 border border-transparent hover:border-purple-500/30 cursor-pointer"
+      className="group flex justify-between items-center p-4 my-2 rounded-lg hover:bg-purple-500/15 hover:scale-[1.01] transition-all duration-300 border border-transparent hover:border-purple-500/30 cursor-pointer"
       onClick={() => onSelect(book.id)}
     >
       <div className="flex items-center gap-4">

@@ -238,10 +238,14 @@ const App = () => {
   }
   
   // Determine the theme for background animation
-  const backgroundTheme = settings?.appearance?.colorScheme && 
-    ['default', 'earth', 'water', 'fire', 'shiva', 'bhairava', 'serenity', 'ganesha', 'mahakali'].includes(settings.appearance.colorScheme) 
-    ? settings.appearance.colorScheme as 'default' | 'earth' | 'water' | 'fire' | 'shiva' | 'bhairava' | 'serenity' | 'ganesha' | 'mahakali'
-    : 'default';
+  // Force default theme on landing page
+  const isLandingPage = window.location.pathname === '/landingpage';
+  const backgroundTheme = isLandingPage 
+    ? 'default' 
+    : settings?.appearance?.colorScheme && 
+      ['default', 'earth', 'water', 'fire', 'shiva', 'bhairava', 'serenity', 'ganesha', 'mahakali'].includes(settings.appearance.colorScheme) 
+      ? settings.appearance.colorScheme as 'default' | 'earth' | 'water' | 'fire' | 'shiva' | 'bhairava' | 'serenity' | 'ganesha' | 'mahakali'
+      : 'default';
   
   return (
     <QueryClientProvider client={queryClient}>

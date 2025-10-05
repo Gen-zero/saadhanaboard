@@ -1,4 +1,3 @@
-
 import { Sadhana } from '@/types/sadhana';
 import SadhanaCard from './SadhanaCard';
 import { Button } from '@/components/ui/button';
@@ -36,16 +35,24 @@ const SadhanaGroup = ({
   };
 
   const content = (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {sadhanas.map(sadhana => (
-        <SadhanaCard
-          key={sadhana.id}
-          sadhana={sadhana}
-          onToggleCompletion={handleToggleCompletion}
-          onDelete={onDelete}
-          onUpdate={onUpdate}
-        />
-      ))}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {sadhanas.map(sadhana => {
+        // Convert Sadhana to SharedSadhana by adding the required isShared property
+        const sharedSadhana = {
+          ...sadhana,
+          isShared: false
+        };
+        
+        return (
+          <SadhanaCard
+            key={sadhana.id}
+            sadhana={sharedSadhana}
+            onToggleCompletion={handleToggleCompletion}
+            onDelete={onDelete}
+            onUpdate={onUpdate}
+          />
+        );
+      })}
     </div>
   );
 
@@ -53,7 +60,7 @@ const SadhanaGroup = ({
     return (
       <Collapsible defaultOpen={defaultOpen}>
         <CollapsibleTrigger className="w-full group">
-          <div className="flex justify-between items-center border-b border-purple-500/20 pb-2">
+          <div className="flex justify-between items-center border-b border-purple-500/20 pb-3">
             <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
               {title}
               <span className="text-sm font-normal text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full">
@@ -65,7 +72,7 @@ const SadhanaGroup = ({
             </Button>
           </div>
         </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4 animate-in fade-in-0 zoom-in-95">
+        <CollapsibleContent className="pt-5 animate-in fade-in-0 zoom-in-95">
            {content}
         </CollapsibleContent>
       </Collapsible>
@@ -74,7 +81,7 @@ const SadhanaGroup = ({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2 border-b border-purple-500/20 pb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
+      <h2 className="text-xl font-semibold tracking-tight flex items-center gap-2 border-b border-purple-500/20 pb-3 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
         {title} 
         <span className="text-sm font-normal text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full">
           {sadhanas.length}

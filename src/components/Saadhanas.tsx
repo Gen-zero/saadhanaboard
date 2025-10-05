@@ -2,7 +2,8 @@ import {
   CheckSquare, 
   Filter, 
   Plus, 
-  Search
+  Search,
+  ChevronDown
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,10 @@ import AddSadhana from './AddSadhana';
 import ReflectionDialog from './ReflectionDialog';
 import CosmicBackgroundSimple from './sadhana/CosmicBackgroundSimple';
 import { useSettings } from '@/hooks/useSettings';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Badge } from '@/components/ui/badge';
 
 const CosmicParticle = ({ delay }: { delay: number }) => {
   return (
@@ -50,6 +55,9 @@ const Saadhanas = () => {
 
   const { settings } = useSettings();
   const [cosmicParticles, setCosmicParticles] = useState<number[]>([]);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [isDesktopFiltersOpen, setIsDesktopFiltersOpen] = useState(false);
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     // Create cosmic particles
@@ -58,6 +66,7 @@ const Saadhanas = () => {
   }, []);
 
   const totalSaadhanas = Object.values(groupedSaadhanas).reduce((sum, arr) => sum + arr.length, 0);
+  const activeFiltersCount = (filter !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0);
 
   // Check if Shiva theme is active
   const isShivaTheme = settings?.appearance?.colorScheme === 'shiva';
@@ -95,19 +104,28 @@ const Saadhanas = () => {
           <CosmicParticle key={index} delay={index * 0.1} />
         ))}
       </div>
-      <div className="backdrop-blur-sm bg-background/70 p-6 rounded-lg border border-purple-500/20">
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">
-          <CheckSquare className="h-7 w-7 text-purple-500" />
-          Saadhanas
-        </h1>
-        <p className="text-muted-foreground">
-          Organize your spiritual practices and goals.
-        </p>
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center flex-wrap gap-4 pb-4 border-b border-purple-500/20">
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20">
+            <CheckSquare className="h-6 w-6 text-purple-500" />
+          </div>
+          <div>
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight text-foreground">
+              Saadhanas
+            </h1>
+            <p className="text-xs md:text-sm text-muted-foreground">
+              Organize your spiritual practices and goals
+            </p>
+          </div>
+        </div>
       </div>
 
-      <div className="backdrop-blur-sm bg-background/70 p-4 rounded-lg border border-purple-500/20">
-        <div className="flex flex-col sm:flex-row justify-between gap-4">
-          <div className="relative flex-1">
+      {/* Search and Filters */}
+      <div className="backdrop-blur-sm bg-background/70 p-4 rounded-xl border border-purple-500/20">
+        <div className="flex flex-col md:flex-row justify-between gap-4">
+          <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder="Search saadhanas..."
@@ -116,29 +134,81 @@ const Saadhanas = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
+          
           <div className="flex gap-2">
-            <Select value={filter} onValueChange={handleFilterChange}>
-              <SelectTrigger className="w-[130px] glass-effect">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  <span>Priority</span>
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="high">High</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="low">Low</SelectItem>
-              </SelectContent>
-            </Select>
-            <AddSadhana onAddSadhana={handleAddSadhanaWrapper} />
+            {/* Filter Button */}
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2 bg-background/70 border-purple-500/30 hover:bg-purple-500/10"
+              onClick={() => isMobile ? setIsMobileFiltersOpen(true) : setIsDesktopFiltersOpen(!isDesktopFiltersOpen)}
+            >
+              <Filter className="h-4 w-4" />
+              Filters
+              {activeFiltersCount > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {activeFiltersCount}
+                </Badge>
+              )}
+            </Button>
           </div>
         </div>
+        
+        {/* Mobile Filter Sheet */}
+        {isMobile && (
+          <Sheet open={isMobileFiltersOpen} onOpenChange={setIsMobileFiltersOpen}>
+            <SheetContent side="bottom" className="h-[50vh]">
+              <SheetHeader>
+                <SheetTitle>Filter Saadhanas</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 space-y-4">
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground mb-2 block">Priority</label>
+                  <Select value={filter} onValueChange={handleFilterChange}>
+                    <SelectTrigger className="glass-effect">
+                      <SelectValue placeholder="Select priority" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="high">High</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="low">Low</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end">
+                <Button onClick={() => setIsMobileFiltersOpen(false)}>Apply Filters</Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+        )}
+        
+        {/* Desktop Filter Panel */}
+        {!isMobile && isDesktopFiltersOpen && (
+          <CollapsibleContent className="pt-4 border-t border-purple-500/20 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground mb-2 block">Priority</label>
+                <Select value={filter} onValueChange={handleFilterChange}>
+                  <SelectTrigger className="glass-effect">
+                    <SelectValue placeholder="Select priority" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="low">Low</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CollapsibleContent>
+        )}
       </div>
 
-      <div className="mt-4 space-y-8">
+      <div className="mt-6 space-y-8">
         {totalSaadhanas === 0 ? (
-          <div className="backdrop-blur-sm bg-background/70 p-8 rounded-lg border border-purple-500/20">
+          <div className="backdrop-blur-sm bg-background/70 p-8 rounded-xl border border-purple-500/20">
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <CheckSquare className="h-16 w-16 text-purple-500/30 mb-4" />
               <h3 className="text-xl font-medium mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-fuchsia-400 to-purple-600">No saadhanas found</h3>
@@ -151,7 +221,7 @@ const Saadhanas = () => {
                 <AddSadhana 
                   onAddSadhana={handleAddSadhanaWrapper}
                   triggerButton={
-                    <Button variant="outline" className="cosmic-button">
+                    <Button className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/30">
                       <Plus className="mr-2 h-4 w-4" />
                       Add Sadhana
                     </Button>
@@ -162,6 +232,19 @@ const Saadhanas = () => {
           </div>
         ) : (
           <>
+            {/* Add Sadhana Button for when there are existing saadhanas */}
+            <div className="flex justify-end">
+              <AddSadhana 
+                onAddSadhana={handleAddSadhanaWrapper} 
+                triggerButton={
+                  <Button className="bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/30">
+                    <Plus className="mr-2 h-4 w-4" />
+                    Add Sadhana
+                  </Button>
+                }
+              />
+            </div>
+            
             <SadhanaGroup 
               title="Overdue" 
               sadhanas={groupedSaadhanas.overdue}

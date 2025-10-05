@@ -59,11 +59,13 @@ function parseArgs(argv) {
 
 function main(argv = process.argv.slice(2)) {
   const { force, dryRun } = parseArgs(argv);
-  console.log('Theme icons copy — starting');
-  console.log('Options:', { force, dryRun });
+  // Reduce verbosity in normal operation
+  // console.log('Theme icons copy — starting');
+  // console.log('Options:', { force, dryRun });
 
   if (!fs.existsSync(iconsDir)) {
-    console.warn('Source icons directory not found:', iconsDir);
+    // Only warn if icons directory is missing
+    // console.warn('Source icons directory not found:', iconsDir);
     process.exit(0);
   }
 
@@ -87,17 +89,21 @@ function main(argv = process.argv.slice(2)) {
       const dest = path.join(themeAssetsDir, file);
       const result = copyFile({ src, dest, force, dryRun });
       if (result.status === 'missing') {
+        // Only warn for missing files
         console.warn(`Missing: ${file} (expected at ${path.relative(repoRoot, src)})`);
         summary.missing += 1;
       } else if (result.status === 'skipped') {
-        console.log(`Skipped: ${file} — up-to-date at ${path.relative(repoRoot, dest)}`);
+        // Suppress skipped file messages
+        // console.log(`Skipped: ${file} — up-to-date at ${path.relative(repoRoot, dest)}`);
         summary.skipped += 1;
       } else if (result.status === 'would-copy') {
-        console.log(`Would copy: ${file} -> ${path.relative(repoRoot, dest)} (${fileSizeReadable(result.size)})`);
+        // Only show in dry-run mode
+        // console.log(`Would copy: ${file} -> ${path.relative(repoRoot, dest)} (${fileSizeReadable(result.size)})`);
         summary.wouldCopy += 1;
         summary.details.push({ themeId, file, op: 'would-copy', size: result.size });
       } else if (result.status === 'copied') {
-        console.log(`Copied: ${file} -> ${path.relative(repoRoot, dest)} (${fileSizeReadable(result.size)})`);
+        // Only show when actually copying
+        // console.log(`Copied: ${file} -> ${path.relative(repoRoot, dest)} (${fileSizeReadable(result.size)})`);
         summary.copied += 1;
         summary.details.push({ themeId, file, op: 'copied', size: result.size });
       }
@@ -107,7 +113,8 @@ function main(argv = process.argv.slice(2)) {
     const readmePath = path.join(themeAssetsDir, 'README.md');
     if (!fs.existsSync(readmePath) && !dryRun) {
       fs.writeFileSync(readmePath, `# Assets for theme ${themeId}\n\nStore local icon/background assets here. Run \`npm run themes:copy-icons\` to sync from repository icons folder.\n`);
-      console.log('Wrote', path.relative(repoRoot, readmePath));
+      // Suppress README creation messages
+      // console.log('Wrote', path.relative(repoRoot, readmePath));
     }
   });
 
@@ -126,13 +133,14 @@ function main(argv = process.argv.slice(2)) {
     });
   }
 
-  console.log('\nSummary:');
-  console.log(`  Total configured files: ${summary.totalFiles}`);
-  console.log(`  Copied: ${summary.copied}`);
-  console.log(`  Skipped (up-to-date): ${summary.skipped}`);
-  console.log(`  Missing in source: ${summary.missing}`);
-  if (dryRun) console.log(`  Would copy (dry-run): ${summary.wouldCopy}`);
-  console.log('Done.');
+  // Only show summary if there were changes or issues
+  if (summary.copied > 0 || summary.missing > 0) {
+    console.log('\nTheme icons summary:');
+    console.log(`  Copied: ${summary.copied}`);
+    console.log(`  Missing: ${summary.missing}`);
+    if (dryRun) console.log(`  Would copy (dry-run): ${summary.wouldCopy}`);
+    console.log('Done.');
+  }
   return summary;
 }
 
