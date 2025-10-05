@@ -17,7 +17,18 @@ const CosmicParticle = ({ delay }: { delay: number }) => {
         animationDelay: `${delay}s`,
         opacity: Math.random() * 0.7 + 0.3,
         zIndex: 0,
-        boxShadow: '0 0 8px #a855f7, 0 0 16px #a855f7'
+        boxShadow: '0 0 8px #a855f7, 0 0 16px #a855f7',
+        transition: 'all 0.3s ease-in-out'
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(2)';
+        e.currentTarget.style.opacity = '1';
+        e.currentTarget.style.boxShadow = '0 0 20px #a855f7, 0 0 30px #a855f7';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.opacity = (Math.random() * 0.7 + 0.3).toString();
+        e.currentTarget.style.boxShadow = '0 0 8px #a855f7, 0 0 16px #a855f7';
       }}
     ></div>
   );

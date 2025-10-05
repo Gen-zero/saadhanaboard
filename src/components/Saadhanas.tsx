@@ -106,7 +106,7 @@ const Saadhanas = () => {
       </div>
       
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center flex-wrap gap-4 pb-4 border-b border-purple-500/20">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-4 border-b border-purple-500/20">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-gradient-to-br from-purple-500/20 to-fuchsia-500/20">
             <CheckSquare className="h-6 w-6 text-purple-500" />
@@ -119,6 +119,10 @@ const Saadhanas = () => {
               Organize your spiritual practices and goals
             </p>
           </div>
+        </div>
+        {/* Add Sadhana Button for when there are existing saadhanas */}
+        <div className="ml-auto">
+          <AddSadhana onAddSadhana={handleAddSadhanaWrapper} />
         </div>
       </div>
 

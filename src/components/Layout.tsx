@@ -209,10 +209,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Fixed sidebar - always visible and fixed in place */}
       <div
-        className={`fixed inset-y-0 left-0 z-50 h-screen sidebar-seamless border-r border-purple-500/10`}
+        className={`fixed inset-y-0 left-0 z-50 h-screen sidebar-seamless border-r border-purple-500/10 flex flex-col`}
         style={{ width: '360px' }}
       >
-        <div className="h-full flex flex-col relative">
+        <div className="flex flex-col h-full">
           {/* Ambient mantra display */}
           <div className="absolute inset-x-0 top-0 h-8 overflow-hidden z-10">
             <div className="text-center text-xs text-purple-300/60 font-sans animate-pulse-slow whitespace-nowrap">
@@ -227,17 +227,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <img
                     src="/lovable-uploads/sadhanaboard_logo.png"
                     alt="Saadhana Board Logo"
-                    className="h-full w-full object-contain cursor-pointer transition-all duration-500 hover:scale-105 logo-enhanced"
+                    className="h-full w-full object-contain cursor-pointer transition-all duration-500 hover:scale-110 logo-enhanced"
                     onClick={() => {
                       navigate('/');
                     }}
                   />
                 </div>
-                {/* Glow effect on hover */}
-                <div className="absolute inset-0 rounded-full bg-purple-500/20 blur-2xl scale-125 opacity-0 group-hover:opacity-100 transition-all duration-500 -z-10 logo-glow-effect"></div>
+                {/* Enhanced glow effect on hover without pulsing animation */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 blur-2xl scale-125 opacity-0 group-hover:opacity-70 transition-all duration-500 -z-10 logo-glow-effect"></div>
               </div>
               <h1 
-                className="text-3xl font-bold cursor-pointer transition-all duration-300 hover:text-purple-300 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400"
+                className="text-3xl font-bold cursor-pointer transition-all duration-300 hover:text-purple-300 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-300 hover:to-pink-300"
                 onClick={() => {
                   navigate('/');
                 }}
@@ -248,7 +248,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
           
           {/* Theme deity display */}
-          <div className="flex flex-col items-center justify-center p-4 space-y-2">
+          <div className="flex flex-col items-center justify-center p-6 space-y-3 border-b border-purple-500/10">
             <div className="flex items-center justify-center transition-transform duration-500 hover:scale-105 cursor-pointer"
               onClick={() => {
                 navigate('/settings');
@@ -265,73 +265,75 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </>
           </div>
           
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto sidebar-scrollbar">
-            {navItems.map((item) => {
-              const active = isActive(item.path);
-              return (
-                <Link
-                  key={item.name}
-                  to={item.path}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-200 ${active ? 'nav-item-active' : 'nav-item-inactive'}`}
-                >
-                  <span className={`flex items-center justify-center w-9 h-9 rounded-lg nav-icon ${active ? 'nav-icon-active' : ''}`}>
-                    <item.icon size={18} className={`${active ? 'text-purple-400' : 'text-muted-foreground group-hover:text-purple-400'}`} />
-                  </span>
-                  <span className="ml-2 truncate">{item.name}</span>
-                  {active && <ChevronRight size={14} className="ml-auto text-purple-300" />}
-                </Link>
-              );
-            })}
+          <nav className="flex-1 p-4 overflow-y-auto sidebar-scrollbar">
+            <div className="space-y-1">
+              {navItems.map((item) => {
+                const active = isActive(item.path);
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 ${
+                      active 
+                        ? 'bg-purple-500/20 text-foreground border border-purple-500/20 shadow-lg transform scale-105' 
+                        : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground hover:scale-105'
+                    }`}
+                  >
+                    <span className={`flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300 ${
+                      active ? 'bg-purple-500/20 text-purple-400 scale-110' : 'text-muted-foreground'
+                    }`}>
+                      <item.icon size={18} />
+                    </span>
+                    <span className="truncate flex-1">{item.name}</span>
+                    {active && <ChevronRight size={14} className="text-purple-300 flex-shrink-0 animate-pulse" />}
+                  </Link>
+                );
+              })}
+            </div>
           </nav>
           <div className="p-4 border-t border-purple-500/10">
             <div className="flex flex-col space-y-2">
               {user ? (
                 <div className="flex flex-col space-y-2">
-                  <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90">
-                    <User size={16} className="text-primary" />
+                  <div className="flex items-center gap-2 text-sm text-sidebar-foreground/90 px-3 py-2">
+                    <User size={16} className="text-primary flex-shrink-0" />
                     <span className="truncate">{user.display_name || user.email}</span>
                   </div>
                   <Link
                     to="/profile"
-                    className={`flex items-center rounded-lg transition-all duration-300 ${
+                    className={`flex items-center rounded-lg transition-all duration-300 px-3 py-2.5 ${
                       isActive('/profile')
-                        ? 'bg-purple-500/20 text-foreground border border-purple-500/20 scale-[1.02] shadow-md'
-                        : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground border border-transparent hover:border-purple-500/20 hover:scale-[1.01]'
-                    } p-3 justify-start group`}
+                        ? 'bg-purple-500/20 text-foreground border border-purple-500/20 shadow-lg transform scale-105'
+                        : 'text-muted-foreground hover:bg-purple-500/10 hover:text-foreground hover:scale-105'
+                    }`}
                   >
                     <User 
                       size={16} 
                       className={`transition-transform duration-300 ${
-                        isActive('/profile') ? 'text-purple-400' : 'group-hover:text-purple-400'
-                      }`} 
+                        isActive('/profile') ? 'text-purple-400 scale-110' : ''
+                      } flex-shrink-0`} 
                     />
                     <span className="ml-3">Profile</span>
                   </Link>
                   <Button
                     variant="outline"
                     size="sm"
-                    className={`w-full cosmic-highlight relative overflow-hidden group border-purple-500/20 hover:bg-purple-500/10 justify-start interactive transition-all duration-300`}
+                    className="w-full justify-start border-purple-500/20 hover:bg-purple-500/10 px-3 py-2.5"
                     onClick={handleLogout}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-destructive/0 via-destructive/20 to-destructive/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform translate-x-[-100%] group-hover:translate-x-[100%]"></div>
-                    <LogOut size={16} className="mr-2 text-destructive group-hover:scale-110 transition-transform duration-300" />
-                    <span className="text-destructive/90 group-hover:text-destructive group-hover:font-medium transition-all duration-300">
-                      Sign Out
-                    </span>
+                    <LogOut size={16} className="mr-2 text-destructive flex-shrink-0" />
+                    <span className="text-destructive/90">Sign Out</span>
                   </Button>
                 </div>
               ) : (
                 <Button
                   variant="outline"
                   size="sm"
-                  className={`w-full cosmic-highlight relative overflow-hidden group border-purple-500/20 hover:bg-purple-500/10 justify-start interactive transition-all duration-300`}
+                  className="w-full justify-start border-purple-500/20 hover:bg-purple-500/10 px-3 py-2.5"
                   onClick={handleLoginNavigation}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform translate-x-[-100%] group-hover:translate-x-[100%]"></div>
-                  <LogIn size={16} className="mr-2 text-primary group-hover:scale-110 transition-transform duration-300" />
-                  <span className="text-primary/90 group-hover:text-primary group-hover:font-medium transition-all duration-300">
-                    Sign In
-                  </span>
+                  <LogIn size={16} className="mr-2 text-primary flex-shrink-0" />
+                  <span className="text-primary/90">Sign In</span>
                 </Button>
               )}
               
@@ -339,15 +341,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full cosmic-highlight relative overflow-hidden group border-yellow-500/20 hover:bg-yellow-500/10 justify-start interactive transition-all duration-300"
+                className="w-full justify-between border-yellow-500/20 hover:bg-yellow-500/10 px-3 py-2.5"
                 onClick={handleBuySP}
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/0 via-yellow-500/20 to-yellow-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform translate-x-[-100%] group-hover:translate-x-[100%]"></div>
-                <Sparkles size={16} className="mr-2 text-yellow-500 group-hover:scale-110 transition-transform duration-300" />
-                <span className="text-yellow-500/90 group-hover:text-yellow-500 group-hover:font-medium transition-all duration-300">
-                  Buy SP
-                </span>
-                <span className="ml-auto text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full">
+                <div className="flex items-center">
+                  <Sparkles size={16} className="mr-2 text-yellow-500 flex-shrink-0" />
+                  <span className="text-yellow-500/90">Buy SP</span>
+                </div>
+                <span className="text-xs bg-yellow-500/20 text-yellow-500 px-2 py-1 rounded-full">
                   0
                 </span>
               </Button>
@@ -358,10 +359,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Main content - adjusted to account for fixed sidebar */}
       <main 
-        className="flex-1 transition-all duration-300"
+        className="flex-1 transition-all duration-300 p-6"
         style={{ marginLeft: '360px' }}
       >
-        {children}
+        <div className="max-w-screen-2xl mx-auto">
+          {children}
+        </div>
       </main>
     </div>
   );

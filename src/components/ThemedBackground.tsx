@@ -26,7 +26,17 @@ const drawOmSymbol = (ctx: CanvasRenderingContext2D, x: number, y: number, size:
     // Make it bolder by increasing font weight and size
     ctx.font = `900 ${size * 1.3}px Arial, sans-serif`; // Increased size by 30% and made ultra-bold
   } else {
-    ctx.fillStyle = '#bb86fc'; // Purple color
+    // Enhanced purple gradient for better visual effect
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 0.8);
+    gradient.addColorStop(0, 'rgba(187, 134, 252, 1)'); // Bright purple center
+    gradient.addColorStop(0.5, 'rgba(168, 85, 247, 0.9)'); // Medium purple
+    gradient.addColorStop(1, 'rgba(139, 92, 246, 0.8)'); // Darker purple edge
+    ctx.fillStyle = gradient;
+    
+    // Add glow effect
+    ctx.shadowColor = 'rgba(187, 134, 252, 0.8)';
+    ctx.shadowBlur = size * 0.5;
+    
     ctx.font = `bold ${size}px Arial`;
   }
   

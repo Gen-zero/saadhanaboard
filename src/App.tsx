@@ -225,6 +225,90 @@ const AppRoutes = () => {
   );
 };
 
+// Add a component for interactive background elements
+const InteractiveBackgroundElements = () => {
+  return (
+    <>
+      {/* Ambient floating mantras with interactive hover effects */}
+      {hinduMantras.map((mantra, index) => (
+        <div 
+          key={index}
+          className="ambient-mantra cursor-pointer transition-all duration-300 hover:scale-110 hover:text-purple-300"
+          style={{
+            left: `${10 + (index * 8) % 80}%`,
+            animationDelay: `${index * 5}s`,
+            animationDuration: `${40 + (index % 3) * 20}s`
+          }}
+          onClick={() => {
+            // Add a subtle animation when clicked
+            const element = document.querySelector(`.ambient-mantra:nth-child(${index + 1})`);
+            if (element) {
+              element.classList.add('animate-pulse');
+              setTimeout(() => {
+                element.classList.remove('animate-pulse');
+              }, 1000);
+            }
+          }}
+        >
+          {mantra}
+        </div>
+      ))}
+      
+      {/* Floating yantra patterns with interactive effects */}
+      {[...Array(4)].map((_, index) => (
+        <div 
+          key={index}
+          className="floating-yantra cursor-pointer transition-all duration-300 hover:scale-125 hover:text-purple-300"
+          style={{
+            left: `${20 + (index * 15) % 70}%`,
+            fontSize: `${2 + (index % 3)}rem`,
+            animationDelay: `${index * 8}s`,
+            animationDuration: `${60 + (index % 2) * 30}s`
+          }}
+          onClick={() => {
+            // Add a rotation effect when clicked
+            const element = document.querySelector(`.floating-yantra:nth-child(${index + 1})`);
+            if (element) {
+              element.classList.add('rotate-180');
+              setTimeout(() => {
+                element.classList.remove('rotate-180');
+              }, 500);
+            }
+          }}
+        >
+          ▲▼▲
+        </div>
+      ))}
+      
+      {/* Floating lotus petals with interactive effects */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        {[...Array(12)].map((_, i) => (
+          <div 
+            key={i}
+            className="absolute animate-float-petal cursor-pointer transition-all duration-300 hover:scale-150"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 3}s`,
+              animationDuration: `${25 + Math.random() * 15}s`,
+              opacity: 0.2 + Math.random() * 0.3
+            }}
+            onClick={(e) => {
+              // Add a bloom effect when clicked
+              e.currentTarget.classList.add('scale-200', 'opacity-0');
+              setTimeout(() => {
+                e.currentTarget.classList.remove('scale-200', 'opacity-0');
+              }, 500);
+            }}
+          >
+            <Leaf className="h-6 w-6 text-pink-300/50" />
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
+
 const App = () => {
   const { settings, isLoading } = useSettings();
   
@@ -254,55 +338,8 @@ const App = () => {
           <div className="relative">
             <ThemedBackground theme={backgroundTheme} />
             
-            {/* Ambient floating mantras */}
-            {hinduMantras.map((mantra, index) => (
-              <div 
-                key={index}
-                className="ambient-mantra"
-                style={{
-                  left: `${10 + (index * 8) % 80}%`,
-                  animationDelay: `${index * 5}s`,
-                  animationDuration: `${40 + (index % 3) * 20}s`
-                }}
-              >
-                {mantra}
-              </div>
-            ))}
-            
-            {/* Floating yantra patterns */}
-            {[...Array(4)].map((_, index) => (
-              <div 
-                key={index}
-                className="floating-yantra"
-                style={{
-                  left: `${20 + (index * 15) % 70}%`,
-                  fontSize: `${2 + (index % 3)}rem`,
-                  animationDelay: `${index * 8}s`,
-                  animationDuration: `${60 + (index % 2) * 30}s`
-                }}
-              >
-                ▲▼▲
-              </div>
-            ))}
-            
-            {/* Floating lotus petals */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-              {[...Array(12)].map((_, i) => (
-                <div 
-                  key={i}
-                  className="absolute animate-float-petal"
-                  style={{
-                    left: `${Math.random() * 100}%`,
-                    top: `${Math.random() * 100}%`,
-                    animationDelay: `${i * 3}s`,
-                    animationDuration: `${25 + Math.random() * 15}s`,
-                    opacity: 0.2 + Math.random() * 0.3
-                  }}
-                >
-                  <Leaf className="h-6 w-6 text-pink-300/50" />
-                </div>
-              ))}
-            </div>
+            {/* Interactive background elements */}
+            {!isLandingPage && <InteractiveBackgroundElements />}
             
             <div className="relative z-10">
               <FocusVisible />

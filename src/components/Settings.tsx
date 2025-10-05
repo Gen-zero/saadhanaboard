@@ -209,15 +209,15 @@ const Settings = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 relative z-10">
         {/* Sidebar */}
         <div className="lg:col-span-1">
-          <SpiritualCard>
-            <CardHeader>
-              <CardTitle>{t('settings_menu')}</CardTitle>
+          <SpiritualCard className="h-full flex flex-col">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Settings Menu</CardTitle>
               <CardDescription>
-                {t('navigate_settings')}
+                Navigate through different settings sections
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <nav className="space-y-2">
+            <CardContent className="flex-1">
+              <nav className="space-y-1">
                 <Button
                   variant={activeSection === 'general' ? 'secondary' : 'ghost'}
                   className={`w-full justify-start gap-3 rounded-lg transition-all duration-300 ${

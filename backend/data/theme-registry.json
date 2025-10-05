@@ -93,7 +93,7 @@
         "description": "Fierce dark red and crimson tones",
         "deity": "Bhairava",
         "category": "color-scheme",
-        "isLandingPage": "false",
+        "isLandingPage": false,
         "gradient": "from-red-900 to-red-700"
       }
     },

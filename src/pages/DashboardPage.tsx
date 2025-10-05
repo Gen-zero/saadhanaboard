@@ -77,13 +77,15 @@ const DashboardPage = () => {
     { id: 3, name: "Meditation Master", icon: TrendingUp, date: "2024-03-22" },
   ];
 
-  // Function to handle card hover effects
+  // Function to handle card hover effects with enhanced animations
   const handleCardHover = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.classList.add('scale-[1.02]', 'shadow-lg');
+    e.currentTarget.classList.add('scale-[1.02]', 'shadow-xl', 'z-10');
+    e.currentTarget.classList.remove('shadow-lg');
   };
 
   const handleCardLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.currentTarget.classList.remove('scale-[1.02]', 'shadow-lg');
+    e.currentTarget.classList.remove('scale-[1.02]', 'shadow-xl', 'z-10');
+    e.currentTarget.classList.add('shadow-lg');
   };
 
   const handleBuySP = () => {
@@ -213,7 +215,7 @@ const DashboardPage = () => {
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card 
-            className="transition-all duration-300 hover:shadow-lg"
+            className="transition-all duration-300 hover:shadow-xl cursor-pointer transform hover:-translate-y-1"
             onMouseEnter={handleCardHover}
             onMouseLeave={handleCardLeave}
           >
@@ -230,7 +232,7 @@ const DashboardPage = () => {
           </Card>
           
           <Card 
-            className="transition-all duration-300 hover:shadow-lg"
+            className="transition-all duration-300 hover:shadow-xl cursor-pointer transform hover:-translate-y-1"
             onMouseEnter={handleCardHover}
             onMouseLeave={handleCardLeave}
           >
@@ -247,7 +249,7 @@ const DashboardPage = () => {
           </Card>
           
           <Card 
-            className="transition-all duration-300 hover:shadow-lg"
+            className="transition-all duration-300 hover:shadow-xl cursor-pointer transform hover:-translate-y-1"
             onMouseEnter={handleCardHover}
             onMouseLeave={handleCardLeave}
           >
@@ -263,7 +265,7 @@ const DashboardPage = () => {
           </Card>
           
           <Card 
-            className="transition-all duration-300 hover:shadow-lg"
+            className="transition-all duration-300 hover:shadow-xl cursor-pointer transform hover:-translate-y-1"
             onMouseEnter={handleCardHover}
             onMouseLeave={handleCardLeave}
           >
@@ -273,7 +275,7 @@ const DashboardPage = () => {
                   <p className="text-sm text-muted-foreground">Current Streak</p>
                   <p className="text-2xl font-bold">{userStats.streak} days</p>
                 </div>
-                <Flame className="h-8 w-8 text-orange-500 cosmic-pulse" />
+                <Flame className="h-8 w-8 text-orange-500 cosmic-pulse animate-pulse" />
               </div>
             </CardContent>
           </Card>
@@ -306,19 +308,19 @@ const DashboardPage = () => {
                   todaySadhana.map((sadhana) => (
                     <div 
                       key={sadhana.id} 
-                      className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-200 hover:shadow-md cursor-pointer ${
+                      className={`flex items-center justify-between p-4 rounded-lg border transition-all duration-300 hover:shadow-lg cursor-pointer transform hover:scale-[1.02] ${
                         sadhana.completed 
                           ? "bg-green-500/10 border-green-500/30" 
                           : "bg-muted/20 border-muted hover:border-purple-500/30"
                       }`}
                       onClick={() => navigate(`/saadhanas/${sadhana.id}`)}
                       onMouseEnter={(e) => {
-                        e.currentTarget.classList.add('scale-[1.01]');
-                        e.currentTarget.classList.remove('hover:shadow-md');
+                        e.currentTarget.classList.add('scale-[1.01]', 'shadow-lg');
+                        e.currentTarget.classList.remove('hover:shadow-lg');
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.classList.remove('scale-[1.01]');
-                        e.currentTarget.classList.add('hover:shadow-md');
+                        e.currentTarget.classList.remove('scale-[1.01]', 'shadow-lg');
+                        e.currentTarget.classList.add('hover:shadow-lg');
                       }}
                     >
                       <div>
@@ -330,11 +332,11 @@ const DashboardPage = () => {
                       </div>
                       <div className="flex items-center gap-2">
                         {sadhana.completed ? (
-                          <Badge variant="default" className="bg-green-500 cosmic-pulse">
+                          <Badge variant="default" className="bg-green-500 cosmic-pulse animate-pulse">
                             Completed
                           </Badge>
                         ) : (
-                          <Button size="sm" variant="outline" className="floating">
+                          <Button size="sm" variant="outline" className="floating hover:scale-105 transition-transform">
                             Start
                           </Button>
                         )}
@@ -420,16 +422,16 @@ const DashboardPage = () => {
                   return (
                     <div 
                       key={achievement.id} 
-                      className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 hover:bg-muted/30 transition-colors cursor-pointer floating"
+                      className="flex items-center gap-3 p-3 rounded-lg bg-muted/20 hover:bg-muted/30 transition-all duration-300 cursor-pointer floating transform hover:scale-[1.02] hover:shadow-lg"
                       onClick={() => navigate("/profile")}
                       onMouseEnter={(e) => {
-                        e.currentTarget.classList.add('bg-muted/30', 'scale-[1.02]');
+                        e.currentTarget.classList.add('bg-muted/30', 'scale-[1.02]', 'shadow-lg');
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.classList.remove('bg-muted/30', 'scale-[1.02]');
+                        e.currentTarget.classList.remove('bg-muted/30', 'scale-[1.02]', 'shadow-lg');
                       }}
                     >
-                      <div className="p-2 rounded-full bg-purple-500/20 cosmic-glow">
+                      <div className="p-2 rounded-full bg-purple-500/20 cosmic-glow transition-all duration-300 hover:scale-110">
                         <IconComponent className="h-5 w-5 text-purple-500" />
                       </div>
                       <div className="flex-1">
@@ -457,7 +459,7 @@ const DashboardPage = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button 
-                  className="w-full justify-start interactive" 
+                  className="w-full justify-start interactive hover:scale-105 transition-transform" 
                   variant="outline"
                   onClick={() => navigate("/sadhana")}
                 >
@@ -465,7 +467,7 @@ const DashboardPage = () => {
                   Start New Sadhana
                 </Button>
                 <Button 
-                  className="w-full justify-start interactive" 
+                  className="w-full justify-start interactive hover:scale-105 transition-transform" 
                   variant="outline"
                   onClick={() => navigate("/library")}
                 >
@@ -473,7 +475,7 @@ const DashboardPage = () => {
                   Browse Library
                 </Button>
                 <Button 
-                  className="w-full justify-start interactive" 
+                  className="w-full justify-start interactive hover:scale-105 transition-transform" 
                   variant="outline"
                   onClick={() => navigate("/settings")}
                 >
@@ -481,7 +483,7 @@ const DashboardPage = () => {
                   Set Daily Goals
                 </Button>
                 <Button 
-                  className="w-full justify-start interactive" 
+                  className="w-full justify-start interactive hover:scale-105 transition-transform" 
                   variant="outline"
                   onClick={() => navigate("/store")}
                 >
